@@ -19,7 +19,7 @@ def run():
     Run the crew.
     """
     inputs = {
-        'topic': 'AI LLMs',
+        "job_listing": "https://www.indeed.com/viewjob?jk=12ac11516eba6670&utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic",
     }
 
     input_files = {
@@ -27,7 +27,7 @@ def run():
     }
 
     try:
-        YourCrew().crew().kickoff(input_files=input_files)
+        YourCrew().crew().kickoff(inputs=inputs, input_files=input_files)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 

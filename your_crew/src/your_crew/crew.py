@@ -1,6 +1,11 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
+from crewai_files import PDFFile
+from crewai_tools import (
+    SerperDevTool,
+    ScrapeWebsiteTool,
+)
 from typing import List
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
@@ -19,10 +24,20 @@ class YourCrew():
 
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
+
+
     @agent
-    def career_coach(self) -> Agent:
+    def job_parser(self) -> Agent:
         return Agent(
-            config=self.agents_config['career_coach'], # type: ignore[index]
+            config=self.agents_config['job_parser'], # type: ignore[index]
+            tools = [ScrapeWebsiteTool(), SerperDevTool()],
+            verbose=True
+        )
+
+    @agent
+    def resume_reader(self) -> Agent:
+        return Agent(
+            config=self.agents_config['resume_reader'], # type: ignore[index]
             verbose=True
         )
 
@@ -36,10 +51,18 @@ class YourCrew():
     # To learn more about structured task outputs,
     # task dependencies, and task callbacks, check out the documentation:
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
+
+    @task
+    def job_parser_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['job_parser_task'], # type: ignore[index]
+        )
+
     @task
     def resume_parser_task(self) -> Task:
         return Task(
             config=self.tasks_config['resume_parser_task'], # type: ignore[index]
+            input_files = { "raw_resume": PDFFile(source="./raw_resume.pdf"),}
         )
 
     @task

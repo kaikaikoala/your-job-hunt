@@ -1,19 +1,34 @@
+job_parser_task:
+  description: >
+    Analyze the job posting URL provided {job_listing}
+    to extract key skills, experiences, and qualifications
+    required. Use the tools to gather content and identify 
+    and categorize the requirements.
+  expected_output: >
+    A structured list of job requirements, including necessary skills,
+    qualifications, and experiences
+  agent: job_parser 
+
 resume_parser_task:
   description: >
-    Understand the user's {raw_resume}. You should know: what industry they are in,
-    their most relevant experience, and their most valueable skills
+    Parse the most relevant information in raw_resume for {job_listing}. Make sure
+    the experience is in Action-Context-Result format. Do not make up anything about
+    ths user.
   expected_output: >
-    The information most critical to put on the user's resume
-  agent: career_coach
+    A profile document that highlights the user's qualifications for the {job_listing}
+  agent: resume_reader
+  context: 
+    - job_parser_task
 
 resume_editor_task:
   description: >
-    Understand the user from the career_coach agent. Format the user's information
-    into a Resume. Make sure to use Action-Context-Result ACR format for their
-    experience. Also ensure it is optmized for Applicant-Tracking-Systems.
+    Format the user's information into an Applicant-Tracking-Systems optimized resume.
+    Do not make up anything about the user.
   expected_output: >
-    A perfectly formatted Resume with all the critial sections
+    A perfectly formatted Resume with all the user's critical information
   agent: resume_writer
+  context:
+    - resume_parser_task
   output_file: output/resume.md
 
 

@@ -1,61 +1,51 @@
-**[FIRST NAME] [LAST NAME]**
-[City, State, Zip Code] | [Phone Number]
+**[NAME]**
+[City, State, Zip] | [Phone Number]
 [Email Address] | [LinkedIn Profile URL] | [GitHub/Portfolio URL]
 
----
-
 ### **PROFESSIONAL SUMMARY**
-High-performing **Senior Software Engineer** with over 6 years of experience at **Google** specializing in high-scale payments infrastructure, CI/CD optimization, and full-stack development. Proven track record of driving multi-million dollar ARR growth through technical innovation and leading cross-functional global teams. Expert in Java backend systems, modern frontend frameworks (React, Angular), and reliability engineering.
+Performance-driven **Software Engineer** with 6 years of experience at **Google** specializing in **Payments Platform** and billing infrastructure. Expert in **Java** backend development, distributed systems, and full-stack optimizations. Proven track record of driving multi-million dollar revenue growth through UX enhancements and leading cross-functional teams to reduce technical debt and improve CI/CD reliability.
 
 ### **TECHNICAL SKILLS**
-*   **Languages:** Java (Expert), TypeScript, JavaScript, HTML5, CSS3, SQL.
-*   **Frameworks & Libraries:** React, Angular, Wiz (Internal Google Framework), Phaser, WebSockets, Node.js.
-*   **Infrastructure & Tools:** CI/CD Pipelines, AWS (EC2, S3, Hosting), Backend System Design, Microservices Architecture, Experimentation Frameworks (A/B Testing), Git/Perforce.
-*   **Leadership:** Technical Lead (TL), Cross-functional Project Management, Stakeholder Management, Global Team Onboarding, Agile/Scrum.
-
----
+*   **Languages:** Java (Expert), Python, Go, TypeScript, JavaScript, SQL.
+*   **Backend & Infrastructure:** Distributed Systems, Microservices, API Design, CI/CD Ownership, Google Cloud Platform (GCP), Data Modeling, System Refactoring.
+*   **Frontend:** Angular, Wiz (Internal Framework), React, HTML5/CSS3.
+*   **Tools & Frameworks:** AWS (S3/EC2), Git, Android Client, Analytics Infrastructure, Web Sockets.
+*   **Domain Expertise:** Global Payment Methods, Subscription Billing, Risk Mitigation, Financial Transaction UX.
 
 ### **PROFESSIONAL EXPERIENCE**
 
-**GOOGLE** | Mountain View, CA (Remote/Hybrid)
-**Senior Software Engineer** | *2019 – Present*
+**GOOGLE** | **Software Engineer (Payments Platform)** | 2019 – 2025
 
-**Senior Engineer – Payments Platform (Java/Backend)**
-*   **Drove a $XXM ARR increase** in Korean Play subscription revenue by re-engineering local card UX and optimizing backend processing logic for local payment methods.
-*   **Led a global migration of the Play card UX**, coordinating technical requirements across Data Science, UX, Tax, Product, and Android Client teams to ensure a seamless transition for millions of users.
-*   **De-risked the Klarna financing revamp** by implementing Terms of Service (ToS) acceptance flows and resolving critical web redirect bugs, ensuring zero downtime during the high-volume launch.
-*   **Launched a scalable backend solution** for rich-card-art UX across all Google surfaces, refactoring card screen infrastructure to improve extensibility and reduce code duplication by 20%.
+**Senior Software Engineer / Tech Lead**
+*   Increased Korean Play subscription revenue by **$XXM ARR** by optimizing local card User Experience (UX) through scalable Java backend solutions.
+*   Led the Play card UX migration by coordinating between Data Science, Tax, and Android Client teams to ensure technical consistency.
+*   De-risked Klarna financing integration by implementing ToS acceptance and debugging complex web redirects for third-party methods.
+*   Refactored card screen infrastructure to reduce code duplication, improving sub-flow extensibility and narrowing technical debt gaps.
+*   Launched rich-card-art UX optimizations across multiple Google surfaces, enhancing visual payment interfaces for millions of global users.
+*   Served as **Build and Release Tech Lead** for a 20+ engineer rotation, reducing test flakiness from **41% to 3%** via CI/CD process improvements.
+*   Onboarded and standardized engineering practices for globally distributed teams in India and Australia to increase development velocity.
+*   Migrated risk feature experimentation to Google mainline to enable GUI-based management, improving deployment efficiency.
+*   Developed a supervised automation experiment rollout system, increasing the reliability of system-wide feature launches.
+*   Resolved complex UI rendering issues by debugging and fixing a “character-cluster” paginator within the Play web frontend using Wiz.
 
-**Build and Release Tech Lead**
-*   **Facilitated resource management projects** that reduced test flakiness from **41% to 3%**, resulting in a significant increase in developer velocity and more reliable deployment cycles.
-*   **Managed a 20+ engineer global on-call rotation**, serving as the primary CI/CD process owner and schedule optimizer for high-frequency global distributions.
-*   **Successfully onboarded and integrated distributed sister teams** in India and Australia, establishing standardized engineering practices and documentation for 24/7 operational coverage.
+**UC RIVERSIDE** | **TTP Mentor** | 2018 – 2019
+*   Provided high-level technical mentorship and public presentations in lecture halls to assist students transitioning to university.
+*   Organized ice-breaker sessions and provided ad-hoc tutoring to improve student engagement and retention in technical programs.
 
-**Full-Stack & Infrastructure Engineer (Risk & Frontend)**
-*   **Designed and implemented a supervised automation experiment rollout system**, updating risk feature experimentation to the Google mainline to enable GUI-based management using **Angular**.
-*   **Optimized the Play Web Frontend** using internal frameworks (Wiz) to implement complex UI features, including slideshow-animated app cards and custom paginator fixes for "character-cluster" rendering.
+**UC RIVERSIDE** | **Admin Office Assistant** | 2017 – 2018
+*   Streamlined data accessibility by migrating legacy paper filing systems to a centralized digital file system.
 
----
+### **PERSONAL PROJECTS**
 
-### **TECHNICAL PROJECTS**
+**Typrant – Touch Typing Teacher**
+*   Built a full-stack React application hosted on AWS featuring student and teacher portals and a PvP-style typing race game.
+*   Utilized **Phaser** and **Web Sockets** for real-time interaction; led market research and won a startup pitch event for the platform.
 
-**Typrant – Touch Typing Teacher (Full-Stack)**
-*   **Architected a React-based web application** hosted on **AWS** featuring distinct student and teacher portals to facilitate classroom-style typing instruction.
-*   **Developed a real-time PvP "io-style" type race game** utilizing **Phaser** and **WebSockets**, enabling low-latency concurrent user interactions.
-*   **Led market fit research** and conducted teacher interviews to define MVP features, resulting in winning a regional startup pitch event and securing a keynote speaking slot with MESA.
+### **EDUCATION**
 
----
+**University of California, Riverside**
+Bachelor of Science in Computer Science
 
-### **EARLY CAREER & EDUCATION**
-
-**UC RIVERSIDE** | Riverside, CA
-*   **TTP Mentor:** Provided high-level technical guidance and public speaking presentations to students transitioning from Community College to University.
-*   **Admin Office Assistant:** Spearheaded the migration of legacy paper filing systems to a centralized digital database, improving data retrieval speed by 50%.
-
-**Education:** 
-*   **Bachelor of Science in Computer Science** | University of California, Riverside
-
----
-
-### **INTERESTS**
-Home Bartending & Mixology (Sake Enthusiast), Coffee Science (Espresso & Manual Brew), Racket Sports.
+### **ADDITIONAL SKILLS & LEADERSHIP**
+*   **Technical Instruction:** Hosted racquet stringing lesson sessions at Google; veteran freelance racquet technician since 2013.
+*   **Community Leadership:** Organized corporate social events/happy hours for 50+ coworkers, managing logistics and internal communications.
