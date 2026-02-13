@@ -1,0 +1,19 @@
+resume_parser_task:
+  description: >
+    Understand the user's {raw_resume}. You should know: what industry they are in,
+    their most relevant experience, and their most valueable skills
+  expected_output: >
+    The information most critical to put on the user's resume
+  agent: career_coach
+
+resume_editor_task:
+  description: >
+    Understand the user from the career_coach agent. Format the user's information
+    into a Resume. Make sure to use Action-Context-Result ACR format for their
+    experience. Also ensure it is optmized for Applicant-Tracking-Systems.
+  expected_output: >
+    A perfectly formatted Resume with all the critial sections
+  agent: resume_writer
+  output_file: output/resume.md
+
+
