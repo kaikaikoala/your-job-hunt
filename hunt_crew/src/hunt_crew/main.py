@@ -1,94 +1,75 @@
 #!/usr/bin/env python
 import sys
 import warnings
-
 from datetime import datetime
+
+from ratelimit import limits, sleep_and_retry
 
 from hunt_crew.crew import HuntCrew
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
+# -------------------------------
+# Rate Limiter Configuration
+# -------------------------------
+# Adjust these values based on your token/API quota
+CALLS_PER_MINUTE = 2  # maximum Crew kickoff calls per minute
+PERIOD_SECONDS = 60
 
+
+@sleep_and_retry
+@limits(calls=CALLS_PER_MINUTE, period=PERIOD_SECONDS)
+def limited_kickoff(crew, inputs):
+    """
+    Wrapper around Crew.kickoff to enforce rate limiting.
+    """
+    return crew.kickoff(inputs)
+
+
+# -------------------------------
+# CLI Loop
+# -------------------------------
 def run():
     """
-    Run the crew.
+    Runs the Job Hunt Tracker CLI with rate limiting.
     """
-    inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
-    }
+    print("\n=== Job Hunt Tracker CLI ===")
+    print("Type 'exit' to quit.\n")
 
-    try:
-        HuntCrew().crew().kickoff(inputs=inputs)
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+    hunt_crew = HuntCrew()
+    crew = hunt_crew.crew()
+
+    while True:
+        try:
+            user_input = input("You: ").strip()
+
+            if user_input.lower() in ["exit", "quit"]:
+                print("Good luck with your job hunt! 🚀")
+                break
+
+            if not user_input:
+                continue
+
+            # Kickoff with rate limiting
+            result = limited_kickoff(
+                crew,
+                inputs={
+                    "user_input": user_input,
+                    "current_date": datetime.now().strftime("%Y-%m-%d"),
+                },
+            )
+
+            print("\nAssistant:")
+            print(result)
+            print()
+
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            sys.exit(0)
+
+        except Exception as e:
+            print(f"\nError: {str(e)}\n")
 
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
-    }
-    try:
-        HuntCrew().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
-
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        HuntCrew().crew().replay(task_id=sys.argv[1])
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
-
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        "current_year": str(datetime.now().year)
-    }
-
-    try:
-        HuntCrew().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
-
-def run_with_trigger():
-    """
-    Run the crew with trigger payload.
-    """
-    import json
-
-    if len(sys.argv) < 2:
-        raise Exception("No trigger payload provided. Please provide JSON payload as argument.")
-
-    try:
-        trigger_payload = json.loads(sys.argv[1])
-    except json.JSONDecodeError:
-        raise Exception("Invalid JSON payload provided as argument")
-
-    inputs = {
-        "crewai_trigger_payload": trigger_payload,
-        "topic": "",
-        "current_year": ""
-    }
-
-    try:
-        result = HuntCrew().crew().kickoff(inputs=inputs)
-        return result
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew with trigger: {e}")
+if __name__ == "__main__":
+    run()
