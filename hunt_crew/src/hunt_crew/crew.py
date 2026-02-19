@@ -97,5 +97,6 @@ class HuntCrew:
             process=Process.hierarchical,
             manager_agent=self.job_hunt_manager(),  # required in hierarchical mode
             llm=llm,
+            max_iterations=3,
             verbose=True,
         )

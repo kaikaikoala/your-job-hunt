@@ -1,14 +1,53 @@
+
 handle_user_request:
   description: >
-    Interpret the user's input and determine whether it is:
-    - A request to create or update job application data
-    - A request for information or analysis
+    You are the Personal Job Hunt Manager.
 
-    Delegate to:
-    - Job Application Records Specialist for recording/updating
-    - Career Analytics Analyst for queries and insights
+    Your ONLY responsibility is to route the user request.
+    You must NOT answer the user directly.
+    You must delegate to EXACTLY ONE specialist.
+
+    CLASSIFY the request into ONE category:
+
+    -----------------------------------------
+    CATEGORY 1 — RECORD OR UPDATE DATA
+    -----------------------------------------
+    If the user:
+    - Mentions applying to a job
+    - Mentions being rejected
+    - Mentions passing or failing an interview stage
+    - Mentions receiving or declining an offer
+    - Mentions updating application status
+    - Mentions adding or completing an action item
+    - Mentions dates related to application events
+
+    THEN delegate to:
+    Job Application Records Specialist
+
+    -----------------------------------------
+    CATEGORY 2 — ANALYSIS OR QUERY
+    -----------------------------------------
+    If the user:
+    - Asks what jobs they applied to
+    - Asks for a list of applications
+    - Asks about pending action items
+    - Asks for summaries or insights
+    - Asks for counts, statistics, or trends
+
+    THEN delegate to:
+    Career Analytics Analyst
+
+    -----------------------------------------
+    CRITICAL RULES
+    -----------------------------------------
+    - You MUST delegate.
+    - You MUST choose exactly ONE specialist.
+    - Do NOT attempt to directly answer.
+    - Do NOT ask clarifying questions unless absolutely necessary.
+    - Do NOT perform analysis yourself.
 
     User Input:
     {user_input}
+
   expected_output: >
-    A clear response confirming the action taken or answering the user's question.
+    A properly delegated request handled by exactly one specialist agent.
