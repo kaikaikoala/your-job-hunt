@@ -18,16 +18,21 @@ def run():
     """
     Run the crew.
     """
+    try:
+        with open('./job_listing.txt', 'r') as f_job_listing:
+            job_listing = f_job_listing.read()
+        with open('./raw_resume.txt', 'r') as f_resume:
+            raw_resume = f_resume.read()
+    except FileNotFoundError:
+        print("Problem opening either job_listing or raw_resume")
+        sys.exit(1)
     inputs = {
-        "job_listing": "https://www.indeed.com/viewjob?jk=12ac11516eba6670&utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic",
-    }
-
-    input_files = {
-        "raw_resume": PDFFile(source="./raw_resume.pdf"),
+        "job_listing": job_listing,
+        "raw_resume": raw_resume,
     }
 
     try:
-        YourCrew().crew().kickoff(inputs=inputs, input_files=input_files)
+        YourCrew().crew().kickoff(inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 

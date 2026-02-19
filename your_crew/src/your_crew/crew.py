@@ -30,7 +30,6 @@ class YourCrew():
     def job_parser(self) -> Agent:
         return Agent(
             config=self.agents_config['job_parser'], # type: ignore[index]
-            tools = [ScrapeWebsiteTool(), SerperDevTool()],
             verbose=True
         )
 
@@ -62,7 +61,6 @@ class YourCrew():
     def resume_parser_task(self) -> Task:
         return Task(
             config=self.tasks_config['resume_parser_task'], # type: ignore[index]
-            input_files = { "raw_resume": PDFFile(source="./raw_resume.pdf"),}
         )
 
     @task
@@ -82,6 +80,6 @@ class YourCrew():
             tasks=self.tasks, # Automatically created by the @task decorator
             process=Process.sequential,
             verbose=True,
-            max_rpm=10,
+            max_rpm=1,
             # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )

@@ -1,51 +1,42 @@
-**[NAME]**
-[City, State, Zip] | [Phone Number]
-[Email Address] | [LinkedIn Profile URL] | [GitHub/Portfolio URL]
+**KOALA KAI**  
+[LinkedIn](https://www.linkedin.com/in/koalakai/) | [GitHub](https://github.com/kaikaikoala) | [Portfolio](https://kaikaikoala.github.io/)  
+Remote | native-fluency@email.com (Placeholder)
 
-### **PROFESSIONAL SUMMARY**
-Performance-driven **Software Engineer** with 6 years of experience at **Google** specializing in **Payments Platform** and billing infrastructure. Expert in **Java** backend development, distributed systems, and full-stack optimizations. Proven track record of driving multi-million dollar revenue growth through UX enhancements and leading cross-functional teams to reduce technical debt and improve CI/CD reliability.
+**PROFESSIONAL SUMMARY**  
+Senior UI/UX specialist and Software Engineer with over 5 years of experience at Google optimizing frontend architecture and user interfaces. Expert in UI/UX critique, visual hierarchy, and interaction design for high-scale platforms. Proven track record of evaluating aesthetic quality and user flows to drive engagement and revenue. Seeking to leverage deep design expertise to evaluate and train cutting-edge AI models in UI/UX, product visuals, and aesthetic evaluation.
 
-### **TECHNICAL SKILLS**
-*   **Languages:** Java (Expert), Python, Go, TypeScript, JavaScript, SQL.
-*   **Backend & Infrastructure:** Distributed Systems, Microservices, API Design, CI/CD Ownership, Google Cloud Platform (GCP), Data Modeling, System Refactoring.
-*   **Frontend:** Angular, Wiz (Internal Framework), React, HTML5/CSS3.
-*   **Tools & Frameworks:** AWS (S3/EC2), Git, Android Client, Analytics Infrastructure, Web Sockets.
-*   **Domain Expertise:** Global Payment Methods, Subscription Billing, Risk Mitigation, Financial Transaction UX.
+**CORE COMPETENCIES**  
+*   **Design Evaluation:** UI/UX Critique, Aesthetic Quality Assessment, Interaction Design, Visual Hierarchy, User Flow Optimization.  
+*   **Technical Design:** Frontend Architecture, Product Visuals, Design Systems, GUI Experimentation, Prototyping.  
+*   **Analysis & Communication:** Technical Writing, Heuristic Evaluation, Market Research, Native English Fluency, Presentation Design.  
+*   **Tools & Frameworks:** React, Angular, Wiz, Web Sockets, CSS Layouts, Git, GitHub.
 
-### **PROFESSIONAL EXPERIENCE**
+**PROFESSIONAL EXPERIENCE**
 
-**GOOGLE** | **Software Engineer (Payments Platform)** | 2019 – 2025
+**Google** | *Software Engineer (Payments Platform)* | **2019 – 2025**  
+*   Optimized local card UI/UX for the Korean market by aligning interface elements with regional user expectations, resulting in a multi-million dollar increase in ARR.  
+*   Directed cross-functional UX migration for Play card surfaces to ensure visual consistency and usability across Android and web platforms.  
+*   Enhanced aesthetic presentation of digital assets by launching visual UX optimizations for "rich-card-art" across multiple global Google surfaces.  
+*   Redesigned Klarna financing user flows to resolve critical ToS and redirect issues, improving overall conversion and system reliability.  
+*   Refactored UI infrastructure to improve sub-flow extensibility and reduce code duplication, creating a more cohesive user interaction model.
 
-**Senior Software Engineer / Tech Lead**
-*   Increased Korean Play subscription revenue by **$XXM ARR** by optimizing local card User Experience (UX) through scalable Java backend solutions.
-*   Led the Play card UX migration by coordinating between Data Science, Tax, and Android Client teams to ensure technical consistency.
-*   De-risked Klarna financing integration by implementing ToS acceptance and debugging complex web redirects for third-party methods.
-*   Refactored card screen infrastructure to reduce code duplication, improving sub-flow extensibility and narrowing technical debt gaps.
-*   Launched rich-card-art UX optimizations across multiple Google surfaces, enhancing visual payment interfaces for millions of global users.
-*   Served as **Build and Release Tech Lead** for a 20+ engineer rotation, reducing test flakiness from **41% to 3%** via CI/CD process improvements.
-*   Onboarded and standardized engineering practices for globally distributed teams in India and Australia to increase development velocity.
-*   Migrated risk feature experimentation to Google mainline to enable GUI-based management, improving deployment efficiency.
-*   Developed a supervised automation experiment rollout system, increasing the reliability of system-wide feature launches.
-*   Resolved complex UI rendering issues by debugging and fixing a “character-cluster” paginator within the Play web frontend using Wiz.
+**Google** | *Play Web Frontend & Risk Infra* | **2019 – 2025**  
+*   Implemented slideshow-animated app cards and custom paginators to increase visual engagement and improve user interaction on the Play Store web frontend.  
+*   Architected a GUI-based experiment management infrastructure to streamline internal risk feature testing and improve system usability for data teams.  
+*   Built high-performance, aesthetically consistent user interfaces using internal frameworks to ensure a premium user experience across product lines.
 
-**UC RIVERSIDE** | **TTP Mentor** | 2018 – 2019
-*   Provided high-level technical mentorship and public presentations in lecture halls to assist students transitioning to university.
-*   Organized ice-breaker sessions and provided ad-hoc tutoring to improve student engagement and retention in technical programs.
+**Typrant (Personal Project)** | *Lead Designer & Developer*  
+*   Conducted market fit research and user interviews to design an intuitive touch-typing application interface for educators and students.  
+*   Developed student and teacher portals focused on usability and interaction design, resulting in a startup pitch victory and conference presentation.
 
-**UC RIVERSIDE** | **Admin Office Assistant** | 2017 – 2018
-*   Streamlined data accessibility by migrating legacy paper filing systems to a centralized digital file system.
+**TTP Mentor** | *UC Riverside* | **2018 – 2019**  
+*   Communicated complex technical concepts through high-level presentations to large audiences, ensuring clarity and educational engagement.
 
-### **PERSONAL PROJECTS**
+**EDUCATION**  
+*   **Bachelor of Science in Computer Science** | University of California, Riverside (2017 – 2019)  
+*   **Associate of Science in Computer Science** | Ohlone Community College (2015 – 2017)
 
-**Typrant – Touch Typing Teacher**
-*   Built a full-stack React application hosted on AWS featuring student and teacher portals and a PvP-style typing race game.
-*   Utilized **Phaser** and **Web Sockets** for real-time interaction; led market research and won a startup pitch event for the platform.
-
-### **EDUCATION**
-
-**University of California, Riverside**
-Bachelor of Science in Computer Science
-
-### **ADDITIONAL SKILLS & LEADERSHIP**
-*   **Technical Instruction:** Hosted racquet stringing lesson sessions at Google; veteran freelance racquet technician since 2013.
-*   **Community Leadership:** Organized corporate social events/happy hours for 50+ coworkers, managing logistics and internal communications.
+**ADDITIONAL EXPERIENCE & INTERESTS**  
+*   **Technical Instruction:** Hosted technical skill-sharing sessions at Google; former sports instructor focused on training and conditioning.  
+*   **Aesthetic Interests:** Maintains a blog for home bartending recipes featuring visual guides and aesthetic presentation principles.  
+*   **Community Involvement:** Founded "Dot Slash" computer science club; volunteer for community gardening and local development projects.

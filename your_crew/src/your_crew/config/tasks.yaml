@@ -1,29 +1,34 @@
 job_parser_task:
   description: >
-    Analyze the job posting URL provided {job_listing}
-    to extract key skills, experiences, and qualifications
-    required. Use the tools to gather content and identify 
-    and categorize the requirements.
+    1. Analyze the job posting provided {job_listing}
+    2. Extract required skills and experience level
+    3. Extract preferred qualifications
+    4. Hypothesize the ideal resume format appropriate for this role
   expected_output: >
-    A structured list of job requirements, including necessary skills,
-    qualifications, and experiences
+    A structured list of required skills and experiences, preferred qualifications, and
+    resume formatting metadata
   agent: job_parser 
 
 resume_parser_task:
   description: >
-    Parse the most relevant information in raw_resume for {job_listing}. Make sure
-    the experience is in Action-Context-Result format. Do not make up anything about
-    ths user.
+    1. Review the output from job_parser
+    2. Analyze the {raw_resume} for hard and soft skills, experience, and user information
+    3. Select the users skills and experience which are most applicable to the job listing DO NOT MAKE ANYTHING UP
+    4. Make sure the document is the appropriate length for the job listing
   expected_output: >
-    A profile document that highlights the user's qualifications for the {job_listing}
+    A profile document for the user tailored for the {job_listing}
   agent: resume_reader
   context: 
     - job_parser_task
 
 resume_editor_task:
   description: >
-    Format the user's information into an Applicant-Tracking-Systems optimized resume.
-    Do not make up anything about the user.
+    1. Review the output from resume_reader
+    2. Ensure all experience is in Action-Context-Result format
+    3. Format the user's information into an Applicant-Tracking-Systems optimized resume. DO NOT MAKE ANYTHING UP
+    4. Perform a final word-smithing to ensure maximum professional tone.
+    5. Remove any repetitive lenguage or filler words.
+    6. Verify all the information about the user required for a resume is present
   expected_output: >
     A perfectly formatted Resume with all the user's critical information
   agent: resume_writer

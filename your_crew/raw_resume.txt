@@ -1,0 +1,108 @@
+﻿Master resume
+https://kaikaikoala.github.io/ 
+https://github.com/kaikaikoala 
+https://www.linkedin.com/in/koalakai/ 
+Work experience
+Google software engineer        2019 - 2025
+Payments platform Java engineer
+* $XXM ARR increase in Korean Play subscription revenue by improving local card UX
+* Drive Play card UX migration across function (data science, UX, content, product) and organization (tax, Android client, analytics infra, and Play)
+* De-risk Klarna financing UX revamp: add ToS acceptance, debug and fix Klarna web redirect
+* Launch rich-card-art UX optimization across Google surfaces with scalable backend solution
+* Refactor card screen infrastructure: improve sub-flow extensibility, reduce code duplication, adopt new infrastructure, and road map additional infrastructure gaps
+Build and release tech lead
+Manage 20+ engineer on-call rotation: CI/CD process owner, schedule optimizer, etc.
+Onboard globally distributed sister teams in India and Australia
+Facilitate various resource management projects to bring test flakiness from 41% to 3%
+Play web frontend
+This role I used wiz to implement the below features
+Debug and implement fix for “character-cluster” paginator 
+Implement slideshow-animated app cards
+Risk engine infra
+Update risk feature experimentation to google mainline to allow GUI experiment management
+Design and implement supervised automation experiment rollout system
+I used angular to develop the frontend
+TTP mentor
+UC riverside
+2018-2019
+* Giving presentations and public speaking in lecture halls
+* Organize ice breakers
+* Adhoc tutoring
+* High level advice for navigating the transition from Community College to university
+Admin office assistant
+UC riverside
+2017-2018
+* Migrate old paper file system to digital file system
+Dublin United Soccer League Trainer
+Fallon Sports Park, 4605 Lockhart St., Dublin, Ca 94568
+September 2015 - 2016 (seasonal)
+* Plan and run training sessions
+* Directly and respectfully communicate with parents/parent coaches
+Ohlone Tutor
+43600 Mission Boulevard, Fremont, CA 94539-5847
+November 2015- 2017 
+                -Be available and attentive to students
+                -Communicate concepts and solutions in various ways
+                -Ability to solve problems quickly
+Soccer Referee
+3585 Castro Valley Boulevard, Castro Valley, CA 94546
+September 2012 - September 2014 (seasonal)
+        -Make sure games start on time
+        -Officiate games 
+HARD Tennis Instructor
+Castro Valley Community Park, Lake Chabot Rd, Castro Valley, CA 94546
+April 2012- April 2014
+        -Recruited students for program
+        -Train and condition kids to use proper strokes and form
+        -Used initiative to enrich program and to ensure safety 
+Freelance racket stringing service
+2013-present
+
+
+My experience stringing rackets comes primarily on a: 2-point mounting, drop weight, floating clamp machine. I have however done a little bit of stringing on a 6-point mounting, fixed clamp machine.
+ 
+* Strung tennis rackets for the boy’s and girl’s teams in highschool
+* Strung badminton rackets for the highschool team
+* Strung tennis rackets for UCR tennis club and taught another member how to string rackets
+* String for friends
+* Hosted several Stringing lesson sessions at Google. Converted 1 person to buy a stringing machine and they string their own rackets now
+Other
+Dot slash computer science
+Founded what was at the time the only computer science club at Ohlone community college as a Freshman. The club github: https://github.com/dot-slash-CS. 
+Personal Interests
+Hobbyist bar tender
+* Organized happy hours for coworkers at google often featuring a cocktail: espresso martini’s, negroni’s, boulevardier 
+* Blog for home bartending and recipes: https://kaikaikoala.github.io/#/startinghomebar
+* Sake enthusiast
+   * Sake day 2022, 2023, 2024
+   * Joy of sake 2024
+   * Sake festival in Kanazawa 2023
+Coffee enthusiast
+* La Marzaco machine operation at Google for myself and coworkers
+* Breville bambino plus operation
+* DF 64 2 grinder
+Gongfu cha
+* Gaiwan usage
+Personal projects
+Typrant - touch typing teacher
+* Partner with MESA as a keynote speaker and host a play test
+* Lead market fit research team: interview teachers, win startup pitch event, attend conference
+* Build a touch typing teacher react-app hosted on aws with student and teacher portals
+* Build a PvP io style type race game with phaser and web sockets
+Education
+University of California Riverside - Computer Science BS 2017-2019
+Ohlone community college - Computer Science AS 2015-2017
+
+
+Community involvement
+
+
+Canvasing for mamdani
+
+
+Hunters point gardening
+For Thursday, October 09
+* Volunteer Gardening - Hunters Point S. (1 spot) from 10:00 am to 12:00 pm -
+Volunteers will meet by the Park House, near Center Blvd. & Borden Ave.
+Please bring your own pair of gloves if you have one. You should also bring your own water bottle, wear a mask, comfortable clothing, and closed toed shoes. All volunteers must have also completed HPPC's volunteer waiver.
+Once you arrive, those who need them will be given a pair of gloves and you will be directed to an area to pull weeds. Please email info@hunterspointparks.org with any questions or concerns.
