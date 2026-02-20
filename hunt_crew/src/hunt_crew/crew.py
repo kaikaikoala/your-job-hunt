@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, task, crew
 
@@ -15,7 +14,7 @@ from hunt_crew.tools.database_tools import (
     run_read_only_query,
 )
 
-# Load environment variables from .env
+# Load environment variables
 load_dotenv()
 
 
@@ -29,7 +28,6 @@ class HuntCrew:
     # -------------------------
     # Agents
     # -------------------------
-
     @agent
     def job_hunt_manager(self) -> Agent:
         return Agent(
@@ -38,9 +36,10 @@ class HuntCrew:
         )
 
     @agent
-    def job_application_recorder(self) -> Agent:
+    def job_hunt_recorder(self) -> Agent:
         return Agent(
-            config=self.agents_config["job_application_recorder"],
+            config=self.agents_config["job_hunt_recorder"],
+            role="job_hunt_recorder",
             tools=[
                 create_application,
                 add_interview_stage,
@@ -55,6 +54,7 @@ class HuntCrew:
     def job_hunt_analyst(self) -> Agent:
         return Agent(
             config=self.agents_config["job_hunt_analyst"],
+            role="job_hunt_analyst",
             tools=[
                 list_pending_action_items,
                 run_read_only_query,
@@ -63,9 +63,8 @@ class HuntCrew:
         )
 
     # -------------------------
-    # Task
+    # Tasks
     # -------------------------
-
     @task
     def handle_user_request(self) -> Task:
         return Task(
@@ -73,29 +72,44 @@ class HuntCrew:
             agent=self.job_hunt_manager(),
         )
 
+    @task
+    def record_job_application(self) -> Task:
+        return Task(
+            config=self.tasks_config["record_job_application"],
+            agent=self.job_hunt_recorder(),
+        )
+
+    @task
+    def query_applications(self) -> Task:
+        return Task(
+            config=self.tasks_config["query_applications"],
+            agent=self.job_hunt_analyst(),
+        )
+
     # -------------------------
     # Crew
     # -------------------------
-
     @crew
     def crew(self) -> Crew:
-        # Initialize database at startup
+        # Initialize database
         initialize_database.run()
 
-        # Instantiate LLM from environment
-        llm_model = os.environ.get("CREWAI_LLM_MODEL", "gemini-2.0-flash-lite-001")
+        # Load LLM from environment
+        llm_model = os.environ.get("MODEL", "gemini-2.0-flash-lite-001")
         llm = LLM(model=llm_model)
 
         return Crew(
             agents=[
-                self.job_application_recorder(),
+                self.job_hunt_recorder(),
                 self.job_hunt_analyst(),
             ],
             tasks=[
                 self.handle_user_request(),
+                self.record_job_application(),
+                self.query_applications(),
             ],
             process=Process.hierarchical,
-            manager_agent=self.job_hunt_manager(),  # required in hierarchical mode
+            manager_agent=self.job_hunt_manager(),
             llm=llm,
             max_iterations=3,
             verbose=True,

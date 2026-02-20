@@ -8,6 +8,7 @@ dependencies = [
     "crewai[google-genai,tools]==1.9.3",
     "plotly>=6.5.2",
     "pytest>=9.0.2",
+    "python-dotenv>=1.1.1",
     "ratelimit>=2.2.1",
 ]
 

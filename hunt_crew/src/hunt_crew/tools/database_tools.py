@@ -1,16 +1,19 @@
 import sqlite3
+from dotenv import load_dotenv
 import os
 from datetime import datetime
 from crewai.tools import tool
 
 # ---------- DATABASE LOCATION ----------
-DB_NAME = "job_hunt.db"
-
 def get_db_path():
-    default_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../../../job_hunt.db")
-    )
-    return os.environ.get("JOB_HUNT_DB_PATH", default_path)
+    # Check if user set a custom DB path
+    load_dotenv()  # reads .env into os.environ
+    if os.environ.get("JOB_HUNT_DB_PATH"):
+        return os.environ["JOB_HUNT_DB_PATH"]
+
+    # Default to project root
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(project_root, "job_hunt.db")
 
 # ---------- DATABASE INITIALIZATION ----------
 

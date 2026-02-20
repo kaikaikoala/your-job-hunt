@@ -2,6 +2,9 @@
 
 This is being vibe coded with CrewGPT: https://chatgpt.com/g/g-qqTuUWsBY-crewai-assistant
 
+## Run
+uv run python -m hunt_crew.main
+
 ## Description
 A conversational CLI application built with **CrewAI** to track and analyze your job search:
 - Record job applications
