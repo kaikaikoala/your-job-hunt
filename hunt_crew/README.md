@@ -2,17 +2,60 @@
 
 This is being vibe coded with CrewGPT: https://chatgpt.com/g/g-qqTuUWsBY-crewai-assistant
 
-## Goal
+## Description
+A conversational CLI application built with **CrewAI** to track and analyze your job search:
+- Record job applications
+- Track interview stages
+- Manage action items
+- Query and analyze your job hunt progress
 
-Create an AI agent to be able to record and track your job hunt with natural language. Be able to tell the agent what jobs you've applied to, and ask it what open action items you have.
+User input is saved in an sqlite db.
 
-## ERD
+## Agent architecture
+* Manager agent
+  * name: job_hunt_manager
+  * Classfies requests as record/update or analysis/query
+  * Delegates a specialist agent
+* Recorder agent
+  * name: job_application_recorder
+  * Handles all DB writes: applications, interview stages, action items
+* Analyst agent
+  * name: job_hunt_analyst
+  * Runs agentically created sql queries (SELECT only)
 
-TODO
+## Data storage ERD
 
-## TODO 
-* [ ] Add application recording
-* [ ] Get open action items
-* [ ] Sankey graph
-* [ ] Add resume version'ing
-* [ ] Add compensation meta data
+```mermaid
+erDiagram
+
+    APPLICATIONS {
+        int id PK
+        string company
+        string role
+        string job_posting_url
+        string status
+        string rejection_stage
+        date applied_date
+        datetime created_at
+    }
+
+    INTERVIEW_STAGES {
+        int id PK
+        int application_id FK
+        string stage_name
+        date stage_date
+        string result
+        datetime created_at
+    }
+
+    ACTION_ITEMS {
+        int id PK
+        int application_id FK
+        string description
+        boolean completed
+        datetime created_at
+        datetime completed_at
+    }
+
+    APPLICATIONS ||--o{ INTERVIEW_STAGES : has
+    APPLICATIONS ||--o{ ACTION_ITEMS : has
