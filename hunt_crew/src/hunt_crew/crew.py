@@ -20,26 +20,17 @@ load_dotenv()
 
 @CrewBase
 class HuntCrew:
-    """HuntCrew job hunt tracker crew"""
-
-    agents_config = "config/agents.yaml"
-    tasks_config = "config/tasks.yaml"
+    """Python-only HuntCrew job hunt tracker using implicit manager"""
 
     # -------------------------
     # Agents
     # -------------------------
     @agent
-    def job_hunt_manager(self) -> Agent:
-        return Agent(
-            config=self.agents_config["job_hunt_manager"],
-            allow_delegation=True,
-        )
-
-    @agent
     def job_hunt_recorder(self) -> Agent:
         return Agent(
-            config=self.agents_config["job_hunt_recorder"],
-            role="job_hunt_recorder",
+            role="Database Associate",      # human-readable
+            goal="Accurately record and update structured job application data.",
+            backstory="You are meticulous about data integrity, modifying applications, stages, and action items precisely.",
             tools=[
                 create_application,
                 add_interview_stage,
@@ -48,42 +39,42 @@ class HuntCrew:
                 mark_action_completed,
             ],
             allow_delegation=False,
+            verbose=True,
         )
 
     @agent
     def job_hunt_analyst(self) -> Agent:
         return Agent(
-            config=self.agents_config["job_hunt_analyst"],
-            role="job_hunt_analyst",
+            role="Data Analyst",
+            goal="Answer analytical questions about the job hunt using stored data.",
+            backstory="You specialize in analyzing job hunt data and producing clear insights. You never modify records.",
             tools=[
                 list_pending_action_items,
                 run_read_only_query,
             ],
             allow_delegation=False,
+            verbose=True,
         )
 
     # -------------------------
     # Tasks
     # -------------------------
     @task
-    def handle_user_request(self) -> Task:
-        return Task(
-            config=self.tasks_config["handle_user_request"],
-            agent=self.job_hunt_manager(),
-        )
-
-    @task
     def record_job_application(self) -> Task:
         return Task(
-            config=self.tasks_config["record_job_application"],
+            role="job_hunt_recorder",
+            description="Record or update a job application in the database.",
             agent=self.job_hunt_recorder(),
+            expected_output="A structured confirmation of the job application recorded in the database."
         )
 
     @task
     def query_applications(self) -> Task:
         return Task(
-            config=self.tasks_config["query_applications"],
+            role="job_hunt_analyst",
+            description="Query and summarize job applications or action items.",
             agent=self.job_hunt_analyst(),
+            expected_output="A structured summary or list of job applications or action items."
         )
 
     # -------------------------
@@ -95,21 +86,23 @@ class HuntCrew:
         initialize_database.run()
 
         # Load LLM from environment
-        llm_model = os.environ.get("MODEL", "gemini-2.0-flash-lite-001")
+        llm_model = os.environ.get("CREWAI_LLM_MODEL", "gemini-2.0-flash-lite-001")
         llm = LLM(model=llm_model)
 
+        # Instantiate agents
+        recorder = self.job_hunt_recorder()
+        analyst = self.job_hunt_analyst()
+
+        # Debug: print registered agents
+        print("===== Registered agents in Crew =====")
+        for a in [recorder, analyst]:
+            print(f"- ID: {getattr(a, 'id', 'no-id')}, Role: {a.role}")
+
+        # Use hierarchical process with implicit manager
         return Crew(
-            agents=[
-                self.job_hunt_recorder(),
-                self.job_hunt_analyst(),
-            ],
-            tasks=[
-                self.handle_user_request(),
-                self.record_job_application(),
-                self.query_applications(),
-            ],
-            process=Process.hierarchical,
-            manager_agent=self.job_hunt_manager(),
+            agents=[recorder, analyst],
+            tasks=[self.record_job_application(), self.query_applications()],
+            process=Process.hierarchical,  # implicit manager used
             llm=llm,
             max_iterations=3,
             verbose=True,
