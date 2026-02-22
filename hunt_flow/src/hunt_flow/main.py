@@ -2,6 +2,7 @@
 from random import randint
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from hunt_flow.crews.record_crew.record_crew import RecordCrew
 import os
 
 from crewai import LLM
@@ -58,7 +59,9 @@ class HuntFlow(Flow[HuntState]):
 
     @listen(HuntAction.RECORD.value)
     def record(self):
-        print("Record")
+        record_crew = RecordCrew().crew()
+        result = record_crew.kickoff(inputs={'user_input': self.state.user_input})
+        print(result)
         return
 
     @listen(HuntAction.ANALYZE.value)
