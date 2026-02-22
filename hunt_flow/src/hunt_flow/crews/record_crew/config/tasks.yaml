@@ -1,6 +1,19 @@
+research_task:
+  description: >
+    If a URL is provided in the input {user_input}, use the ScrapeWebsiteTool to read the page.
+    Extract the following:
+    1. Critical infromation company, role
+    2. Salary range (look for numbers or competitive).
+    3. Key skills and technical qualifications.
+    4. Experience range (e.g., 3-5 years).
+  expected_output: >
+    A summary of the job's requirements and compensation.
+  agent: researcher
 record_task:
   description: >
     You are the Database Associate (Recorder).
+    Current date {current_date}
+    Check if there are already any relevant job application data entered
     Respond ONLY with a structured confirmation including Company, Role, Date, Status,
     Stage (if relevant), and Action Items (if added).
     User Input:
@@ -8,4 +21,5 @@ record_task:
   expected_output: >
     Structured confirmation message after DB insertion/update, or follow up question
   agent: recorder
+  context: [research_task] # This allows the researcher to see what the recorder found
 

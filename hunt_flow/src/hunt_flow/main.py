@@ -2,13 +2,14 @@
 from random import randint
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from hunt_flow.crews.record_crew.record_crew import RecordCrew
+from enum import Enum, auto
+from datetime import datetime
 import os
+from hunt_flow.crews.record_crew.record_crew import RecordCrew
 
 from crewai import LLM
 from crewai.flow import Flow, listen, start, router
 
-from enum import Enum, auto
 
 load_dotenv()
 
@@ -20,6 +21,7 @@ class HuntAction(Enum):
 class HuntState(BaseModel):
     action: HuntAction = HuntAction.UNKNOWN
     user_input: str = ""
+    current_date: str = ""
 
 
 class HuntFlow(Flow[HuntState]):
@@ -60,7 +62,11 @@ class HuntFlow(Flow[HuntState]):
     @listen(HuntAction.RECORD.value)
     def record(self):
         record_crew = RecordCrew().crew()
-        result = record_crew.kickoff(inputs={'user_input': self.state.user_input})
+        result = record_crew.kickoff(
+            inputs={
+                'user_input': self.state.user_input,
+                'current_date': self.state.current_date,
+            })
         print(result)
         return
 
@@ -71,6 +77,7 @@ class HuntFlow(Flow[HuntState]):
 
 
 def kickoff():
+    current_date = datetime.now().strftime("%Y-%m-%d")
     hunt_flow = HuntFlow()
     print("Welcome to your Job Hunt Assistant! (Type 'exit' to quit)")
     while True:
@@ -79,7 +86,7 @@ def kickoff():
             print("Goodbye! Good luck with the hunt.")
             break
         # We pass the input directly into the flow state
-        hunt_flow.kickoff(inputs={"user_input": user_input})
+        hunt_flow.kickoff(inputs={"user_input": user_input, "current_date": current_date})
 
 def plot():
     hunt_flow = HuntFlow()
