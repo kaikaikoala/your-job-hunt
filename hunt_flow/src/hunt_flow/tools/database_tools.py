@@ -157,7 +157,6 @@ def add_application_stage(
             INSERT INTO application_stage (app_id, stage, stage_date, result)
             VALUES (?, ?, ?, ?)
         """, (app_id, stage, stage_date, result))
-
         conn.commit()
         conn.close()
         
@@ -172,6 +171,37 @@ def add_application_stage(
     
     except Exception as e:
         # This catches everything else (typos, connection issues, etc.)
+        return f"An unexpected error occurred: {str(e)}"
+
+@tool
+def update_application_stage_result(
+    app_stage_id: int, 
+    result: str = None
+) -> str:
+    """
+    Updates the result of a specific application stage.
+    :param app_stage_id: The ID of the application stage to update.
+    :param result: The outcome of the stage (e.g., 'Passed', 'Rejected').
+    """
+    try:
+        conn = sqlite3.connect(get_db_path()) # Fixed variable name
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE application_stage SET result = ? WHERE app_stage_id = ?
+        """, (result, app_stage_id))
+
+        conn.commit() # Critical: otherwise changes aren't saved
+        
+        # Check if anything was actually updated
+        if cursor.rowcount == 0:
+            conn.close()
+            return f"Error: No stage found with ID {app_stage_id}."
+
+        conn.close()
+        return f"Successfully updated result to '{result}' for stage ID {app_stage_id}."
+
+    except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
 
 @tool

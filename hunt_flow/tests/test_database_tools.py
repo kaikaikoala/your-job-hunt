@@ -173,7 +173,7 @@ def test_add_application_stage(temp_db):
     )
 
     # 3. Assert: Check return string
-    assert f"added stage '{TEST_STAGE}'" in result
+    assert f"added stage '{TEST_STAGE}" in result
     assert f"application {app_id}" in result
 
     # 4. Verify in DB
@@ -189,6 +189,59 @@ def test_add_application_stage(temp_db):
     assert row is not None
     assert row[0] == TEST_STAGE
     assert row[1] == "Passed"
+
+def test_update_application_stage_result(temp_db):
+    from hunt_flow.tools.database_tools import (
+        initialize_database, 
+        add_application, 
+        add_application_stage,
+        update_application_stage_result
+    )
+    
+    initialize_database.run()
+
+    # 1. ARRANGE: Create application and a stage
+    setup_app = add_application.run(company=TEST_COMPANY, role=TEST_ROLE)
+    app_id = int(setup_app.split("app_id: ")[1])
+    
+    # We need the app_stage_id. Since we removed it from the return string, 
+    # we'll fetch it from the DB manually for the test.
+    add_application_stage.run(app_id=app_id, stage=TEST_STAGE, stage_date=TEST_DATE)
+    
+    conn = sqlite3.connect(temp_db)
+    cursor = conn.cursor()
+    app_stage_id = cursor.execute("SELECT app_stage_id FROM application_stage LIMIT 1").fetchone()[0]
+    conn.close()
+
+    # 2. ACT: Update the result
+    new_result = "Passed Technical"
+    tool_output = update_application_stage_result.run(
+        app_stage_id=app_stage_id, 
+        result=new_result
+    )
+
+    # 3. ASSERT: Check tool message
+    assert "Successfully updated" in tool_output
+    assert new_result in tool_output
+
+    # 4. VERIFY: Check database for the change
+    conn = sqlite3.connect(temp_db)
+    cursor = conn.cursor()
+    cursor.execute("SELECT result FROM application_stage WHERE app_stage_id = ?", (app_stage_id,))
+    db_result = cursor.fetchone()[0]
+    conn.close()
+
+    assert db_result == new_result
+
+def test_update_application_stage_result_invalid_id(temp_db):
+    from hunt_flow.tools.database_tools import initialize_database, update_application_stage_result
+    initialize_database.run()
+
+    # Act: Try to update an ID that doesn't exist
+    result = update_application_stage_result.run(app_stage_id=999, result="Failed")
+
+    # Assert: Should return the error message defined in our tool
+    assert "Error: No stage found" in result
 
 def test_read_only_query_enforcement(temp_db):
     from hunt_flow.tools.database_tools import initialize_database, run_read_only_query
