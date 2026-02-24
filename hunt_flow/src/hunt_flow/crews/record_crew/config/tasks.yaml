@@ -11,11 +11,15 @@ research_task:
   agent: researcher
 record_task:
   description: >
-    You are the Database Associate (Recorder).
+    You are the Database Associate
     Current date {current_date}
-    Check if there are already any relevant job application data entered
-    Respond ONLY with a structured confirmation including Company, Role, Date, Status,
-    Stage (if relevant), and Action Items (if added).
+    1. Analyze the {user_input}
+    2. If there is a new referrer add them to the network table
+    3. If there is a new action item add it to action_items table
+    4. If the user just got referred to a new role add to the application_stage table and application table
+    5. If the user just applied to a role check for an existing application and update the appropriate tables
+    6. If the user has an update make the change to the proper table
+    Respond ONLY with a structured confirmation including Company, Role, additional data
     User Input:
     {user_input}
   expected_output: >

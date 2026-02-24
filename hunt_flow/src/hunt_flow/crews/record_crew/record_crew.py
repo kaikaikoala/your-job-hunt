@@ -5,14 +5,12 @@ from crewai_tools import ScrapeWebsiteTool
 from typing import List
 from hunt_flow.tools.database_tools import (
     initialize_database,
-    check_applications,
-    update_application_job_link,
-    create_application,
-    add_interview_stage,
-    update_application_status,
+    add_application,
     add_action_item,
-    mark_action_completed,
-    list_pending_action_items,
+    add_network_contact,
+    add_application_stage,
+    update_application_stage_result,
+    update_application,
     run_read_only_query,
 )
 from hunt_flow.tools.scraper_tool import smart_scraper
@@ -47,13 +45,15 @@ class RecordCrew():
     def recorder(self) -> Agent:
         return Agent(
             config=self.agents_config['recorder'], # type: ignore[index]
-             tools=[
-                create_application,
-                add_interview_stage,
-                update_application_job_link,
-                update_application_status,
+            tools=[
+                initialize_database,
+                add_application,
                 add_action_item,
-                mark_action_completed,
+                add_network_contact,
+                add_application_stage,
+                update_application_stage_result,
+                update_application,
+                run_read_only_query,
             ],
             verbose=True
         )
