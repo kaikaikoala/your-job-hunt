@@ -6,6 +6,7 @@ from enum import Enum, auto
 from datetime import datetime
 import os
 from hunt_flow.crews.record_crew.record_crew import RecordCrew
+from hunt_flow.crews.analyst_crew.analyst_crew import AnalystCrew
 
 from crewai import LLM
 from crewai.flow import Flow, listen, start, router
@@ -72,7 +73,9 @@ class HuntFlow(Flow[HuntState]):
 
     @listen(HuntAction.ANALYZE.value)
     def analyze(self):
-        print("ANALYZE")
+        analyst_crew = AnalystCrew().crew()
+        result = analyst_crew.kickoff(inputs={'user_input': self.state.user_input})
+        print(result)
         return
 
 
