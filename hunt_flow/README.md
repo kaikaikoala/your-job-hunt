@@ -1,56 +1,71 @@
-# {{crew_name}} Crew
+# Agentic Job Hunt Tracker
 
-Welcome to the {{crew_name}} Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+## Run
+uv run crewai run
 
-## Installation
+## Description
+A conversational CLI application built with **CrewAI** to track and analyze your job search:
+- Record job applications
+- Track interview stages
+- Manage action items
+- Query and analyze your job hunt progress
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+User input is saved in an sqlite db.
 
-First, if you haven't already, install uv:
+## Agent architecture
+* Manager agent
+  * name: job_hunt_manager
+  * Classfies requests as record/update or analysis/query
+  * Delegates a specialist agent
+* Recorder agent
+  * name: job_application_recorder
+  * Handles all DB writes: applications, interview stages, action items
+* Analyst agent
+  * name: job_hunt_analyst
+  * Runs agentically created sql queries (SELECT only)
 
-```bash
-pip install uv
-```
+## Data storage ERD
 
-Next, navigate to your project directory and install the dependencies:
+```mermaid
+erDiagram
+    application_stage {
+        string app_stage_id PK
+        string app_id FK
+        string stage
+        string stage_date
+        string result
+    }
+    application_stage }|--|| applications : ""
 
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
-```
+    applications {
+        string app_id PK
+        string company
+        string role
+        string job_posting_url
+        string referrer_id FK
+        string salary_range
+        string required_skills
+        string exp_required
+    }
+    applications |o--o{ action_items : ""
+    applications }o--o| network : ""
 
-### Customizing
+    action_items }o--o| network : ""
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+    action_items {
+        string action_item_id PK
+        string app_id FK
+        string referrer_id FK
+        string description
+        string status
+        string due_date
+        string create_date
+    }
 
-- Modify `src/hunt_flow/config/agents.yaml` to define your agents
-- Modify `src/hunt_flow/config/tasks.yaml` to define your tasks
-- Modify `src/hunt_flow/crew.py` to add your own logic, tools and specific args
-- Modify `src/hunt_flow/main.py` to add custom inputs for your agents and tasks
+    network {
+        string referrer_id PK
+        string name
+        string type
+    }
 
-## Running the Project
 
-To kickstart your flow and begin execution, run this from the root folder of your project:
-
-```bash
-crewai run
-```
-
-This command initializes the hunt_flow Flow as defined in your configuration.
-
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
-
-## Understanding Your Crew
-
-The hunt_flow Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
-
-## Support
-
-For support, questions, or feedback regarding the {{crew_name}} Crew or crewAI.
-
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
-
-Let's create wonders together with the power and simplicity of crewAI.

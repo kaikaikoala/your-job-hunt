@@ -1,400 +1,190 @@
 import sqlite3
-from dotenv import load_dotenv
+from sqlite3 import IntegrityError
 import os
-from datetime import datetime
+from pathlib import Path
+from dotenv import load_dotenv
 from crewai.tools import tool
 
 # ---------- DATABASE LOCATION ----------
 def get_db_path():
-    # Check if user set a custom DB path
-    load_dotenv()  # reads .env into os.environ
+    load_dotenv()
     if os.environ.get("JOB_HUNT_DB_PATH"):
         return os.environ["JOB_HUNT_DB_PATH"]
 
     # Default to project root
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(project_root, "job_hunt.db")
+    project_root = Path(__file__).parent.parent.parent.parent
+    return str(project_root / "job_hunt.db")
 
 # ---------- DATABASE INITIALIZATION ----------
 
 @tool
 def initialize_database() -> str:
-    """Initializes the SQLite database and creates required tables."""
+    """Initializes the database by executing the schema.sql file."""
     try:
+        current_dir = Path(__file__).parent
+        schema_path = current_dir / "schema.sql"
+
+        with open(schema_path, "r") as f:
+            sql_script = f.read()
+
         conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
-
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS applications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            company TEXT NOT NULL,
-            role TEXT NOT NULL,
-            date_applied TEXT NOT NULL,
-            status TEXT DEFAULT 'pending',
-            rejection_stage TEXT,
-            job_posting_url TEXT,
-            salary_range TEXT,
-            required_skills TEXT,
-            exp_required TEXT,
-            notes TEXT
-        )
-        """)
-
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS interview_stages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            application_id INTEGER NOT NULL,
-            stage_name TEXT NOT NULL,
-            date_entered TEXT NOT NULL,
-            result TEXT NOT NULL,
-            FOREIGN KEY(application_id) REFERENCES applications(id)
-        )
-        """)
-
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS action_items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            application_id INTEGER NOT NULL,
-            description TEXT NOT NULL,
-            due_date TEXT,
-            completed INTEGER DEFAULT 0,
-            FOREIGN KEY(application_id) REFERENCES applications(id)
-        )
-        """)
-
+        cursor.executescript(sql_script)
         conn.commit()
         conn.close()
-
         return "Database initialized successfully."
-
     except Exception as e:
         return f"Database initialization failed: {str(e)}"
 
-
-# ---------- INTERNAL HELPER ----------
-
-def resolve_application(company: str, role: str):
-    """Resolves an application by company + role with disambiguation."""
-    conn = sqlite3.connect(get_db_path())
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT id, company, role, date_applied
-        FROM applications
-        WHERE LOWER(company) = LOWER(?)
-        AND LOWER(role) = LOWER(?)
-        ORDER BY date_applied DESC
-    """, (company, role))
-
-    results = cursor.fetchall()
-    conn.close()
-
-    if len(results) == 0:
-        return None, "No matching application found."
-
-    if len(results) > 1:
-        message = "Multiple applications found:\n"
-        for r in results:
-            message += f"- {r[1]} | {r[2]} | Applied: {r[3]}\n"
-        message += "Please specify which one."
-        return None, message
-
-    return results[0][0], None
-
-
-# ---------- CHECK APPLICATION ----------
+# ---------- ADD APPLICATION ----------
 
 @tool
-def check_applications(
+def add_application(
     company: str,
     role: str,
-    date_applied: str,
+    referrer_id: int = None,
     job_posting_url: str = None,
-    notes: str = None
-) -> str:
-    """Checks for existing applications."""
-    try:
-        conn = sqlite3.connect(get_db_path())
-        cursor = conn.cursor()
-
-        # Check for existing active applications
-        cursor.execute("""
-        SELECT id, status FROM applications
-        WHERE LOWER(company) = LOWER(?)
-        AND LOWER(role) = LOWER(?)
-        AND status NOT IN ('rejected', 'denied', 'offer', 'ghosted')
-        """, (company, role))
-
-        existing = cursor.fetchall()
-        return existing
-    except Exception as e:
-        return f"Error checking for application: {str(e)}"
-
-
-# ---------- UPDATE APPLICATION JOB LINK ----------
-
-@tool
-def update_application_job_link(
-    company: str,
-    role: str,
-    job_posting_url: str = None,
-    exp_required: str = None,
     salary_range: str = None,
-    required_skills: str = None
+    skills_required: str = None,
+    experience_required: str = None
 ) -> str:
-    """Checks for existing applications."""
-    app_id, error = resolve_application(company, role)
-    if error:
-        return error
+    """Creates a new job application and returns the new app_id."""
     try:
         conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
 
-        # Check for existing active applications
         cursor.execute("""
-        UPDATE applications
-        SET job_posting_url = ?, salary_range = ?, exp_required = ?, required_skills = ?
-        WHERE id = ?
-        """, (job_posting_url, salary_range, exp_required, required_skills, app_id))
-        cursor.execute("""
-        UPDATE id, status FROM applications
-        WHERE LOWER(company) = LOWER(?)
-        AND LOWER(role) = LOWER(?)
-        AND status NOT IN ('rejected', 'denied', 'offer', 'ghosted')
-        """, (company, role))
-
-        existing = cursor.fetchall()
-        return existing
-    except Exception as e:
-        return f"Error adding job link: {str(e)}"
-
-# ---------- CREATE APPLICATION ----------
-
-@tool
-def create_application(
-    company: str,
-    role: str,
-    date_applied: str,
-    job_posting_url: str = None,
-    notes: str = None
-) -> str:
-    """Creates a new job application entry with uniqueness check on active applications."""
-    try:
-        conn = sqlite3.connect(get_db_path())
-        cursor = conn.cursor()
-
-        # Check for existing active applications
-        cursor.execute("""
-        SELECT id, status FROM applications
-        WHERE LOWER(company) = LOWER(?)
-        AND LOWER(role) = LOWER(?)
-        AND status NOT IN ('rejected', 'denied', 'offer', 'ghosted')
-        """, (company, role))
-
-        existing = cursor.fetchall()
-        if existing:
-            return (f"You already have an active application for {company} - {role}. "
-                    "Please provide a more descriptive role name (e.g., add the team name) "
-                    "to differentiate.")
-
-        # Insert new application
-        cursor.execute("""
-        INSERT INTO applications (company, role, date_applied, job_posting_url, notes)
-        VALUES (?, ?, ?, ?, ?)
-        """, (company, role, date_applied, job_posting_url, notes))
+            INSERT INTO applications (
+                company, role, referrer_id, job_posting_url,
+                salary_range, skills_required, experience_required
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (company, role, referrer_id, job_posting_url,
+              salary_range, skills_required, experience_required))
 
         conn.commit()
+        new_id = cursor.lastrowid
         conn.close()
-
-        return f"Application created for {company} - {role}."
-
+        return f"Application created for {company}. app_id: {new_id}"
     except Exception as e:
-        return f"Error creating application: {str(e)}"
-
-# ---------- ADD INTERVIEW STAGE ----------
-
-@tool
-def add_interview_stage(
-    company: str,
-    role: str,
-    stage_name: str,
-    date_entered: str,
-    result: str
-) -> str:
-    """Adds an interview stage to an existing application."""
-    app_id, error = resolve_application(company, role)
-    if error:
-        return error
-
-    try:
-        conn = sqlite3.connect(get_db_path())
-        cursor = conn.cursor()
-
-        cursor.execute("""
-        INSERT INTO interview_stages (application_id, stage_name, date_entered, result)
-        VALUES (?, ?, ?, ?)
-        """, (app_id, stage_name, date_entered, result))
-
-        conn.commit()
-        conn.close()
-
-        return f"Stage '{stage_name}' added for {company} - {role}."
-
-    except Exception as e:
-        return f"Error adding stage: {str(e)}"
-
-
-# ---------- UPDATE APPLICATION STATUS ----------
-
-@tool
-def update_application_status(
-    company: str,
-    role: str,
-    status: str,
-    rejection_stage: str = None
-) -> str:
-    """Updates the status of an application."""
-    app_id, error = resolve_application(company, role)
-    if error:
-        return error
-
-    try:
-        conn = sqlite3.connect(get_db_path())
-        cursor = conn.cursor()
-
-        cursor.execute("""
-        UPDATE applications
-        SET status = ?, rejection_stage = ?
-        WHERE id = ?
-        """, (status, rejection_stage, app_id))
-
-        conn.commit()
-        conn.close()
-
-        return f"Application status updated for {company} - {role}."
-
-    except Exception as e:
-        return f"Error updating status: {str(e)}"
-
+        return f"Error adding application: {str(e)}"
 
 # ---------- ADD ACTION ITEM ----------
 
 @tool
 def add_action_item(
-    company: str,
-    role: str,
     description: str,
+    create_date: str,
+    app_id: int = None,
+    referrer_id: int = None,
+    status: str = "pending",
     due_date: str = None
 ) -> str:
-    """Adds an action item to an application."""
-    app_id, error = resolve_application(company, role)
-    if error:
-        return error
-
+    """Adds a task/follow-up and returns the action_item_id."""
     try:
         conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
 
         cursor.execute("""
-        INSERT INTO action_items (application_id, description, due_date)
-        VALUES (?, ?, ?)
-        """, (app_id, description, due_date))
+            INSERT INTO action_items (
+                description, create_date, app_id, referrer_id, status, due_date
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        """, (description, create_date, app_id, referrer_id, status, due_date))
 
         conn.commit()
+        new_id = cursor.lastrowid
         conn.close()
-
-        return f"Action item added for {company} - {role}."
-
+        return f"Action item created. action_item_id: {new_id}"
     except Exception as e:
         return f"Error adding action item: {str(e)}"
 
-
-# ---------- MARK ACTION COMPLETED ----------
+# ---------- ADD NETWORK CONTACT ----------
 
 @tool
-def mark_action_completed(
-    company: str,
-    role: str,
-    description: str
-) -> str:
-    """Marks an action item as completed."""
-    app_id, error = resolve_application(company, role)
-    if error:
-        return error
-
+def add_network_contact(name: str, contact_type: str = "other") -> str:
+    """Adds a networking contact and returns the referrer_id."""
     try:
         conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
 
+        cursor.execute("INSERT INTO network (name, type) VALUES (?, ?)", (name, contact_type))
+
+        conn.commit()
+        new_id = cursor.lastrowid
+        conn.close()
+        return f"Contact '{name}' added. referrer_id: {new_id}"
+    except Exception as e:
+        return f"Error adding contact: {str(e)}"
+
+# ---------- UPDATE APPLICATION ----------
+
+@tool
+def update_application(app_id: int, updates: dict) -> str:
+    """Updates fields for an existing app_id (e.g., salary_range, role)."""
+    try:
+        if not updates: return "No updates provided."
+        set_clause = ", ".join([f"{k} = ?" for k in updates.keys()])
+        values = list(updates.values())
+        values.append(app_id)
+
+        conn = sqlite3.connect(get_db_path())
+        cursor = conn.cursor()
+        cursor.execute(f"UPDATE applications SET {set_clause} WHERE app_id = ?", values)
+        conn.commit()
+        conn.close()
+        return f"Successfully updated application {app_id}."
+    except Exception as e:
+        return f"Error updating application: {str(e)}"
+
+@tool
+def add_application_stage(
+    app_id: int, 
+    stage: str, 
+    stage_date: str, 
+    result: str = None
+) -> str:
+    """
+    Records a new stage/event for a specific application (e.g., 'Interview', 'Offer').
+    :param app_id: The ID of the parent application.
+    :param stage: Name of the stage (e.g., 'Initial Screen', 'Technical').
+    :param stage_date: Date in YYYY-MM-DD format.
+    :param result: Optional outcome of the stage.
+    """
+    try:
+        conn = sqlite3.connect(get_db_path())
+        cursor = conn.cursor()
         cursor.execute("""
-        UPDATE action_items
-        SET completed = 1
-        WHERE application_id = ?
-        AND LOWER(description) = LOWER(?)
-        """, (app_id, description))
+            INSERT INTO application_stage (app_id, stage, stage_date, result)
+            VALUES (?, ?, ?, ?)
+        """, (app_id, stage, stage_date, result))
 
         conn.commit()
         conn.close()
+        
+        return (f"Successfully added stage '{stage}' for application {app_id}. "
+                "Reminder: Ensure previous stages are updated if they are now completed.")
 
-        return f"Action item marked complete for {company} - {role}."
-
+    except IntegrityError:
+        # This catches the Foreign Key failure specifically
+        return (f"Error: The application ID '{app_id}' does not exist in the database. "
+                "Please use the 'run_read_only_query' tool to find the correct app_id "
+                "for this company before trying again.")
+    
     except Exception as e:
-        return f"Error updating action item: {str(e)}"
-
-
-# ---------- LIST PENDING ACTION ITEMS ----------
-
-@tool
-def list_pending_action_items() -> str:
-    """Lists all pending action items."""
-    try:
-        conn = sqlite3.connect(get_db_path())
-        cursor = conn.cursor()
-
-        cursor.execute("""
-        SELECT a.company, a.role, ai.description, ai.due_date
-        FROM action_items ai
-        JOIN applications a ON ai.application_id = a.id
-        WHERE ai.completed = 0
-        """)
-
-        results = cursor.fetchall()
-        conn.close()
-
-        if not results:
-            return "No pending action items."
-
-        message = "Pending action items:\n"
-        for r in results:
-            message += f"- {r[0]} | {r[1]} | {r[2]} | Due: {r[3]}\n"
-
-        return message
-
-    except Exception as e:
-        return f"Error retrieving pending items: {str(e)}"
-
-
-# ---------- READ-ONLY QUERY TOOL ----------
+        # This catches everything else (typos, connection issues, etc.)
+        return f"An unexpected error occurred: {str(e)}"
 
 @tool
 def run_read_only_query(query: str) -> str:
-    """Executes a SELECT-only SQL query for analytics purposes."""
+    """Executes SELECT queries for analysis."""
     if not query.strip().lower().startswith("select"):
         return "Only SELECT queries are allowed."
-
     try:
         conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
-
         cursor.execute(query)
         results = cursor.fetchall()
-
         conn.close()
-
-        if not results:
-            return "Query executed successfully. No results."
-
-        return str(results)
-
+        return str(results) if results else "No results."
     except Exception as e:
         return f"Query failed: {str(e)}"
