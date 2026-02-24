@@ -9,6 +9,7 @@ research_task:
   expected_output: >
     A summary of the job's requirements and compensation.
   agent: researcher
+  verbose: true
 record_task:
   description: >
     You are the Database Associate
@@ -26,4 +27,5 @@ record_task:
     Structured confirmation message after DB insertion/update, or follow up question
   agent: recorder
   context: [research_task] # This allows the researcher to see what the recorder found
+  verbose: true
 

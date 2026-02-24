@@ -65,7 +65,7 @@ def add_application(
         conn.commit()
         new_id = cursor.lastrowid
         conn.close()
-        return f"Application created for {company}. app_id: {new_id}"
+        return f"Application created for company: {company} app_id: {new_id}. Add the appropriate stage to application_stage"
     except Exception as e:
         return f"Error adding application: {str(e)}"
 
