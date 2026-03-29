@@ -1,0 +1,580 @@
+<!doctype html>
+
+<html class="light" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>CareerFlow Pro | Resume Editor</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "on-secondary-fixed": "#0b1c30",
+                            "on-tertiary": "#ffffff",
+                            error: "#ba1a1a",
+                            surface: "#f7f9fb",
+                            "surface-dim": "#d8dadc",
+                            "surface-container-low": "#f2f4f6",
+                            "secondary-container": "#d0e1fb",
+                            "on-primary-fixed-variant": "#173bab",
+                            "on-tertiary-fixed": "#002113",
+                            "surface-variant": "#e0e3e5",
+                            "surface-container-high": "#e6e8ea",
+                            "on-secondary": "#ffffff",
+                            "on-primary": "#ffffff",
+                            "tertiary-fixed-dim": "#4edea3",
+                            "outline-variant": "#c6c6cd",
+                            "primary-fixed": "#dde1ff",
+                            "surface-container-highest": "#e0e3e5",
+                            primary: "#000000",
+                            "on-primary-fixed": "#001453",
+                            "primary-fixed-dim": "#b8c4ff",
+                            "inverse-primary": "#b8c4ff",
+                            "inverse-on-surface": "#eff1f3",
+                            "surface-container": "#eceef0",
+                            "surface-bright": "#f7f9fb",
+                            "on-surface": "#191c1e",
+                            "on-error-container": "#93000a",
+                            "error-container": "#ffdad6",
+                            secondary: "#505f76",
+                            "secondary-fixed-dim": "#b7c8e1",
+                            "secondary-fixed": "#d3e4fe",
+                            "surface-container-lowest": "#ffffff",
+                            "on-surface-variant": "#45464d",
+                            "tertiary-fixed": "#6ffbbe",
+                            outline: "#76777d",
+                            "on-tertiary-container": "#009668",
+                            "on-secondary-container": "#54647a",
+                            "primary-container": "#001453",
+                            background: "#f7f9fb",
+                            "on-background": "#191c1e",
+                            "surface-tint": "#3755c3",
+                            "on-error": "#ffffff",
+                            "tertiary-container": "#002113",
+                            tertiary: "#000000",
+                            "on-primary-container": "#607cec",
+                            "on-tertiary-fixed-variant": "#005236",
+                            "on-secondary-fixed-variant": "#38485d",
+                            "inverse-surface": "#2d3133",
+                        },
+                        fontFamily: {
+                            headline: ["Manrope"],
+                            body: ["Inter"],
+                            label: ["Inter"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.25rem",
+                            lg: "0.5rem",
+                            xl: "0.75rem",
+                            full: "9999px",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .material-symbols-outlined {
+                font-variation-settings:
+                    "FILL" 0,
+                    "wght" 400,
+                    "GRAD" 0,
+                    "opsz" 24;
+            }
+            body {
+                font-family: "Inter", sans-serif;
+            }
+            h1,
+            h2,
+            h3 {
+                font-family: "Manrope", sans-serif;
+            }
+            .glass-nav {
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+            .resume-shadow {
+                box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+            }
+        </style>
+    </head>
+    <body class="bg-surface text-on-surface selection:bg-primary-fixed">
+        <!-- TopNavBar Execution -->
+        <nav
+            class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100"
+        >
+            <div
+                class="flex justify-between items-center h-16 px-8 max-w-full mx-auto font-manrope font-bold tracking-tight"
+            >
+                <div class="flex items-center gap-8">
+                    <span
+                        class="text-xl font-black text-slate-900 tracking-tighter"
+                        >The Digital Curator</span
+                    >
+                    <nav class="hidden md:flex gap-6 items-center">
+                        <a
+                            class="text-indigo-600 border-b-2 border-indigo-600 pb-1"
+                            href="#"
+                            >Resume Builder</a
+                        >
+                        <a
+                            class="text-slate-500 hover:text-slate-900 transition-colors"
+                            href="#"
+                            >Hunt Tracker</a
+                        >
+                    </nav>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button
+                        class="px-4 py-2 text-slate-500 hover:text-slate-900 font-medium transition-all active:scale-95 text-sm"
+                    >
+                        Sign Out
+                    </button>
+                    <button
+                        class="px-5 py-2 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all active:scale-95 shadow-sm text-sm"
+                    >
+                        Profile
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <!-- Unified Sidebar Panel -->
+        <aside
+            class="fixed left-0 top-0 h-full w-[340px] pt-20 flex flex-col z-40 bg-white dark:bg-slate-900 border-r border-outline-variant/10"
+        >
+            <div class="flex-grow overflow-y-auto custom-scrollbar">
+                <!-- Experience Context Section -->
+                <section class="p-6 border-b border-outline-variant/10">
+                    <h2
+                        class="text-[10px] font-bold font-headline uppercase tracking-[0.2em] text-on-surface-variant mb-4"
+                        style=""
+                    >
+                        Experience Context
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button
+                            class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-colors text-center gap-2 group"
+                            style=""
+                        >
+                            <span
+                                class="material-symbols-outlined text-secondary group-hover:text-primary"
+                                data-icon="upload_file"
+                                style=""
+                                >upload_file</span
+                            >
+                            <span class="text-[11px] font-bold" style=""
+                                >Upload File</span
+                            >
+                        </button>
+                        <button
+                            class="flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-colors text-center gap-2 group"
+                            style=""
+                        >
+                            <span
+                                class="material-symbols-outlined text-secondary group-hover:text-primary"
+                                data-icon="link"
+                                style=""
+                                >link</span
+                            >
+                            <span class="text-[11px] font-bold" style=""
+                                >Link Projects</span
+                            >
+                        </button>
+                    </div>
+                </section>
+                <!-- Job Context Section -->
+                <section class="p-6 border-b border-outline-variant/10">
+                    <h2
+                        class="text-[10px] font-bold font-headline uppercase tracking-[0.2em] text-on-surface-variant mb-4"
+                        style=""
+                    >
+                        Job Context
+                    </h2>
+                    <div class="space-y-3">
+                        <button
+                            class="w-full flex items-center gap-3 px-4 py-3 bg-surface-container-lowest border border-outline-variant/10 rounded-xl hover:border-primary/20 transition-all"
+                            style=""
+                        >
+                            <span
+                                class="material-symbols-outlined text-[20px] text-secondary"
+                                data-icon="link"
+                                style=""
+                                >link</span
+                            >
+                            <span class="text-xs font-medium" style=""
+                                >Paste Job Link</span
+                            >
+                        </button>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button
+                                class="flex items-center gap-2 px-3 py-2.5 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors"
+                                style=""
+                            >
+                                <span
+                                    class="material-symbols-outlined text-[18px]"
+                                    data-icon="upload"
+                                    style=""
+                                    >upload</span
+                                >
+                                <span class="text-[11px] font-bold" style=""
+                                    >Upload Job</span
+                                >
+                            </button>
+                            <button
+                                class="flex items-center gap-2 px-3 py-2.5 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors"
+                                style=""
+                            >
+                                <span
+                                    class="material-symbols-outlined text-[18px]"
+                                    data-icon="notes"
+                                    style=""
+                                    >notes</span
+                                >
+                                <span class="text-[11px] font-bold" style=""
+                                    >Paste Text</span
+                                >
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                <!-- AI Chat Section (Takes remaining space) -->
+                <section class="flex-grow flex flex-col">
+                    <div class="px-6 pt-6 pb-2">
+                        <h2
+                            class="text-[10px] font-bold font-headline uppercase tracking-[0.2em] text-on-surface-variant mb-2"
+                            style=""
+                        >
+                            AI Assistant
+                        </h2>
+                        <p
+                            class="text-[11px] text-on-surface-variant/60 italic"
+                            style=""
+                        >
+                            Optimization in progress...
+                        </p>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div
+                            class="bg-surface-container-low p-4 rounded-2xl rounded-tl-none text-sm text-on-surface-variant leading-relaxed"
+                            style=""
+                        >
+                            I've analyzed the Senior Product Designer role at
+                            Apple. Should I emphasize your mobile design systems
+                            experience?
+                        </div>
+                        <div
+                            class="bg-primary-container text-white p-4 rounded-2xl rounded-tr-none text-sm self-end ml-8 shadow-sm"
+                            style=""
+                        >
+                            Yes, please highlight the 'Luna Design System'
+                            project.
+                        </div>
+                        <div
+                            class="bg-surface-container-low p-4 rounded-2xl rounded-tl-none text-sm text-on-surface-variant leading-relaxed"
+                            style=""
+                        >
+                            Perfect. Updating the "Experience" section now to
+                            quantify the efficiency gains from Luna.
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- Sticky Chat Input -->
+            <div
+                class="p-4 bg-white dark:bg-slate-900 border-t border-outline-variant/10"
+            >
+                <div class="relative flex items-center">
+                    <input
+                        class="w-full bg-surface-container-low border-none rounded-xl py-4 pl-5 pr-14 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-on-surface-variant/40"
+                        placeholder="Ask AI to refine..."
+                        type="text"
+                    />
+                    <button
+                        class="absolute right-2 p-2.5 bg-primary text-white rounded-lg hover:bg-on-primary-fixed-variant transition-colors"
+                        style=""
+                    >
+                        <span
+                            class="material-symbols-outlined text-[20px]"
+                            data-icon="send"
+                            style=""
+                            >send</span
+                        >
+                    </button>
+                </div>
+            </div>
+        </aside>
+        <!-- Main Workspace -->
+        <main class="ml-[340px] pt-20 min-h-screen flex">
+            <!-- Document Preview Canvas -->
+            <div
+                class="flex-grow bg-surface p-12 overflow-y-auto relative flex flex-col items-center"
+            >
+                <!-- Floating Toolbar (Canvas Controls) -->
+                <div class="absolute top-8 right-12 flex gap-3 z-30">
+                    <button
+                        class="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-full shadow-sm border border-outline-variant/10 text-sm font-medium hover:bg-surface-container-low transition-colors"
+                        style=""
+                    >
+                        <span
+                            class="material-symbols-outlined text-[20px]"
+                            data-icon="zoom_in"
+                            style=""
+                            >zoom_in</span
+                        >
+                        100%
+                    </button>
+                    <button
+                        class="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-full shadow-sm border border-outline-variant/10 text-sm font-medium hover:bg-surface-container-low transition-colors"
+                        style=""
+                    >
+                        <span
+                            class="material-symbols-outlined text-[20px]"
+                            data-icon="history"
+                            style=""
+                            >history</span
+                        >
+                        History
+                    </button>
+                    <button
+                        class="flex items-center gap-2 bg-primary-fixed text-on-primary-fixed-variant px-5 py-2 rounded-full shadow-sm font-bold text-sm hover:brightness-95 transition-all"
+                        style=""
+                    >
+                        Start New Application
+                    </button>
+                </div>
+                <!-- Resume Document -->
+                <div
+                    class="w-[800px] min-h-[1131px] bg-white resume-shadow p-16 flex flex-col gap-8 relative mb-12"
+                >
+                    <!-- Resume Header -->
+                    <header
+                        class="flex justify-between items-start border-b-2 border-primary/5 pb-10"
+                    >
+                        <div>
+                            <h1
+                                class="text-4xl font-extrabold tracking-tighter text-primary"
+                                style=""
+                            >
+                                ALEXANDER RHOADES
+                            </h1>
+                            <p
+                                class="text-lg font-medium text-on-primary-container mt-1 uppercase tracking-widest"
+                                style=""
+                            >
+                                Senior Product Designer
+                            </p>
+                        </div>
+                        <div
+                            class="text-right text-xs text-on-surface-variant space-y-1"
+                        >
+                            <p class="" style="">rhoades.design@gmail.com</p>
+                            <p class="" style="">+1 (555) 012-3456</p>
+                            <p class="" style="">San Francisco, CA</p>
+                            <p class="" style="">portfolio.alexrhoades.com</p>
+                        </div>
+                    </header>
+                    <!-- Professional Summary -->
+                    <section>
+                        <h2
+                            class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4"
+                            style=""
+                        >
+                            Core Philosophy
+                        </h2>
+                        <p
+                            class="text-sm leading-relaxed text-on-surface-variant"
+                            style=""
+                        >
+                            Strategic designer with 8+ years of experience
+                            crafting editorial-grade digital experiences.
+                            Specialist in design systems, high-fidelity
+                            prototyping, and bridging the gap between aesthetic
+                            excellence and conversion-driven product goals.
+                        </p>
+                    </section>
+                    <!-- Experience -->
+                    <section class="space-y-8">
+                        <h2
+                            class="text-xs font-bold text-primary uppercase tracking-[0.2em]"
+                            style=""
+                        >
+                            Selected Experience
+                        </h2>
+                        <div class="group">
+                            <div
+                                class="flex justify-between items-baseline mb-2"
+                            >
+                                <h3 class="font-bold text-base" style="">
+                                    Linear Technologies
+                                </h3>
+                                <span
+                                    class="text-xs text-on-surface-variant italic"
+                                    style=""
+                                    >2020 — Present</span
+                                >
+                            </div>
+                            <p
+                                class="text-xs font-medium text-on-primary-container mb-3"
+                                style=""
+                            >
+                                Lead Interaction Designer
+                            </p>
+                            <ul
+                                class="text-sm space-y-2 text-on-surface-variant list-disc pl-4"
+                            >
+                                <li class="" style="">
+                                    Architected the
+                                    <span
+                                        class="text-primary font-semibold"
+                                        style=""
+                                        >Luna Design System</span
+                                    >, reducing engineering handoff time by 40%
+                                    across three core platforms.
+                                </li>
+                                <li class="" style="">
+                                    Led the redesign of the main user dashboard,
+                                    resulting in a 22% increase in daily active
+                                    engagement.
+                                </li>
+                                <li class="" style="">
+                                    Mentored a team of 4 junior designers and
+                                    established the company's first internal
+                                    design critique framework.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="group">
+                            <div
+                                class="flex justify-between items-baseline mb-2"
+                            >
+                                <h3 class="font-bold text-base" style="">
+                                    Monolith Studio
+                                </h3>
+                                <span
+                                    class="text-xs text-on-surface-variant italic"
+                                    style=""
+                                    >2017 — 2020</span
+                                >
+                            </div>
+                            <p
+                                class="text-xs font-medium text-on-primary-container mb-3"
+                                style=""
+                            >
+                                Senior Digital Art Director
+                            </p>
+                            <ul
+                                class="text-sm space-y-2 text-on-surface-variant list-disc pl-4"
+                            >
+                                <li class="" style="">
+                                    Directed the end-to-end visual strategy for
+                                    high-profile fintech clients, focusing on
+                                    data visualization.
+                                </li>
+                                <li class="" style="">
+                                    Implemented motion design principles into
+                                    core product flows, enhancing perceived
+                                    performance by 15%.
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+                    <!-- Education/Skills Bento Style -->
+                    <div class="grid grid-cols-2 gap-8 mt-4">
+                        <section>
+                            <h2
+                                class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4"
+                                style=""
+                            >
+                                Expertise
+                            </h2>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold rounded-full uppercase tracking-tighter"
+                                    style=""
+                                    >Design Systems</span
+                                >
+                                <span
+                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold rounded-full uppercase tracking-tighter"
+                                    style=""
+                                    >SaaS Architecture</span
+                                >
+                                <span
+                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold rounded-full uppercase tracking-tighter"
+                                    style=""
+                                    >React/Next.js</span
+                                >
+                                <span
+                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold rounded-full uppercase tracking-tighter"
+                                    style=""
+                                    >User Research</span
+                                >
+                            </div>
+                        </section>
+                        <section>
+                            <h2
+                                class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4"
+                                style=""
+                            >
+                                Education
+                            </h2>
+                            <div>
+                                <p class="text-sm font-bold" style="">
+                                    Rhode Island School of Design
+                                </p>
+                                <p
+                                    class="text-xs text-on-surface-variant"
+                                    style=""
+                                >
+                                    BFA in Graphic Design, 2016
+                                </p>
+                            </div>
+                        </section>
+                    </div>
+                    <!-- Subtle watermark-style branding -->
+                    <div
+                        class="mt-auto pt-10 flex justify-between items-center opacity-20 grayscale"
+                    >
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest"
+                            style=""
+                            >Optimized by CareerFlow Pro</span
+                        >
+                        <span
+                            class="material-symbols-outlined text-sm"
+                            data-icon="verified"
+                            style=""
+                            >verified</span
+                        >
+                    </div>
+                </div>
+                <!-- Contextual FAB (Resume Pulse) -->
+                <button
+                    class="fixed bottom-12 right-12 flex items-center gap-3 bg-primary text-white px-6 py-4 rounded-full shadow-xl shadow-primary/20 border border-white/10 transition-transform hover:scale-105 z-30"
+                    style=""
+                >
+                    <span
+                        class="material-symbols-outlined text-white"
+                        data-icon="picture_as_pdf"
+                        style="font-variation-settings: &quot;FILL&quot; 0"
+                        >picture_as_pdf</span
+                    >
+                    <span
+                        class="text-sm font-bold text-on-tertiary-fixed text-white"
+                        >Export PDF</span
+                    >
+                </button>
+            </div>
+            <!-- Right Metadata/Action Panel -->
+        </main>
+    </body>
+</html>

@@ -1,0 +1,770 @@
+<!doctype html>
+
+<html class="light" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>Visual Analytics | Curator AI</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "error-container": "#ffdad6",
+                            "on-tertiary": "#ffffff",
+                            "tertiary-fixed-dim": "#4edea3",
+                            "on-tertiary-container": "#009668",
+                            error: "#ba1a1a",
+                            surface: "#f7f9fb",
+                            "surface-container": "#eceef0",
+                            "surface-bright": "#f7f9fb",
+                            "tertiary-container": "#002113",
+                            "surface-container-low": "#f2f4f6",
+                            "on-background": "#191c1e",
+                            "inverse-on-surface": "#eff1f3",
+                            "surface-dim": "#d8dadc",
+                            tertiary: "#000000",
+                            "on-secondary-container": "#54647a",
+                            "on-primary": "#ffffff",
+                            outline: "#76777d",
+                            "primary-fixed": "#dde1ff",
+                            background: "#f7f9fb",
+                            "on-tertiary-fixed-variant": "#005236",
+                            "on-tertiary-fixed": "#002113",
+                            "on-surface-variant": "#45464d",
+                            "on-secondary": "#ffffff",
+                            "surface-tint": "#3755c3",
+                            secondary: "#505f76",
+                            "on-primary-container": "#607cec",
+                            "on-surface": "#191c1e",
+                            "on-secondary-fixed-variant": "#38485d",
+                            "secondary-fixed": "#d3e4fe",
+                            "on-primary-fixed-variant": "#173bab",
+                            "inverse-surface": "#2d3133",
+                            "on-secondary-fixed": "#0b1c30",
+                            "surface-variant": "#e0e3e5",
+                            "secondary-container": "#d0e1fb",
+                            "surface-container-high": "#e6e8ea",
+                            "on-primary-fixed": "#001453",
+                            "primary-container": "#001453",
+                            "inverse-primary": "#b8c4ff",
+                            "secondary-fixed-dim": "#b7c8e1",
+                            "surface-container-lowest": "#ffffff",
+                            "primary-fixed-dim": "#b8c4ff",
+                            "surface-container-highest": "#e0e3e5",
+                            "outline-variant": "#c6c6cd",
+                            "on-error": "#ffffff",
+                            "tertiary-fixed": "#6ffbbe",
+                            "on-error-container": "#93000a",
+                            primary: "#000000",
+                        },
+                        fontFamily: {
+                            headline: ["Manrope"],
+                            body: ["Inter"],
+                            label: ["Inter"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.25rem",
+                            lg: "0.5rem",
+                            xl: "0.75rem",
+                            full: "9999px",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .material-symbols-outlined {
+                font-variation-settings:
+                    "FILL" 0,
+                    "wght" 400,
+                    "GRAD" 0,
+                    "opsz" 24;
+            }
+            .glass-card {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(12px);
+            }
+            .sankey-path {
+                fill: none;
+                stroke-opacity: 0.15;
+            }
+            .sankey-node {
+                transition: transform 0.2s ease;
+            }
+            .sankey-node:hover {
+                transform: scale(1.02);
+            }
+        </style>
+    </head>
+    <body class="bg-surface font-body text-on-surface">
+        <!-- TopNavBar -->
+        <nav
+            class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100"
+        >
+            <div
+                class="flex justify-between items-center h-16 px-8 max-w-full mx-auto font-manrope font-bold tracking-tight"
+            >
+                <div class="flex items-center gap-8">
+                    <a
+                        class="text-xl font-black text-slate-900 tracking-tighter"
+                        >The Digital Curator</a
+                    >
+                    <nav class="hidden md:flex gap-6 items-center">
+                        <a
+                            class="text-slate-500 hover:text-slate-900 transition-colors"
+                            href="#"
+                            >Resume Builder</a
+                        >
+                        <a
+                            class="text-indigo-600 border-b-2 border-indigo-600 pb-1"
+                            href="#"
+                            >Hunt Tracker</a
+                        >
+                    </nav>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button
+                        class="px-4 py-2 text-slate-500 hover:text-slate-900 font-medium transition-all active:scale-95 text-sm"
+                    >
+                        Sign Out
+                    </button>
+                    <button
+                        class="px-5 py-2 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all active:scale-95 shadow-sm text-sm"
+                    >
+                        Profile
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="mt-16 p-8 min-h-screen">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <header
+                    class="mb-12 flex flex-col md:flex-row justify-between items-end gap-6"
+                >
+                    <div class="max-w-2xl">
+                        <h1
+                            class="text-4xl md:text-5xl font-headline font-extrabold tracking-tighter text-on-surface mb-4"
+                            style=""
+                        >
+                            The Hunt Dashboard
+                        </h1>
+                        <p
+                            class="text-lg text-on-surface-variant leading-relaxed"
+                            style=""
+                        >
+                            Your professional journey, curated. Monitor every
+                            application milestone and leverage AI to optimize
+                            your strategy.
+                        </p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button
+                            class="px-6 py-3 bg-primary text-on-primary font-headline font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                            style=""
+                        >
+                            New Application
+                        </button>
+                    </div>
+                </header>
+                <!-- Bento Grid Layout -->
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Main Sankey Graph (Hero Card) -->
+                    <div
+                        class="col-span-12 lg:col-span-8 bg-surface-container-lowest rounded-2xl shadow-[0_8px_24px_rgba(25,28,30,0.06)] p-8 relative overflow-hidden group"
+                    >
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="material-symbols-outlined text-on-primary-container"
+                                    style=""
+                                    >account_tree</span
+                                >
+                                <h3
+                                    class="font-headline font-bold text-xl"
+                                    style=""
+                                >
+                                    Conversion Flow
+                                </h3>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="flex items-center gap-1.5">
+                                    <span
+                                        class="w-2 h-2 rounded-full bg-primary-container"
+                                    ></span>
+                                    <span
+                                        class="text-xs font-medium text-on-surface-variant"
+                                        style=""
+                                        >Active</span
+                                    >
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span
+                                        class="w-2 h-2 rounded-full bg-error-container"
+                                    ></span>
+                                    <span
+                                        class="text-xs font-medium text-on-surface-variant"
+                                        style=""
+                                        >Rejected</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Mock Sankey Diagram Visualization -->
+                        <div class="h-80 w-full relative">
+                            <svg class="w-full h-full" viewbox="0 0 800 300">
+                                <!-- Paths -->
+                                <path
+                                    class="sankey-path stroke-primary-container"
+                                    d="M 50 50 C 150 50, 150 100, 250 100"
+                                    stroke-width="40"
+                                ></path>
+                                <path
+                                    class="sankey-path stroke-primary-container"
+                                    d="M 250 100 C 350 100, 350 150, 450 150"
+                                    stroke-width="25"
+                                ></path>
+                                <path
+                                    class="sankey-path stroke-primary-container"
+                                    d="M 450 150 C 550 150, 550 200, 650 200"
+                                    stroke-width="12"
+                                ></path>
+                                <!-- Dropoffs -->
+                                <path
+                                    class="sankey-path stroke-error"
+                                    d="M 250 100 C 350 100, 350 250, 450 250"
+                                    stroke-width="15"
+                                ></path>
+                                <path
+                                    class="sankey-path stroke-error"
+                                    d="M 450 150 C 550 150, 550 280, 650 280"
+                                    stroke-width="13"
+                                ></path>
+                                <!-- Nodes -->
+                                <g class="sankey-node cursor-pointer">
+                                    <rect
+                                        class="fill-primary"
+                                        height="240"
+                                        rx="8"
+                                        width="40"
+                                        x="30"
+                                        y="30"
+                                    ></rect>
+                                    <text
+                                        class="text-[10px] font-bold fill-on-surface-variant"
+                                        x="35"
+                                        y="20"
+                                    >
+                                        APPLIED (124)
+                                    </text>
+                                </g>
+                                <g class="sankey-node cursor-pointer">
+                                    <rect
+                                        class="fill-on-primary-container"
+                                        height="140"
+                                        rx="8"
+                                        width="40"
+                                        x="230"
+                                        y="80"
+                                    ></rect>
+                                    <text
+                                        class="text-[10px] font-bold fill-on-surface-variant"
+                                        x="235"
+                                        y="70"
+                                    >
+                                        SCREENING (42)
+                                    </text>
+                                </g>
+                                <g class="sankey-node cursor-pointer">
+                                    <rect
+                                        class="fill-on-primary-fixed-variant"
+                                        height="80"
+                                        rx="8"
+                                        width="40"
+                                        x="430"
+                                        y="135"
+                                    ></rect>
+                                    <text
+                                        class="text-[10px] font-bold fill-on-surface-variant"
+                                        x="435"
+                                        y="125"
+                                    >
+                                        INTERVIEW (18)
+                                    </text>
+                                </g>
+                                <g class="sankey-node cursor-pointer">
+                                    <rect
+                                        class="fill-tertiary-fixed-dim"
+                                        height="40"
+                                        rx="8"
+                                        width="40"
+                                        x="630"
+                                        y="190"
+                                    ></rect>
+                                    <text
+                                        class="text-[10px] font-bold fill-on-tertiary-container"
+                                        x="635"
+                                        y="180"
+                                    >
+                                        OFFER (5)
+                                    </text>
+                                </g>
+                            </svg>
+                        </div>
+                        <div
+                            class="mt-6 flex justify-between text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                        >
+                            <span class="" style="">SALARY RANGE</span>
+                            <span class="" style="">Location</span>
+                            <span class="" style="">Skills</span>
+                            <span class="" style="">Roles</span>
+                        </div>
+                    </div>
+
+                    <!-- ToDo List Card -->
+                    <section
+                        class="md:col-span-4 bg-surface-container-low rounded-xl p-8 flex flex-col"
+                    >
+                        <div class="mb-6 flex items-center justify-between">
+                            <h3
+                                class="text-xl font-headline font-bold text-on-surface"
+                                style=""
+                            >
+                                To-Do list
+                            </h3>
+                            <span
+                                class="material-symbols-outlined text-on-surface-variant"
+                                style=""
+                                >pending_actions</span
+                            >
+                        </div>
+                        <div class="space-y-4 flex-1">
+                            <div
+                                class="p-4 bg-surface-container-lowest rounded-xl shadow-sm border-l-4 border-on-primary-container"
+                            >
+                                <p
+                                    class="font-bold text-on-surface leading-tight"
+                                    style=""
+                                >
+                                    Follow up with Stripe
+                                </p>
+                                <p
+                                    class="text-xs text-on-surface-variant mt-1 italic"
+                                    style=""
+                                >
+                                    Due in 2 hours
+                                </p>
+                            </div>
+                            <div
+                                class="p-4 bg-surface-container-lowest rounded-xl shadow-sm opacity-80"
+                            >
+                                <p
+                                    class="font-medium text-on-surface leading-tight"
+                                    style=""
+                                >
+                                    Complete Take-home: Figma
+                                </p>
+                                <p
+                                    class="text-xs text-on-surface-variant mt-1"
+                                    style=""
+                                >
+                                    Due Tomorrow
+                                </p>
+                            </div>
+                            <div
+                                class="p-4 bg-surface-container-lowest rounded-xl shadow-sm opacity-80"
+                            >
+                                <p
+                                    class="font-medium text-on-surface leading-tight"
+                                    style=""
+                                >
+                                    Update Portfolio Case Study
+                                </p>
+                                <p
+                                    class="text-xs text-on-surface-variant mt-1"
+                                    style=""
+                                >
+                                    No due date
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            class="mt-6 w-full py-3 border border-outline-variant/30 text-on-surface-variant text-sm font-bold rounded-lg hover:bg-surface-container-high transition-colors"
+                            style=""
+                        >
+                            + Add Task
+                        </button>
+                    </section>
+                    <!-- Application List (Filtered) -->
+                    <div
+                        class="col-span-12 bg-surface-container-low rounded-2xl p-8 space-y-6"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <h3
+                                    class="font-headline font-bold text-2xl"
+                                    style=""
+                                >
+                                    Refined Application List
+                                </h3>
+                                <span
+                                    class="px-3 py-1 bg-surface-container-highest rounded-full text-xs font-bold text-on-surface-variant"
+                                    style=""
+                                    >12 Results</span
+                                >
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    class="p-2 bg-surface-container-lowest rounded-lg text-on-surface-variant hover:text-primary transition-colors"
+                                    style=""
+                                >
+                                    <span
+                                        class="material-symbols-outlined"
+                                        style=""
+                                        >filter_list</span
+                                    >
+                                </button>
+                                <button
+                                    class="p-2 bg-surface-container-lowest rounded-lg text-on-surface-variant hover:text-primary transition-colors"
+                                    style=""
+                                >
+                                    <span
+                                        class="material-symbols-outlined"
+                                        style=""
+                                        >download</span
+                                    >
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <!-- Application Item 1 -->
+                            <div
+                                class="bg-surface-container-lowest p-5 rounded-xl flex items-center justify-between hover:shadow-md transition-all duration-300 group"
+                            >
+                                <div class="flex items-center gap-6">
+                                    <div
+                                        class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center overflow-hidden"
+                                    >
+                                        <img
+                                            alt="Company Logo"
+                                            class="w-10 h-10 object-contain"
+                                            data-alt="minimalist tech company logo with clean lines and modern geometry on a white background"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5Jc8bml-SijnFjIjoXifPjArr-uoc_KnMlt6vBQW5ccS6fe82MZLr3q8Oh1BlZAoLtzLeEOoDHpl_CdOE8H0Rh_tihTo9qcbWcjvChwx6qu3RBzDdnXDJkU7hGRH1vLfVlXOhrtZKLp8QmrEEOYD8FsZ3XwNFDTDa8vPFBBmccIfA5G4X4hzeaeJ0TqrZ05zTO5TcjTUBCRFWORr-DHyWFmlxrU3bHrRPm1L_vt6vS-ccf60-yqks7KYpYPsFElV1bASsRbIivXhp"
+                                            style=""
+                                        />
+                                    </div>
+                                    <div>
+                                        <h5
+                                            class="font-bold text-lg text-primary"
+                                            style=""
+                                        >
+                                            Senior Product Designer
+                                        </h5>
+                                        <div
+                                            class="flex items-center gap-3 text-sm text-on-surface-variant"
+                                        >
+                                            <span class="font-medium" style=""
+                                                >Stripe</span
+                                            >
+                                            <span
+                                                class="w-1 h-1 rounded-full bg-outline-variant"
+                                            ></span>
+                                            <span class="" style=""
+                                                >Applied 12 days ago</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-8">
+                                    <div class="text-right">
+                                        <div
+                                            class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter mb-1"
+                                            style=""
+                                        >
+                                            Current Stage
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="w-2 h-2 rounded-full bg-on-primary-container animate-pulse"
+                                            ></span>
+                                            <span
+                                                class="font-bold text-on-primary-container"
+                                                style=""
+                                                >Technical Interview</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="h-10 w-[1px] bg-surface-container-high"
+                                    ></div>
+                                    <div
+                                        class="flex items-center gap-3 font-headline"
+                                    >
+                                        <button
+                                            class="px-4 py-2 border-2 border-outline-variant text-on-surface-variant text-sm font-bold rounded-lg hover:bg-surface-container-high transition-colors"
+                                            style=""
+                                        >
+                                            Rejected
+                                        </button>
+                                        <button
+                                            class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg hover:opacity-90 transition-opacity"
+                                            style=""
+                                        >
+                                            Passed Round
+                                        </button>
+                                        <button
+                                            class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors"
+                                            style=""
+                                            title="Add Action Item"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined"
+                                                style=""
+                                                >add_task</span
+                                            >
+                                        </button>
+                                        <button
+                                            class="p-2 text-on-primary-container bg-on-primary-container/10 hover:bg-on-primary-container/20 rounded-lg transition-colors"
+                                            style=""
+                                            title="AI Update"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined"
+                                                style=""
+                                                >smart_toy</span
+                                            >
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Application Item 2 -->
+                            <div
+                                class="bg-surface-container-lowest p-5 rounded-xl flex items-center justify-between hover:shadow-md transition-all duration-300 group"
+                            >
+                                <div class="flex items-center gap-6">
+                                    <div
+                                        class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center overflow-hidden"
+                                    >
+                                        <img
+                                            alt="Company Logo"
+                                            class="w-10 h-10 object-contain"
+                                            data-alt="sleek professional corporate logo using abstract geometric shapes in dark blue tones"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWSy_DUEAFcSR1zUUQRCcxeLwgqUC3Zzv_lpeZ5kso1d60x-G7ioal50YziHWtaLpBULyUVtH7w53dTPJDtb9eayqMCpAbruMAR2wak0mA2Jg-o8eMUV65qegkPeupjEyKCsxPYq5hu78hQvt5_OpJHR5CS2fiKMSWjkn_QNmXx_CYpTZuI0STYeWKNUT3HuprSRF5vkcY7orJjGDp3rPC-NKxytDZGrj2iAA5y9J6mwB6aHob-qYfXFMvCGuSpHwZyB3ssL-tFt4M"
+                                            style=""
+                                        />
+                                    </div>
+                                    <div>
+                                        <h5
+                                            class="font-bold text-lg text-primary"
+                                            style=""
+                                        >
+                                            Staff UX Researcher
+                                        </h5>
+                                        <div
+                                            class="flex items-center gap-3 text-sm text-on-surface-variant"
+                                        >
+                                            <span class="font-medium" style=""
+                                                >Linear</span
+                                            >
+                                            <span
+                                                class="w-1 h-1 rounded-full bg-outline-variant"
+                                            ></span>
+                                            <span class="" style=""
+                                                >Applied 18 days ago</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-8">
+                                    <div class="text-right">
+                                        <div
+                                            class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter mb-1"
+                                            style=""
+                                        >
+                                            Current Stage
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="w-2 h-2 rounded-full bg-on-tertiary-container"
+                                            ></span>
+                                            <span
+                                                class="font-bold text-on-tertiary-container"
+                                                style=""
+                                                >Offer Extended</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="h-10 w-[1px] bg-surface-container-high"
+                                    ></div>
+                                    <div
+                                        class="flex items-center gap-3 font-headline"
+                                    >
+                                        <button
+                                            class="px-4 py-2 border-2 border-outline-variant text-on-surface-variant text-sm font-bold rounded-lg hover:bg-surface-container-high transition-colors"
+                                            style=""
+                                        >
+                                            Rejected
+                                        </button>
+                                        <button
+                                            class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg hover:opacity-90 transition-opacity"
+                                            style=""
+                                        >
+                                            Passed Round
+                                        </button>
+                                        <button
+                                            class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors"
+                                            style=""
+                                            title="Add Action Item"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined"
+                                                style=""
+                                                >add_task</span
+                                            >
+                                        </button>
+                                        <button
+                                            class="p-2 text-on-primary-container bg-on-primary-container/10 hover:bg-on-primary-container/20 rounded-lg transition-colors"
+                                            style=""
+                                            title="AI Update"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined"
+                                                style=""
+                                                >smart_toy</span
+                                            >
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Application Item 3 -->
+                            <div
+                                class="bg-surface-container-lowest p-5 rounded-xl flex items-center justify-between hover:shadow-md transition-all duration-300 group"
+                            >
+                                <div class="flex items-center gap-6">
+                                    <div
+                                        class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center overflow-hidden"
+                                    >
+                                        <img
+                                            alt="Company Logo"
+                                            class="w-10 h-10 object-contain"
+                                            data-alt="modern startup logo with a bold lettermark in high contrast black and white"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjWpNJvzdyukZbtyUo9uDivgE5gJ5ODl8GeN8GaxgLFJBBnvPcQNWPS1N5wCdDy4ueCcB5fjtOyyq4iqDDE2iG3Od9cmTeYsSdKZGUyhfCEHs0O43DKwRAOJ-7Age6TBwdhMpOJHiL9g-V2z-Sods1--WmP7_2R5OwOMtFnjuo6ZCgJ1AqngtpZz4VnLijIoGna2f9-p2vTROq_Ukk4CqCY9XxCVOAC1fNQRxzrHKZBytFZpK741ng-EKE2JZNGv_aLvPWZGDHmBgY"
+                                            style=""
+                                        />
+                                    </div>
+                                    <div>
+                                        <h5
+                                            class="font-bold text-lg text-primary"
+                                            style=""
+                                        >
+                                            Lead Experience Architect
+                                        </h5>
+                                        <div
+                                            class="flex items-center gap-3 text-sm text-on-surface-variant"
+                                        >
+                                            <span class="font-medium" style=""
+                                                >Airbnb</span
+                                            >
+                                            <span
+                                                class="w-1 h-1 rounded-full bg-outline-variant"
+                                            ></span>
+                                            <span class="" style=""
+                                                >Applied 5 days ago</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-8">
+                                    <div class="text-right">
+                                        <div
+                                            class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter mb-1"
+                                            style=""
+                                        >
+                                            Current Stage
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="w-2 h-2 rounded-full bg-secondary"
+                                            ></span>
+                                            <span
+                                                class="font-bold text-secondary"
+                                                style=""
+                                                >Initial Screening</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="h-10 w-[1px] bg-surface-container-high"
+                                    ></div>
+                                    <div
+                                        class="flex items-center gap-3 font-headline"
+                                    >
+                                        <button
+                                            class="px-4 py-2 border-2 border-outline-variant text-on-surface-variant text-sm font-bold rounded-lg hover:bg-surface-container-high transition-colors"
+                                            style=""
+                                        >
+                                            Rejected
+                                        </button>
+                                        <button
+                                            class="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-lg hover:opacity-90 transition-opacity"
+                                            style=""
+                                        >
+                                            Passed Round
+                                        </button>
+                                        <button
+                                            class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors"
+                                            style=""
+                                            title="Add Action Item"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined"
+                                                style=""
+                                                >add_task</span
+                                            >
+                                        </button>
+                                        <button
+                                            class="p-2 text-on-primary-container bg-on-primary-container/10 hover:bg-on-primary-container/20 rounded-lg transition-colors"
+                                            style=""
+                                            title="AI Update"
+                                        >
+                                            <span
+                                                class="material-symbols-outlined"
+                                                style=""
+                                                >smart_toy</span
+                                            >
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Contextual FAB -->
+        <button
+            class="fixed bottom-8 right-8 bg-tertiary-fixed text-primary px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-bold hover:scale-105 transition-transform group"
+            style=""
+        >
+            <span
+                class="material-symbols-outlined"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >add</span
+            >
+            <span class="" style="">Chat</span>
+        </button>
+    </body>
+</html>
