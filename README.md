@@ -67,6 +67,56 @@ The app is built in three phases. Each phase ships working, deployed functionali
 
 ---
 
+## Local Development
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- JDK 21 — see [web-service/README.md](./web-service/README.md)
+- [Node.js 20+](https://nodejs.org/)
+
+### 1. Start PostgreSQL
+```bash
+docker compose up -d db
+```
+
+### 2. Run the web service
+```bash
+cd web-service
+./gradlew bootRun
+```
+The API will be available at `http://localhost:8080`.
+
+### 3. Run the frontend
+In a separate terminal:
+```bash
+cd frontend
+npm install   # first time only
+npm run dev
+```
+The app will be available at `http://localhost:5173`.
+
+### Verify
+```bash
+curl http://localhost:8080/health
+# → {"status":"ok"}
+```
+
+### Run tests
+```bash
+# Backend unit tests
+cd web-service && ./gradlew test
+
+# Frontend unit tests
+cd frontend && npm test
+```
+
+### Stop
+```bash
+docker compose down
+```
+
+---
+
 ## Design
 
 ### Entities

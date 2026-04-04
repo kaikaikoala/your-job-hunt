@@ -1,0 +1,35 @@
+databases:
+  - name: jobhunt-db
+    plan: free
+    databaseName: jobhunt
+
+services:
+  - type: web
+    name: jobhunt-api
+    env: docker
+    plan: free
+    dockerfilePath: ./web-service/Dockerfile
+    dockerContext: ./web-service
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jobhunt-db
+          property: connectionString
+      - key: DB_USER
+        fromDatabase:
+          name: jobhunt-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: jobhunt-db
+          property: password
+
+  - type: web
+    name: jobhunt-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://jobhunt-api.onrender.com
