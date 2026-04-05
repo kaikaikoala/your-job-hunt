@@ -7,7 +7,6 @@ services:
   - type: web
     name: jobhunt-api
     env: docker
-    plan: free
     dockerfilePath: ./web-service/Dockerfile
     dockerContext: ./web-service
     envVars:
