@@ -10,10 +10,18 @@ services:
     dockerfilePath: ./web-service/Dockerfile
     dockerContext: ./web-service
     envVars:
-      - key: DATABASE_URL
+      - key: DB_HOST
         fromDatabase:
           name: jobhunt-db
-          property: jdbcConnectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: jobhunt-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: jobhunt-db
+          property: database
       - key: DB_USER
         fromDatabase:
           name: jobhunt-db
