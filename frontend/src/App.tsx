@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import LandingPage from './pages/LandingPage';
 import SignInPage from './pages/SignInPage';
-import DashboardPage from './pages/DashboardPage';
+import HuntPage from './pages/HuntPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -13,7 +13,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/sign-in" element={<SignInPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/hunt" element={<HuntPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

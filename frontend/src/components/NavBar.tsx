@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const NAV_LINKS = [
-  { label: 'Resume Builder', key: 'resume-builder' },
-  { label: 'Hunt Tracker', key: 'hunt-tracker' },
+  { label: 'Resume Builder', key: 'resume-builder', href: '#' },
+  { label: 'Hunt Tracker', key: 'hunt-tracker', href: '/hunt' },
 ] as const;
 
 type NavLink = (typeof NAV_LINKS)[number]['key'];
@@ -57,13 +57,13 @@ export default function NavBar({ activeLink }: NavBarProps) {
             gap: 4,
           }}
         >
-          {NAV_LINKS.map(({ label, key }) => {
+          {NAV_LINKS.map(({ label, key, href }) => {
             const isActive = activeLink === key;
             return (
               <Typography
                 key={key}
                 component="a"
-                href="#"
+                href={href}
                 sx={{
                   color: isActive ? '#607CEC' : '#45464D',
                   textDecoration: 'none',

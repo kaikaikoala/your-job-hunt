@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../theme';
-import DashboardPage from './DashboardPage';
+import HuntPage from './HuntPage';
 import * as applicationsApi from '../api/applications';
 
 // Mock Firebase auth context
@@ -32,20 +32,20 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
-describe('DashboardPage', () => {
+describe('HuntPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('shows loading indicator while query is pending', () => {
     vi.mocked(applicationsApi.fetchApplications).mockReturnValue(new Promise(() => {}));
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<HuntPage />);
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('shows empty state when API returns empty list', async () => {
     vi.mocked(applicationsApi.fetchApplications).mockResolvedValue([]);
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<HuntPage />);
     await waitFor(() => {
       expect(screen.getByText('No applications yet.')).toBeInTheDocument();
     });
@@ -56,7 +56,7 @@ describe('DashboardPage', () => {
       { appId: '1', company: 'Stripe', role: 'Staff Engineer' },
       { appId: '2', company: 'Linear', role: 'Product Designer' },
     ]);
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<HuntPage />);
     await waitFor(() => {
       expect(screen.getByText('Staff Engineer')).toBeInTheDocument();
       expect(screen.getByText('Stripe')).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('DashboardPage', () => {
 
   it('"New Application" button opens the add dialog', async () => {
     vi.mocked(applicationsApi.fetchApplications).mockResolvedValue([]);
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(<HuntPage />);
     await waitFor(() => screen.getByText('No applications yet.'));
 
     await userEvent.click(screen.getByRole('button', { name: /new application/i }));

@@ -13,7 +13,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate('/hunt');
     }
   }, [user, navigate]);
 

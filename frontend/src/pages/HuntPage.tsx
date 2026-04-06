@@ -27,7 +27,7 @@ export default function DashboardPage() {
       <NavBar activeLink="hunt-tracker" />
 
       {/* Main */}
-      <Box component="main" sx={{ pt: '64px', p: 4, maxWidth: 1280, mx: 'auto' }}>
+      <Box component="main" sx={{ pt: '64px', px: 4, pb: 4, maxWidth: 1280, mx: 'auto' }}>
         {/* Header */}
         <Box
           sx={{
