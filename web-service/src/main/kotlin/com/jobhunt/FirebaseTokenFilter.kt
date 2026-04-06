@@ -12,6 +12,9 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class FirebaseTokenFilter(private val firebaseAuth: FirebaseAuth) : OncePerRequestFilter() {
 
+    override fun shouldNotFilter(request: HttpServletRequest) =
+        request.method.equals("OPTIONS", ignoreCase = true)
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
