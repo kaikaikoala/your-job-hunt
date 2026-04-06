@@ -1,4 +1,5 @@
 import AppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
@@ -6,9 +7,11 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import heroPng from '../assets/corp-man.png';
+import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   return (
     <Box sx={{ bgcolor: '#F7F9FB', minHeight: '100vh' }}>
@@ -66,22 +69,52 @@ export default function LandingPage() {
             ))}
           </Box>
 
-          {/* Sign In */}
-          <Button
-            variant="contained"
-            onClick={() => navigate('/sign-in')}
-            sx={{
-              fontFamily: 'Manrope, sans-serif',
-              fontWeight: 700,
-              borderRadius: '8px',
-              textTransform: 'none',
-              px: 2.5,
-              py: 1,
-              fontSize: '0.875rem',
-            }}
-          >
-            Sign In
-          </Button>
+          {/* Auth controls */}
+          {user ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar
+                src={user.photoURL ?? undefined}
+                alt={user.displayName ?? 'User'}
+                sx={{ width: 34, height: 34, fontSize: '0.8rem' }}
+              >
+                {!user.photoURL && (user.displayName?.[0] ?? user.email?.[0] ?? 'U')}
+              </Avatar>
+              <Button
+                variant="outlined"
+                onClick={signOut}
+                sx={{
+                  fontFamily: 'Manrope, sans-serif',
+                  fontWeight: 700,
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  px: 2.5,
+                  py: 1,
+                  fontSize: '0.875rem',
+                  borderColor: '#e2e8f0',
+                  color: '#0F172A',
+                  '&:hover': { borderColor: '#607CEC', bgcolor: '#f8faff' },
+                }}
+              >
+                Sign Out
+              </Button>
+            </Box>
+          ) : (
+            <Button
+              variant="contained"
+              onClick={() => navigate('/sign-in')}
+              sx={{
+                fontFamily: 'Manrope, sans-serif',
+                fontWeight: 700,
+                borderRadius: '8px',
+                textTransform: 'none',
+                px: 2.5,
+                py: 1,
+                fontSize: '0.875rem',
+              }}
+            >
+              Sign In
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
 
