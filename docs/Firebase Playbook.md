@@ -14,13 +14,16 @@ Authentication → Sign-in method → Google → **Enable** → Save.
 
 Project settings (⚙️) → Your apps → **Add app** → Web (`</>`) → Register app → copy the `firebaseConfig` object.
 
-Create `frontend/.env.local` (gitignored) with the four values from that object:
+Create `frontend/.env.local` (gitignored) with the four values from that object, plus the backend API URL:
 ```
 VITE_FIREBASE_API_KEY=...
 VITE_FIREBASE_AUTH_DOMAIN=<project-id>.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=<project-id>
 VITE_FIREBASE_APP_ID=...
+VITE_API_URL=http://localhost:8080
 ```
+
+`VITE_API_URL` must be set or API requests will fall through to the Vite dev server and fail.
 
 ## 4. Create the service account
 
