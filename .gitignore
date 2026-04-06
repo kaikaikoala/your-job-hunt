@@ -1,1 +1,10 @@
 .DS_STORE
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Spring Boot / Gradle
+web-service/build/
+web-service/.gradle/

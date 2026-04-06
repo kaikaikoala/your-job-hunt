@@ -73,28 +73,7 @@ The app is built in three phases. Each phase ships working, deployed functionali
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - JDK 21 — see [web-service/README.md](./web-service/README.md)
 - [Node.js 20+](https://nodejs.org/)
-
-### Auth setup (one-time)
-
-**Firebase console setup:**
-1. Go to [console.firebase.google.com](https://console.firebase.google.com) → Create project (or select existing)
-2. **Enable Google Sign-In**: Authentication → Sign-in method → Google → Enable → Save
-3. **Register web app**: Project settings (⚙️) → Your apps → Add app → Web → Register → copy the `firebaseConfig` object
-4. **Create service account for backend**: Project settings → Service accounts → Generate new private key → download JSON
-5. **Authorize localhost**: Authentication → Settings → Authorized domains → Add `localhost`
-
-**Create `frontend/.env.local`** (gitignored) with values from the `firebaseConfig` object:
-```
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=<project-id>.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=<project-id>
-VITE_FIREBASE_APP_ID=...
-```
-
-**Set `FIREBASE_SERVICE_ACCOUNT`** for the web service — the full contents of the downloaded service account JSON:
-```bash
-export FIREBASE_SERVICE_ACCOUNT=$(cat /path/to/service-account.json)
-```
+- Firebase project configured — see [docs/Firebase Playbook.md](./docs/Firebase%20Playbook.md)
 
 ### 1. Start PostgreSQL
 ```bash
@@ -102,7 +81,9 @@ docker compose up -d db
 ```
 
 ### 2. Run the web service
+Set the Firebase service account credential, then start the service:
 ```bash
+export FIREBASE_SERVICE_ACCOUNT=$(cat /path/to/service-account.json)
 cd web-service
 ./gradlew bootRun
 ```
@@ -163,20 +144,7 @@ The `render.yaml` blueprint provisions:
 
 ### Firebase configuration
 
-1. **Authorize the Render domain**: Firebase console → Authentication → Settings → Authorized domains → Add your static site domain (e.g. `jobhunt-frontend.onrender.com`)
-2. The service account from the local setup steps above is reused — no new credentials needed.
-
-In the Render dashboard, set the following secrets under Environment Variables (mark as secret):
-
-| Service | Variable | Value |
-|:--------|:---------|:------|
-| `jobhunt-api` | `FIREBASE_SERVICE_ACCOUNT` | Full contents of the service account JSON file |
-| `jobhunt-frontend` | `VITE_FIREBASE_API_KEY` | From Firebase web app config |
-| `jobhunt-frontend` | `VITE_FIREBASE_AUTH_DOMAIN` | From Firebase web app config |
-| `jobhunt-frontend` | `VITE_FIREBASE_PROJECT_ID` | From Firebase web app config |
-| `jobhunt-frontend` | `VITE_FIREBASE_APP_ID` | From Firebase web app config |
-
-> `VITE_*` vars are baked into the static bundle at build time — a redeploy is required if they change.
+See [docs/Firebase Playbook.md](./docs/Firebase%20Playbook.md) for authorized domain and secret setup.
 
 ### Re-deploying
 Push to `main` on GitHub. Render picks up the change automatically. To trigger a manual deploy, use the Render dashboard or the Render CLI.

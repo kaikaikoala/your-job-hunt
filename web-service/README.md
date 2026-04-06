@@ -30,9 +30,16 @@ sdk env
 
 ## Running locally
 
-PostgreSQL must be running before starting the service. From the repo root:
+PostgreSQL must be running and `FIREBASE_SERVICE_ACCOUNT` must be set before starting the service. See [Firebase Playbook](../docs/Firebase%20Playbook.md) for one-time setup.
+
+From the repo root:
 ```bash
 docker compose up -d db
+```
+
+Export the service account credential:
+```bash
+export FIREBASE_SERVICE_ACCOUNT=$(cat /path/to/service-account.json)
 ```
 
 Then start the web service:

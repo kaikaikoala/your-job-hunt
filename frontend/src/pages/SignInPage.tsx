@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -7,16 +7,22 @@ import Typography from '@mui/material/Typography';
 import { useAuth } from '../context/AuthContext';
 
 export default function SignInPage() {
-  const { signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   async function handleSignIn() {
     setLoading(true);
     try {
       await signInWithGoogle();
-      navigate('/dashboard');
-    } finally {
+    } catch (err) {
+      console.error('Sign-in error:', err);
       setLoading(false);
     }
   }
