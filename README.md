@@ -117,6 +117,33 @@ docker compose down
 
 ---
 
+## Deployment Setup
+
+The app is deployed on [Render](https://render.com/) using the `render.yaml` blueprint, connected to the GitHub repo [kaikaikoala/your-job-hunt](https://github.com/kaikaikoala/your-job-hunt). Render auto-deploys on push to `main`.
+
+| Service | URL |
+|:--------|:----|
+| Web service (API) | https://jobhunt-api-8cwf.onrender.com |
+| Frontend | https://jobhunt-frontend-4g9s.onrender.com |
+
+### Health check
+```bash
+curl https://jobhunt-api-8cwf.onrender.com/health
+# → {"status":"ok"}
+```
+
+### Services
+The `render.yaml` blueprint provisions:
+
+- **`jobhunt-db`** — PostgreSQL (free tier)
+- **`jobhunt-api`** — Docker web service (Spring Boot); DB connection env vars are injected automatically from the database
+- **`jobhunt-frontend`** — Static site built with `npm run build` from `./frontend`; `VITE_API_URL` points to the deployed API
+
+### Re-deploying
+Push to `main` on GitHub. Render picks up the change automatically. To trigger a manual deploy, use the Render dashboard or the Render CLI.
+
+---
+
 ## Design
 
 ### Entities
