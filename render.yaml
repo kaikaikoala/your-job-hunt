@@ -32,6 +32,8 @@ services:
           property: password
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
+      - key: APP_CORS_ALLOWED_ORIGIN
+        value: https://jobhunt-frontend-4g9s.onrender.com
 
   - type: web
     name: jobhunt-frontend
