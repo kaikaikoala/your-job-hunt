@@ -137,13 +137,13 @@ function ApplicationCard({ app }: { app: Application }) {
           </Box>
         </Box>
 
-        <Box sx={{ width: 1, height: 36, bgcolor: '#eceef0' }} />
+        <Box sx={{ width: '1px', height: 36, bgcolor: '#eceef0' }} />
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Button
             variant="outlined"
             size="small"
-            sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderColor: '#c6c6cd', color: '#45464D', fontSize: 13 }}
+            sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderColor: '#c6c6cd', color: '#45464D', fontSize: 13, px: 1.5 }}
           >
             Rejected
           </Button>
