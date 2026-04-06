@@ -1,12 +1,15 @@
 # Stage 1 — build
 FROM gradle:8.7-jdk21 AS build
-WORKDIR /app
-COPY . .
+WORKDIR /workspace
+COPY web-service/ ./web-service/
+COPY database/ ./database/
+WORKDIR /workspace/web-service
 RUN gradle bootJar --no-daemon
 
 # Stage 2 — runtime
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /workspace/web-service/build/libs/*.jar app.jar
+COPY --from=build /workspace/database/migrations/ /database/migrations/
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

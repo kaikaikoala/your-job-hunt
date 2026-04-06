@@ -8,7 +8,7 @@ services:
     name: jobhunt-api
     env: docker
     dockerfilePath: ./web-service/Dockerfile
-    dockerContext: ./web-service
+    dockerContext: .
     envVars:
       - key: DB_HOST
         fromDatabase:
