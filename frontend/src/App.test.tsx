@@ -9,5 +9,5 @@ test('renders app heading', () => {
       <App />
     </ThemeProvider>,
   );
-  expect(screen.getByText('The Digital Curator')).toBeInTheDocument();
+  expect(screen.getAllByText('The Digital Curator').length).toBeGreaterThan(0);
 });

@@ -142,6 +142,31 @@ The `render.yaml` blueprint provisions:
 - **`jobhunt-api`** — Docker web service (Spring Boot); DB connection env vars are injected automatically from the database
 - **`jobhunt-frontend`** — Static site built with `npm run build` from `./frontend`; `VITE_API_URL` points to the deployed API
 
+### Environment variables
+
+Variables are set **per service** in the Render dashboard (or via `render.yaml`). `sync: false` means the value must be entered manually in the dashboard — it is never committed to the repo.
+
+**Web service (`jobhunt-api`)**
+
+| Variable | Source | Notes |
+|:---------|:-------|:------|
+| `DB_HOST` | Auto-injected from `jobhunt-db` | |
+| `DB_PORT` | Auto-injected from `jobhunt-db` | |
+| `DB_NAME` | Auto-injected from `jobhunt-db` | |
+| `DB_USER` | Auto-injected from `jobhunt-db` | |
+| `DB_PASSWORD` | Auto-injected from `jobhunt-db` | |
+| `FIREBASE_SERVICE_ACCOUNT` | Manual (`sync: false`) | Paste the contents of your Firebase service account JSON |
+
+**Frontend (`jobhunt-frontend`)**
+
+| Variable | Source | Notes |
+|:---------|:-------|:------|
+| `VITE_API_URL` | Set in `render.yaml` | Points to the deployed web service URL |
+| `VITE_FIREBASE_API_KEY` | Manual (`sync: false`) | |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Manual (`sync: false`) | |
+| `VITE_FIREBASE_PROJECT_ID` | Manual (`sync: false`) | |
+| `VITE_FIREBASE_APP_ID` | Manual (`sync: false`) | |
+
 ### Firebase configuration
 
 See [docs/Firebase Playbook.md](./docs/Firebase%20Playbook.md) for authorized domain and secret setup.

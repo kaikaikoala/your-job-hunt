@@ -36,17 +36,3 @@ Authentication → Settings → **Authorized domains**:
 |:------------|:--------------|
 | Local dev | `localhost` |
 | Render | your Render static site domain (e.g. `jobhunt-frontend.onrender.com`) |
-
-## Render deployment
-
-Set the following secrets in the Render dashboard under Environment Variables:
-
-| Service | Variable | Value |
-|:--------|:---------|:------|
-| `jobhunt-api` | `FIREBASE_SERVICE_ACCOUNT` | Full contents of the service account JSON file |
-| `jobhunt-frontend` | `VITE_FIREBASE_API_KEY` | From Firebase web app config |
-| `jobhunt-frontend` | `VITE_FIREBASE_AUTH_DOMAIN` | From Firebase web app config |
-| `jobhunt-frontend` | `VITE_FIREBASE_PROJECT_ID` | From Firebase web app config |
-| `jobhunt-frontend` | `VITE_FIREBASE_APP_ID` | From Firebase web app config |
-
-> `VITE_*` vars are baked into the static bundle at build time — a redeploy is required if they change.
