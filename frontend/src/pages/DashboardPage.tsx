@@ -12,10 +12,9 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { fetchApplications, type Application } from '../api/applications';
 import AddApplicationDialog from '../components/AddApplicationDialog';
-import { useAuth } from '../context/AuthContext';
+import NavBar from '../components/NavBar';
 
 export default function DashboardPage() {
-  const { user, signOut } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: applications, isLoading } = useQuery({
@@ -25,57 +24,7 @@ export default function DashboardPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#F7F9FB' }}>
-      {/* Nav */}
-      <Box
-        component="nav"
-        sx={{
-          position: 'fixed',
-          top: 0,
-          width: '100%',
-          zIndex: 50,
-          bgcolor: 'rgba(255,255,255,0.85)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid #e2e8f0',
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            height: 64,
-            px: 4,
-            maxWidth: 1280,
-            mx: 'auto',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Typography
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 900, fontSize: '1.2rem', color: '#0F172A' }}
-            >
-              The Digital Curator
-            </Typography>
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3 }}>
-              <Typography component="a" href="#" sx={{ color: '#64748b', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>
-                Resume Builder
-              </Typography>
-              <Typography component="a" href="#" sx={{ color: '#607CEC', textDecoration: 'none', fontSize: 14, fontWeight: 700, borderBottom: '2px solid #607CEC', pb: 0.5 }}>
-                Hunt Tracker
-              </Typography>
-            </Box>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Button onClick={signOut} sx={{ color: '#64748b', fontSize: 14, fontWeight: 500 }}>
-              Sign Out
-            </Button>
-            <Avatar
-              src={user?.photoURL ?? undefined}
-              alt={user?.displayName ?? 'User'}
-              sx={{ width: 36, height: 36, cursor: 'pointer' }}
-            />
-          </Box>
-        </Box>
-      </Box>
+      <NavBar activeLink="hunt-tracker" />
 
       {/* Main */}
       <Box component="main" sx={{ pt: '64px', p: 4, maxWidth: 1280, mx: 'auto' }}>

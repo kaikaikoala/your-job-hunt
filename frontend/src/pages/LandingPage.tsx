@@ -1,122 +1,17 @@
-import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import heroPng from '../assets/corp-man.png';
-import { useAuth } from '../context/AuthContext';
+import NavBar from '../components/NavBar';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
 
   return (
     <Box sx={{ bgcolor: '#F7F9FB', minHeight: '100vh' }}>
-      {/* Top Nav */}
-      <AppBar
-        position="fixed"
-        elevation={0}
-        sx={{
-          bgcolor: 'rgba(255,255,255,0.85)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid #f1f5f9',
-        }}
-      >
-        <Toolbar sx={{ height: 64, px: { xs: 3, md: 4 } }}>
-          {/* Brand */}
-          <Typography
-            sx={{
-              fontFamily: 'Manrope, sans-serif',
-              fontWeight: 900,
-              fontSize: '1.2rem',
-              color: '#0F172A',
-              letterSpacing: '-0.03em',
-              flexShrink: 0,
-            }}
-          >
-            The Digital Curator
-          </Typography>
-
-          {/* Center links */}
-          <Box
-            component="nav"
-            sx={{
-              flex: 1,
-              display: { xs: 'none', md: 'flex' },
-              justifyContent: 'center',
-              gap: 4,
-            }}
-          >
-            {['Resume Builder', 'Hunt Tracker'].map((label) => (
-              <Typography
-                key={label}
-                component="a"
-                href="#"
-                sx={{
-                  color: '#45464D',
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                  fontSize: '0.9rem',
-                  '&:hover': { color: '#0F172A' },
-                  transition: 'color 0.15s',
-                }}
-              >
-                {label}
-              </Typography>
-            ))}
-          </Box>
-
-          {/* Auth controls */}
-          {user ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Avatar
-                src={user.photoURL ?? undefined}
-                alt={user.displayName ?? 'User'}
-                sx={{ width: 34, height: 34, fontSize: '0.8rem' }}
-              >
-                {!user.photoURL && (user.displayName?.[0] ?? user.email?.[0] ?? 'U')}
-              </Avatar>
-              <Button
-                variant="outlined"
-                onClick={signOut}
-                sx={{
-                  fontFamily: 'Manrope, sans-serif',
-                  fontWeight: 700,
-                  borderRadius: '8px',
-                  textTransform: 'none',
-                  px: 2.5,
-                  py: 1,
-                  fontSize: '0.875rem',
-                  borderColor: '#e2e8f0',
-                  color: '#0F172A',
-                  '&:hover': { borderColor: '#607CEC', bgcolor: '#f8faff' },
-                }}
-              >
-                Sign Out
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              variant="contained"
-              onClick={() => navigate('/sign-in')}
-              sx={{
-                fontFamily: 'Manrope, sans-serif',
-                fontWeight: 700,
-                borderRadius: '8px',
-                textTransform: 'none',
-                px: 2.5,
-                py: 1,
-                fontSize: '0.875rem',
-              }}
-            >
-              Sign In
-            </Button>
-          )}
-        </Toolbar>
-      </AppBar>
+      <NavBar />
 
       {/* Page content */}
       <Box
