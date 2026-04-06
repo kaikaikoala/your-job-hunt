@@ -490,10 +490,10 @@ export default function LandingPage() {
                 mb: 0.5,
               }}
             >
-              The Digital Curator
+              Your Job Hunt
             </Typography>
             <Typography sx={{ color: '#45464D', fontSize: '0.875rem' }}>
-              © 2025 The Premium Job Hunting Experience.
+              © 2025 Your Job Hunt.
             </Typography>
           </Box>
 

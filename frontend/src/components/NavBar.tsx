@@ -35,6 +35,8 @@ export default function NavBar({ activeLink }: NavBarProps) {
       <Toolbar sx={{ height: 64, px: { xs: 3, md: 4 }, maxWidth: 1280, width: '100%', mx: 'auto' }}>
         {/* Brand */}
         <Typography
+          component="a"
+          href="/"
           sx={{
             fontFamily: 'Manrope, sans-serif',
             fontWeight: 900,
@@ -42,9 +44,10 @@ export default function NavBar({ activeLink }: NavBarProps) {
             color: '#0F172A',
             letterSpacing: '-0.03em',
             flexShrink: 0,
+            textDecoration: 'none',
           }}
         >
-          The Digital Curator
+          Your Job Hunt
         </Typography>
 
         {/* Center links */}

@@ -60,7 +60,7 @@ export default function SignInPage() {
             mb: 1,
           }}
         >
-          The Digital Curator
+          Your Job Hunt
         </Typography>
 
         <Typography
