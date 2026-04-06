@@ -30,6 +30,9 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.bootRun {
-    args("--spring.profiles.active=local")
+// Bundle migrations from the repo-root database/ directory into the JAR classpath
+tasks.processResources {
+    from("../database/migrations") {
+        into("db/migration")
+    }
 }

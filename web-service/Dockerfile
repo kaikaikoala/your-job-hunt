@@ -10,6 +10,5 @@ RUN gradle bootJar --no-daemon
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /workspace/web-service/build/libs/*.jar app.jar
-COPY --from=build /workspace/database/migrations/ /database/migrations/
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
