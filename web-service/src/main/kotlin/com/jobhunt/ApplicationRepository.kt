@@ -5,4 +5,5 @@ import java.util.UUID
 
 interface ApplicationRepository : JpaRepository<JobApplication, UUID> {
     fun findAllByUserId(userId: String): List<JobApplication>
+    fun findByAppIdAndUserId(appId: UUID, userId: String): JobApplication?
 }

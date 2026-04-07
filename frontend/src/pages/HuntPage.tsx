@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
   Box,
@@ -9,10 +10,27 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchApplications, type Application } from '../api/applications';
+import { createStage } from '../api/stages';
 import AddApplicationDialog from '../components/AddApplicationDialog';
+import AddStageDialog from '../components/AddStageDialog';
 import NavBar from '../components/NavBar';
+
+const STAGE_COLORS: Record<string, string> = {
+  Applied: '#a5b4fc',
+  Referred: '#a5b4fc',
+  Technical: '#607CEC',
+  Offer: '#4EDEA3',
+  Rejected: '#BA1A1A',
+};
+
+function stageColor(stage?: string) {
+  if (!stage) return '#c6c6cd';
+  return STAGE_COLORS[stage] ?? '#607CEC';
+}
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
 
 export default function DashboardPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -88,79 +106,105 @@ export default function DashboardPage() {
 }
 
 function ApplicationCard({ app }: { app: Application }) {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [addStageOpen, setAddStageOpen] = useState(false);
+
+  const latestStage = app.latestStage?.stage;
+  const dotColor = stageColor(latestStage);
+
+  const rejectMutation = useMutation({
+    mutationFn: () =>
+      createStage(app.appId, { stage: 'Rejected', stageDate: todayIso(), result: 'Rejected' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['applications'] });
+    },
+  });
+
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2.5,
-        borderRadius: 3,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        bgcolor: '#fff',
-        border: '1px solid #eceef0',
-        '&:hover': { boxShadow: '0 4px 16px rgba(25,28,30,0.08)' },
-        transition: 'box-shadow 0.2s',
-      }}
-    >
-      {/* Left: logo + info */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-        <Avatar
-          variant="rounded"
-          sx={{ width: 52, height: 52, bgcolor: '#eceef0', color: '#45464D', fontWeight: 700, fontSize: 20, borderRadius: 2 }}
-        >
-          {app.company.charAt(0).toUpperCase()}
-        </Avatar>
-        <Box>
-          <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#607CEC' }}>
-            {app.role}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-            <Typography sx={{ fontSize: 14, fontWeight: 500, color: '#45464D' }}>
-              {app.company}
+    <>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2.5,
+          borderRadius: 3,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          bgcolor: '#fff',
+          border: '1px solid #eceef0',
+          '&:hover': { boxShadow: '0 4px 16px rgba(25,28,30,0.08)' },
+          transition: 'box-shadow 0.2s',
+          cursor: 'pointer',
+        }}
+        onClick={() => navigate(`/applications/${app.appId}`)}
+      >
+        {/* Left: logo + info */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+          <Avatar
+            variant="rounded"
+            sx={{ width: 52, height: 52, bgcolor: '#eceef0', color: '#45464D', fontWeight: 700, fontSize: 20, borderRadius: 2 }}
+          >
+            {app.company.charAt(0).toUpperCase()}
+          </Avatar>
+          <Box>
+            <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#607CEC' }}>
+              {app.role}
             </Typography>
-            <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#c6c6cd' }} />
-            <Typography sx={{ fontSize: 14, color: '#45464D' }}>Applied recently</Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* Right: stage + actions */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        <Box sx={{ textAlign: 'right' }}>
-          <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#45464D', textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
-            Current Stage
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#c6c6cd' }} />
-            <Typography sx={{ fontSize: 14, color: '#45464D' }}>—</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+              <Typography sx={{ fontSize: 14, fontWeight: 500, color: '#45464D' }}>
+                {app.company}
+              </Typography>
+              <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#c6c6cd' }} />
+              <Typography sx={{ fontSize: 14, color: '#45464D' }}>Applied recently</Typography>
+            </Box>
           </Box>
         </Box>
 
-        <Box sx={{ width: '1px', height: 36, bgcolor: '#eceef0' }} />
+        {/* Right: stage + actions */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }} onClick={(e) => e.stopPropagation()}>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#45464D', textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+              Current Stage
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: dotColor }} />
+              <Typography sx={{ fontSize: 14, color: '#45464D' }}>
+                {latestStage ?? '—'}
+              </Typography>
+            </Box>
+          </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderColor: '#c6c6cd', color: '#45464D', fontSize: 13, px: 1.5 }}
-          >
-            Rejected
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13 }}
-          >
-            Passed Round
-          </Button>
-          <Tooltip title="Add Action Item">
-            <IconButton size="small" sx={{ color: '#45464D' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add_task</span>
-            </IconButton>
-          </Tooltip>
+          <Box sx={{ width: '1px', height: 36, bgcolor: '#eceef0' }} />
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              disabled={rejectMutation.isPending}
+              onClick={() => rejectMutation.mutate()}
+              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderColor: '#c6c6cd', color: '#45464D', fontSize: 13, px: 1.5 }}
+            >
+              Rejected
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setAddStageOpen(true)}
+              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13 }}
+            >
+              Passed Round
+            </Button>
+            <Tooltip title="Add Action Item">
+              <IconButton size="small" sx={{ color: '#45464D' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add_task</span>
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
-      </Box>
-    </Paper>
+      </Paper>
+
+      <AddStageDialog open={addStageOpen} appId={app.appId} onClose={() => setAddStageOpen(false)} />
+    </>
   );
 }
