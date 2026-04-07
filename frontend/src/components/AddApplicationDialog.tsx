@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Stack,
   TextField,
 } from '@mui/material';
@@ -18,12 +19,15 @@ interface Props {
   onClose: () => void;
 }
 
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
 export default function AddApplicationDialog({ open, onClose }: Props) {
   const qc = useQueryClient();
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const [jobPostingUrl, setJobPostingUrl] = useState('');
   const [salaryRange, setSalaryRange] = useState('');
+  const [stageDate, setStageDate] = useState(todayIso);
   const [duplicateError, setDuplicateError] = useState(false);
 
   const mutation = useMutation({
@@ -44,18 +48,21 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
     setRole('');
     setJobPostingUrl('');
     setSalaryRange('');
+    setStageDate(todayIso());
     setDuplicateError(false);
     mutation.reset();
     onClose();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (initialStage: 'Applied' | 'Referred') => {
     setDuplicateError(false);
     mutation.mutate({
       company: company.trim(),
       role: role.trim(),
       jobPostingUrl: jobPostingUrl.trim() || undefined,
       salaryRange: salaryRange.trim() || undefined,
+      initialStage,
+      stageDate,
     });
   };
 
@@ -63,8 +70,15 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700 }}>
+      <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, pr: 6 }}>
         New Application
+        <IconButton
+          onClick={handleClose}
+          disabled={mutation.isPending}
+          sx={{ position: 'absolute', right: 8, top: 8 }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+        </IconButton>
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
@@ -100,18 +114,30 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
             value={salaryRange}
             onChange={(e) => setSalaryRange(e.target.value)}
           />
+          <TextField
+            label="Date"
+            type="date"
+            fullWidth
+            value={stageDate}
+            onChange={(e) => setStageDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleClose} disabled={mutation.isPending}>
-          Cancel
+        <Button
+          variant="contained"
+          onClick={() => handleSubmit('Referred')}
+          disabled={!canSubmit}
+        >
+          {mutation.isPending ? 'Adding…' : 'Referred'}
         </Button>
         <Button
           variant="contained"
-          onClick={handleSubmit}
+          onClick={() => handleSubmit('Applied')}
           disabled={!canSubmit}
         >
-          {mutation.isPending ? 'Adding…' : 'Add Application'}
+          {mutation.isPending ? 'Adding…' : 'Applied'}
         </Button>
       </DialogActions>
     </Dialog>

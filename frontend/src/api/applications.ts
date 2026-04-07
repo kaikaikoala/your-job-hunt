@@ -13,6 +13,8 @@ export interface CreateApplicationInput {
   role: string;
   jobPostingUrl?: string;
   salaryRange?: string;
+  initialStage?: string;
+  stageDate?: string;
 }
 
 export const fetchApplications = (): Promise<Application[]> =>
