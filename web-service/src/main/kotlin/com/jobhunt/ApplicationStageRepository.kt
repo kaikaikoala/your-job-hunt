@@ -10,6 +10,6 @@ interface ApplicationStageRepository : JpaRepository<ApplicationStage, UUID> {
 
     fun findAllByAppId(appId: UUID): List<ApplicationStage>
 
-    @Query("SELECT s FROM ApplicationStage s WHERE s.appId = :appId ORDER BY s.stageDate DESC NULLS LAST, s.appStageId DESC")
+    @Query("SELECT s FROM ApplicationStage s WHERE s.appId = :appId ORDER BY s.stageDate DESC NULLS LAST, s.createdAt DESC")
     fun findLatestByAppId(@Param("appId") appId: UUID, pageable: Pageable): List<ApplicationStage>
 }
