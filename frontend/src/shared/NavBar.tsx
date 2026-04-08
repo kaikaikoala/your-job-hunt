@@ -10,7 +10,6 @@ import { useAuth } from '../context/AuthContext';
 const NAV_LINKS = [
   { label: 'Resume Builder', key: 'resume-builder', href: '#' },
   { label: 'Hunt Tracker', key: 'hunt-tracker', href: '/hunt' },
-  { label: 'Tasks', key: 'action-items', href: '/action-items' },
 ] as const;
 
 type NavLink = (typeof NAV_LINKS)[number]['key'];

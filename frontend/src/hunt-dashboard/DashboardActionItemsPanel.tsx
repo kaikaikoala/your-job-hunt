@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { fetchActionItems, updateActionItem, type ActionItem } from '../api/actionItems';
 import AddActionItemDialog from './AddActionItemDialog';
 
@@ -19,6 +20,7 @@ function formatDue(iso?: string) {
 
 export default function DashboardActionItemsPanel() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
 
   const { data: items, isLoading } = useQuery({
@@ -46,7 +48,10 @@ export default function DashboardActionItemsPanel() {
     >
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 20, color: '#0F172A' }}>
+        <Typography
+          onClick={() => navigate('/action-items')}
+          sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 20, color: '#0F172A', cursor: 'pointer', '&:hover': { color: '#607CEC' } }}
+        >
           To-Do List
         </Typography>
         <span className="material-symbols-outlined" style={{ color: '#45464D' }}>pending_actions</span>
