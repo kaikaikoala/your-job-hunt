@@ -11,11 +11,14 @@ import {
   Typography,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchApplications, type Application } from '../api/applications';
+import { fetchDashboard, type ApplicationWithStages } from '../api/applications';
 import { createStage } from '../api/stages';
-import AddApplicationDialog from '../components/AddApplicationDialog';
-import AddStageDialog from '../components/AddStageDialog';
-import NavBar from '../components/NavBar';
+import AddApplicationDialog from './AddApplicationDialog';
+import AddStageDialog from './AddStageDialog';
+import NavBar from '../shared/NavBar';
+import ConversionFlowCard, { computeSankeyLinks } from './ConversionFlowCard';
+
+// ─── Stage colours ────────────────────────────────────────────────────────────
 
 const STAGE_COLORS: Record<string, string> = {
   Applied: '#a5b4fc',
@@ -30,21 +33,32 @@ function stageColor(stage?: string) {
   return STAGE_COLORS[stage] ?? '#607CEC';
 }
 
+// ─── Misc ─────────────────────────────────────────────────────────────────────
+
 const todayIso = () => new Date().toISOString().slice(0, 10);
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-  const { data: applications, isLoading } = useQuery({
-    queryKey: ['applications'],
-    queryFn: fetchApplications,
+  const { data, isLoading } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: fetchDashboard,
   });
+
+  const applications = data?.applications;
+  const sankeyLinks = computeSankeyLinks(applications ?? []);
+
+  const visibleApps = selectedNode
+    ? applications?.filter((app) => app.stages.some((s) => s.stage === selectedNode))
+    : applications;
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#F7F9FB' }}>
       <NavBar activeLink="hunt-tracker" />
 
-      {/* Main */}
       <Box component="main" sx={{ pt: '64px', px: 4, pb: 4, maxWidth: 1280, mx: 'auto' }}>
         {/* Header */}
         <Box
@@ -77,23 +91,62 @@ export default function DashboardPage() {
           </Button>
         </Box>
 
+        {/* Bento grid */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: 'repeat(12, 1fr)' },
+            gap: 3,
+            mb: 4,
+          }}
+        >
+          {/* Sankey hero — 8 col */}
+          <Box sx={{ gridColumn: { xs: '1 / -1', lg: '1 / 9' } }}>
+            <ConversionFlowCard
+              links={sankeyLinks}
+              selectedNode={selectedNode}
+              onNodeClick={setSelectedNode}
+            />
+          </Box>
+          {/* Todo placeholder — 4 col */}
+          <Box sx={{ gridColumn: { xs: '1 / -1', lg: '9 / -1' } }}>
+            <Paper
+              elevation={0}
+              sx={{
+                height: '100%',
+                minHeight: 240,
+                p: 3,
+                borderRadius: 3,
+                border: '1px solid #eceef0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography sx={{ color: '#c6c6cd' }}>Action items coming soon</Typography>
+            </Paper>
+          </Box>
+        </Box>
+
         {/* Application list */}
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
             <CircularProgress />
           </Box>
-        ) : applications && applications.length === 0 ? (
+        ) : visibleApps && visibleApps.length === 0 ? (
           <Box sx={{ textAlign: 'center', mt: 8 }}>
             <Typography variant="h6" sx={{ color: '#45464D', mb: 1 }}>
-              No applications yet.
+              {selectedNode ? `No applications at "${selectedNode}" stage.` : 'No applications yet.'}
             </Typography>
-            <Typography sx={{ color: '#45464D' }}>
-              Click "New Application" to add your first one!
-            </Typography>
+            {!selectedNode && (
+              <Typography sx={{ color: '#45464D' }}>
+                Click "New Application" to add your first one!
+              </Typography>
+            )}
           </Box>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {applications?.map((app) => (
+            {visibleApps?.map((app) => (
               <ApplicationCard key={app.appId} app={app} />
             ))}
           </Box>
@@ -105,7 +158,9 @@ export default function DashboardPage() {
   );
 }
 
-function ApplicationCard({ app }: { app: Application }) {
+// ─── Application card ─────────────────────────────────────────────────────────
+
+function ApplicationCard({ app }: { app: ApplicationWithStages }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [addStageOpen, setAddStageOpen] = useState(false);
@@ -117,7 +172,7 @@ function ApplicationCard({ app }: { app: Application }) {
     mutationFn: () =>
       createStage(app.appId, { stage: 'Rejected', stageDate: todayIso(), result: 'Rejected' }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['applications'] });
+      qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
 

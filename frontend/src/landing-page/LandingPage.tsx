@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import heroPng from '../assets/corp-man.png';
-import NavBar from '../components/NavBar';
+import NavBar from '../shared/NavBar';
 
 export default function LandingPage() {
   const navigate = useNavigate();

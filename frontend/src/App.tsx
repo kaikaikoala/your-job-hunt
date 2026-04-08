@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import LandingPage from './pages/LandingPage';
-import SignInPage from './pages/SignInPage';
-import HuntPage from './pages/HuntPage';
-import ApplicationDetailPage from './pages/ApplicationDetailPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import LandingPage from './landing-page/LandingPage';
+import SignInPage from './profile/SignInPage';
+import HuntPage from './hunt-dashboard/HuntPage';
+import ApplicationDetailPage from './hunt-dashboard/ApplicationDetailPage';
+import ProtectedRoute from './shared/ProtectedRoute';
 
 export default function App() {
   return (

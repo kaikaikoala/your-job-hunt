@@ -24,8 +24,27 @@ export interface CreateApplicationInput {
   stageDate?: string;
 }
 
+export interface Stage {
+  appStageId: string;
+  stage: string;
+  stageDate?: string;
+  result?: string;
+  createdAt: string;
+}
+
+export interface ApplicationWithStages extends Application {
+  stages: Stage[];
+}
+
+export interface DashboardData {
+  applications: ApplicationWithStages[];
+}
+
 export const fetchApplications = (): Promise<Application[]> =>
   axiosInstance.get('/applications').then((r) => r.data);
+
+export const fetchDashboard = (): Promise<DashboardData> =>
+  axiosInstance.get('/applications/dashboard').then((r) => r.data);
 
 export const fetchApplication = (id: string): Promise<Application> =>
   axiosInstance.get(`/applications/${id}`).then((r) => r.data);

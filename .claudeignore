@@ -1,0 +1,10 @@
+web-service/build/
+web-service/.gradle/
+
+frontend/dist/
+frontend/node_modules/
+
+hunt_flow/
+your_crew/
+
+.venv/

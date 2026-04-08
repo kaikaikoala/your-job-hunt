@@ -15,8 +15,8 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchApplication } from '../api/applications';
 import { fetchStages, updateStage, deleteStage, type Stage, type PatchStageInput } from '../api/stages';
-import AddStageDialog from '../components/AddStageDialog';
-import NavBar from '../components/NavBar';
+import AddStageDialog from './AddStageDialog';
+import NavBar from '../shared/NavBar';
 
 const STAGE_COLORS: Record<string, string> = {
   Applied: '#a5b4fc',
