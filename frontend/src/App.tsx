@@ -4,6 +4,7 @@ import LandingPage from './landing-page/LandingPage';
 import SignInPage from './profile/SignInPage';
 import HuntPage from './hunt-dashboard/HuntPage';
 import ApplicationDetailPage from './hunt-dashboard/ApplicationDetailPage';
+import ActionItemsPage from './hunt-dashboard/ActionItemsPage';
 import ProtectedRoute from './shared/ProtectedRoute';
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/hunt" element={<HuntPage />} />
             <Route path="/applications/:id" element={<ApplicationDetailPage />} />
+            <Route path="/action-items" element={<ActionItemsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

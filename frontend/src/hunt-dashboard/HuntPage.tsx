@@ -15,6 +15,8 @@ import { fetchDashboard, type ApplicationWithStages } from '../api/applications'
 import { createStage } from '../api/stages';
 import AddApplicationDialog from './AddApplicationDialog';
 import AddStageDialog from './AddStageDialog';
+import AddActionItemDialog from './AddActionItemDialog';
+import DashboardActionItemsPanel from './DashboardActionItemsPanel';
 import NavBar from '../shared/NavBar';
 import ConversionFlowCard, { computeSankeyLinks } from './ConversionFlowCard';
 
@@ -108,23 +110,9 @@ export default function DashboardPage() {
               onNodeClick={setSelectedNode}
             />
           </Box>
-          {/* Todo placeholder — 4 col */}
+          {/* Action items sidebar — 4 col */}
           <Box sx={{ gridColumn: { xs: '1 / -1', lg: '9 / -1' } }}>
-            <Paper
-              elevation={0}
-              sx={{
-                height: '100%',
-                minHeight: 240,
-                p: 3,
-                borderRadius: 3,
-                border: '1px solid #eceef0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography sx={{ color: '#c6c6cd' }}>Action items coming soon</Typography>
-            </Paper>
+            <DashboardActionItemsPanel />
           </Box>
         </Box>
 
@@ -164,6 +152,7 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [addStageOpen, setAddStageOpen] = useState(false);
+  const [addActionItemOpen, setAddActionItemOpen] = useState(false);
 
   const latestStage = app.latestStage?.stage;
   const dotColor = stageColor(latestStage);
@@ -251,7 +240,7 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
               Passed Round
             </Button>
             <Tooltip title="Add Action Item">
-              <IconButton size="small" sx={{ color: '#45464D' }}>
+              <IconButton size="small" sx={{ color: '#45464D' }} onClick={() => setAddActionItemOpen(true)}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add_task</span>
               </IconButton>
             </Tooltip>
@@ -260,6 +249,7 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
       </Paper>
 
       <AddStageDialog open={addStageOpen} appId={app.appId} onClose={() => setAddStageOpen(false)} />
+      <AddActionItemDialog open={addActionItemOpen} appId={app.appId} onClose={() => setAddActionItemOpen(false)} />
     </>
   );
 }

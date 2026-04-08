@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
+  Checkbox,
   Chip,
   CircularProgress,
   IconButton,
@@ -15,7 +16,9 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchApplication } from '../api/applications';
 import { fetchStages, updateStage, deleteStage, type Stage, type PatchStageInput } from '../api/stages';
+import { fetchActionItems, updateActionItem, deleteActionItem, type ActionItem } from '../api/actionItems';
 import AddStageDialog from './AddStageDialog';
+import AddActionItemDialog from './AddActionItemDialog';
 import NavBar from '../shared/NavBar';
 
 const STAGE_COLORS: Record<string, string> = {
@@ -39,6 +42,7 @@ export default function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [addStageOpen, setAddStageOpen] = useState(false);
+  const [addActionItemOpen, setAddActionItemOpen] = useState(false);
 
   const { data: app, isLoading: appLoading } = useQuery({
     queryKey: ['application', id],
@@ -49,6 +53,12 @@ export default function ApplicationDetailPage() {
   const { data: stages, isLoading: stagesLoading } = useQuery({
     queryKey: ['stages', id],
     queryFn: () => fetchStages(id!),
+    enabled: !!id,
+  });
+
+  const { data: actionItems, isLoading: actionItemsLoading } = useQuery({
+    queryKey: ['actionItems', { appId: id }],
+    queryFn: () => fetchActionItems({ appId: id }),
     enabled: !!id,
   });
 
@@ -147,9 +157,98 @@ export default function ApplicationDetailPage() {
             </Stack>
           )}
         </Paper>
+        {/* Action items */}
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #eceef0', bgcolor: '#fff', mt: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: '#0F172A' }}>
+              Action Items
+            </Typography>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => setAddActionItemOpen(true)}
+              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13 }}
+            >
+              + Add Action Item
+            </Button>
+          </Box>
+
+          {actionItemsLoading ? (
+            <CircularProgress size={24} />
+          ) : !actionItems || actionItems.length === 0 ? (
+            <Typography sx={{ color: '#45464D', fontSize: 14 }}>No action items yet.</Typography>
+          ) : (
+            <Stack spacing={0}>
+              {actionItems.map((item) => (
+                <ActionItemRow key={item.actionItemId} item={item} />
+              ))}
+            </Stack>
+          )}
+        </Paper>
       </Box>
 
       <AddStageDialog open={addStageOpen} appId={id!} onClose={() => setAddStageOpen(false)} />
+      <AddActionItemDialog open={addActionItemOpen} appId={id!} onClose={() => setAddActionItemOpen(false)} />
+    </Box>
+  );
+}
+
+function ActionItemRow({ item }: { item: ActionItem }) {
+  const qc = useQueryClient();
+
+  const completeMutation = useMutation({
+    mutationFn: () => updateActionItem(item.actionItemId, { status: item.status === 'open' ? 'completed' : 'open' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['actionItems'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteActionItem(item.actionItemId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['actionItems'] }),
+  });
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        py: 1,
+        borderBottom: '1px solid #eceef0',
+        '&:last-child': { borderBottom: 'none' },
+      }}
+    >
+      <Checkbox
+        size="small"
+        checked={item.status === 'completed'}
+        disabled={completeMutation.isPending}
+        onChange={() => completeMutation.mutate()}
+        sx={{ mt: -0.5, color: '#c6c6cd' }}
+      />
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography
+          sx={{
+            fontSize: 14,
+            color: item.status === 'completed' ? '#c6c6cd' : '#0F172A',
+            textDecoration: item.status === 'completed' ? 'line-through' : 'none',
+          }}
+        >
+          {item.description}
+        </Typography>
+        {item.dueDate && (
+          <Typography sx={{ fontSize: 12, color: '#45464D', mt: 0.25 }}>
+            Due {formatDate(item.dueDate)}
+          </Typography>
+        )}
+      </Box>
+      <Tooltip title="Delete">
+        <IconButton
+          size="small"
+          onClick={() => deleteMutation.mutate()}
+          disabled={deleteMutation.isPending}
+          sx={{ color: '#BA1A1A', ml: 1 }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 }
