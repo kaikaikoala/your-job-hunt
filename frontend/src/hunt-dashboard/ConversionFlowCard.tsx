@@ -2,7 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import * as d3Sankey from "d3-sankey";
 import { type ApplicationWithStages, type Stage } from "../api/applications";
-import { borderSubtle, outlineVariant, onSurfaceVariant, stageColor } from "../colors";
+import {
+  borderSubtle,
+  outlineVariant,
+  onSurfaceVariant,
+  stageColor,
+} from "../colors";
 
 // ─── Node colours ─────────────────────────────────────────────────────────────
 
@@ -183,7 +188,6 @@ export default function ConversionFlowCard({
             const targetId = (
               link.target as d3Sankey.SankeyNode<{ id: string }, object>
             ).id;
-            const isRejected = targetId === "Rejected";
             const strokeColor = stageColor(targetId);
             const strokeW = Math.max(1, link.width ?? 4);
             return (
