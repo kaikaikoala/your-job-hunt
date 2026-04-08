@@ -5,10 +5,27 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
 } from '@mui/material';
+
+const OTHER = 'Other';
+const STAGE_OPTIONS = [
+  'Referred',
+  'Applied',
+  'Recruiter Screen',
+  'Team Lead/Manager Screen',
+  'Technical Screen',
+  'Onsite Technical',
+  'Offer',
+  'Rejected',
+  OTHER,
+];
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createStage, type CreateStageInput } from '../api/stages';
 
@@ -23,6 +40,7 @@ const todayIso = () => new Date().toISOString().slice(0, 10);
 export default function AddStageDialog({ open, appId, onClose }: Props) {
   const qc = useQueryClient();
   const [stage, setStage] = useState('');
+  const [stageSelect, setStageSelect] = useState('');
   const [stageDate, setStageDate] = useState(todayIso);
   const [result, setResult] = useState('');
 
@@ -37,6 +55,7 @@ export default function AddStageDialog({ open, appId, onClose }: Props) {
 
   const handleClose = () => {
     setStage('');
+    setStageSelect('');
     setStageDate(todayIso());
     setResult('');
     mutation.reset();
@@ -67,14 +86,33 @@ export default function AddStageDialog({ open, appId, onClose }: Props) {
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField
-            label="Stage"
-            required
-            fullWidth
-            placeholder="e.g. Technical, Offer"
-            value={stage}
-            onChange={(e) => setStage(e.target.value)}
-          />
+          <FormControl fullWidth required>
+            <InputLabel>Stage</InputLabel>
+            <Select
+              value={stageSelect}
+              label="Stage"
+              onChange={(e) => {
+                const val = e.target.value;
+                setStageSelect(val);
+                setStage(val === OTHER ? '' : val);
+              }}
+            >
+              {STAGE_OPTIONS.map((opt) => (
+                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {stageSelect === OTHER && (
+            <TextField
+              label="Custom Stage"
+              required
+              fullWidth
+              placeholder="Enter stage name"
+              value={stage}
+              onChange={(e) => setStage(e.target.value)}
+              autoFocus
+            />
+          )}
           <TextField
             label="Date"
             type="date"
