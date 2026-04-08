@@ -22,6 +22,7 @@ export interface CreateApplicationInput {
   salaryRange?: string;
   initialStage?: string;
   stageDate?: string;
+  referrerId?: string;
 }
 
 export interface Stage {

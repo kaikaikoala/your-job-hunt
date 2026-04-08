@@ -11,6 +11,7 @@ import { onSurface, onSurfaceVariant, primary, borderLight, dark } from '../colo
 const NAV_LINKS = [
   { label: 'Resume Builder', key: 'resume-builder', href: '#' },
   { label: 'Hunt Tracker', key: 'hunt-tracker', href: '/hunt' },
+  { label: 'Network', key: 'network', href: '/network' },
 ] as const;
 
 type NavLink = (typeof NAV_LINKS)[number]['key'];

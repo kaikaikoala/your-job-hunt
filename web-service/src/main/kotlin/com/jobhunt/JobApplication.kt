@@ -27,4 +27,7 @@ class JobApplication(
 
     @Column(name = "salary_range")
     val salaryRange: String? = null,
+
+    @Column(name = "referrer_id")
+    val referrerId: UUID? = null,
 )

@@ -23,6 +23,7 @@ data class CreateApplicationRequest(
     val salaryRange: String? = null,
     val initialStage: String? = null,
     val stageDate: String? = null,
+    val referrerId: String? = null,
 )
 
 data class LatestStageResponse(
@@ -37,6 +38,7 @@ data class ApplicationResponse(
     val role: String,
     val jobPostingUrl: String?,
     val salaryRange: String?,
+    val referrerId: String?,
     val latestStage: LatestStageResponse? = null,
 )
 
@@ -46,6 +48,7 @@ data class ApplicationWithStagesResponse(
     val role: String,
     val jobPostingUrl: String?,
     val salaryRange: String?,
+    val referrerId: String?,
     val latestStage: LatestStageResponse?,
     val stages: List<StageResponse>,
 )
@@ -72,6 +75,7 @@ class ApplicationController(
             role = request.role,
             jobPostingUrl = request.jobPostingUrl,
             salaryRange = request.salaryRange,
+            referrerId = request.referrerId?.let { runCatching { UUID.fromString(it) }.getOrNull() },
         )
         val saved = try {
             repo.save(entity)
@@ -112,6 +116,7 @@ class ApplicationController(
                 role = app.role,
                 jobPostingUrl = app.jobPostingUrl,
                 salaryRange = app.salaryRange,
+                referrerId = app.referrerId?.toString(),
                 latestStage = latest?.toLatestStageResponse(),
                 stages = allStages.map { it.toDashboardStageResponse() },
             )
@@ -153,6 +158,7 @@ class ApplicationController(
         role = role,
         jobPostingUrl = jobPostingUrl,
         salaryRange = salaryRange,
+        referrerId = referrerId?.toString(),
         latestStage = latestStage,
     )
 }

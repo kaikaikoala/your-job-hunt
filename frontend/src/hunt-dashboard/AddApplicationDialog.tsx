@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   Alert,
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -10,8 +11,9 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createApplication, type CreateApplicationInput } from '../api/applications';
+import { fetchContacts, createContact, type NetworkContact } from '../api/network';
 import axios from 'axios';
 
 interface Props {
@@ -28,7 +30,14 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
   const [jobPostingUrl, setJobPostingUrl] = useState('');
   const [salaryRange, setSalaryRange] = useState('');
   const [stageDate, setStageDate] = useState(todayIso);
+  const [referrerValue, setReferrerValue] = useState<NetworkContact | string | null>(null);
   const [duplicateError, setDuplicateError] = useState(false);
+
+  const { data: contacts } = useQuery({
+    queryKey: ['network'],
+    queryFn: fetchContacts,
+    enabled: open,
+  });
 
   const mutation = useMutation({
     mutationFn: (input: CreateApplicationInput) => createApplication(input),
@@ -49,13 +58,24 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
     setJobPostingUrl('');
     setSalaryRange('');
     setStageDate(todayIso());
+    setReferrerValue(null);
     setDuplicateError(false);
     mutation.reset();
     onClose();
   };
 
-  const handleSubmit = (initialStage: 'Applied' | 'Referred') => {
+  const handleSubmit = async (initialStage: 'Applied' | 'Referred') => {
     setDuplicateError(false);
+
+    let finalReferrerId: string | undefined;
+    if (typeof referrerValue === 'string' && referrerValue.trim()) {
+      const newContact = await createContact({ name: referrerValue.trim() });
+      qc.invalidateQueries({ queryKey: ['network'] });
+      finalReferrerId = newContact.referrerId;
+    } else if (referrerValue && typeof referrerValue === 'object') {
+      finalReferrerId = referrerValue.referrerId;
+    }
+
     mutation.mutate({
       company: company.trim(),
       role: role.trim(),
@@ -63,6 +83,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
       salaryRange: salaryRange.trim() || undefined,
       initialStage,
       stageDate,
+      referrerId: finalReferrerId,
     });
   };
 
@@ -113,6 +134,20 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
             fullWidth
             value={salaryRange}
             onChange={(e) => setSalaryRange(e.target.value)}
+          />
+          <Autocomplete
+            freeSolo
+            options={contacts ?? []}
+            getOptionLabel={(option) =>
+              typeof option === 'string'
+                ? option
+                : `${option.name}${option.type ? ` (${option.type})` : ''}`
+            }
+            value={referrerValue}
+            onChange={(_, newValue) => setReferrerValue(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label="Referred by (optional)" />
+            )}
           />
           <TextField
             label="Date"
