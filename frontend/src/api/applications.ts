@@ -12,6 +12,7 @@ export interface Application {
   role: string;
   jobPostingUrl?: string;
   salaryRange?: string;
+  referrerId?: string;
   latestStage?: LatestStage;
 }
 

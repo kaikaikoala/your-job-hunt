@@ -53,6 +53,19 @@ class NetworkController(
         }
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getContact(@PathVariable id: String): NetworkContactResponse {
+        val uid = SecurityContextHolder.getContext().authentication.name
+        val referrerId = runCatching { UUID.fromString(id) }.getOrElse {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+        val contact = repo.findByReferrerIdAndUserId(referrerId, uid)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val count = appRepo.countByReferrerIdAndUserId(contact.referrerId, uid)
+        return contact.toResponse(count)
+    }
+
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun updateContact(

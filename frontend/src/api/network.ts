@@ -15,6 +15,9 @@ export interface CreateNetworkInput {
 export const fetchContacts = (): Promise<NetworkContact[]> =>
   axiosInstance.get('/network').then((r) => r.data);
 
+export const fetchContact = (id: string): Promise<NetworkContact> =>
+  axiosInstance.get(`/network/${id}`).then((r) => r.data);
+
 export const createContact = (input: CreateNetworkInput): Promise<NetworkContact> =>
   axiosInstance.post('/network', input).then((r) => r.data);
 

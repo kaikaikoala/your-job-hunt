@@ -17,6 +17,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchApplication } from '../api/applications';
 import { fetchStages, updateStage, deleteStage, type Stage, type PatchStageInput } from '../api/stages';
 import { fetchActionItems, updateActionItem, deleteActionItem, type ActionItem } from '../api/actionItems';
+import { fetchContact } from '../api/network';
 import AddStageDialog from './AddStageDialog';
 import AddActionItemDialog from './AddActionItemDialog';
 import NavBar from '../shared/NavBar';
@@ -49,6 +50,12 @@ export default function ApplicationDetailPage() {
     queryKey: ['actionItems', { appId: id }],
     queryFn: () => fetchActionItems({ appId: id }),
     enabled: !!id,
+  });
+
+  const { data: referrer } = useQuery({
+    queryKey: ['contact', app?.referrerId],
+    queryFn: () => fetchContact(app!.referrerId!),
+    enabled: !!app?.referrerId,
   });
 
   if (appLoading) {
@@ -112,6 +119,14 @@ export default function ApplicationDetailPage() {
                   sx={{ fontSize: 14, color: primary, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
                 >
                   View posting
+                </Typography>
+              </Box>
+            )}
+            {referrer && (
+              <Box>
+                <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5 }}>Referred By</Typography>
+                <Typography sx={{ fontSize: 14, color: onSurface }}>
+                  {referrer.name}{referrer.type ? ` · ${referrer.type}` : ''}
                 </Typography>
               </Box>
             )}
