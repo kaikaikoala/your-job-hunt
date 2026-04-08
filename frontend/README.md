@@ -125,3 +125,32 @@ For the resume tailoring app, use a **floating action chip** that follows the us
 - **Don't** use 1px solid black or dark grey dividers. They clutter the UI and break the premium feel.
 - **Don't** use `none` or `sm` roundedness. All interactive elements must use `md` (0.75rem) or `lg` (1rem) to feel approachable and modern.
 - **Don't** center-align long-form text. Keep it left-aligned to maintain the "Editorial" grid structure.
+
+# Typography Specifications: 
+
+## Core Principles
+The typography for Your-Job-Hunt is designed to blend **Editorial Elegance** with **SaaS Utility**. It prioritizes readability for long-form resume content while maintaining a sharp, professional edge for data-heavy tracking views.
+
+## Primary Typeface: Manrope
+Chosen for its modern, geometric structure and excellent legibility across all weights.
+
+### Headings (Display & UI)
+- **H1 (Page Hero):** 36px / SemiBold / Tracking: -0.02em / Color: #0F172A
+- **H2 (Section Header):** 24px / SemiBold / Tracking: -0.01em / Color: #1E293B
+- **H3 (Component Header):** 18px / Medium / Color: #334155
+
+### Body & Content
+- **Body Large (Resume Content):** 16px / Regular / Line Height: 1.6 / Color: #334155
+- **Body Standard (UI Text):** 14px / Regular / Line Height: 1.5 / Color: #475569
+- **Body Small (Secondary/Meta):** 12px / Medium / Color: #64748B
+
+### Interactive & Specialized
+- **Button Text:** 14px / SemiBold / Tracking: 0.01em / Uppercase (Optional for secondary)
+- **Label/Caps:** 11px / Bold / Tracking: 0.05em / Uppercase / Color: #94A3B8
+- **Monospace (Data/Scores):** Inter Tight or Manrope Medium (Numeric)
+
+## Color Palette Alignment
+- **Primary Text:** #0F172A (Slate 900) - Used for primary headings and critical info.
+- **Secondary Text:** #475569 (Slate 600) - Default for body and descriptions.
+- **Tertiary/Muted:** #94A3B8 (Slate 400) - For labels, placeholders, and non-essential meta-data.
+- **Accent:** #4F46E5 (Indigo 600) - Used sparingly for links and active states.
