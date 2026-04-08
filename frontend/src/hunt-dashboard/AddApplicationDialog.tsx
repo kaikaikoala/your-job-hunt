@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Alert,
-  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -11,9 +10,9 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createApplication, type CreateApplicationInput } from '../api/applications';
-import { fetchContacts, createContact, type NetworkContact } from '../api/network';
+import ReferrerAutocomplete, { type ReferrerAutocompleteHandle } from './ReferrerAutocomplete';
 import axios from 'axios';
 
 interface Props {
@@ -30,15 +29,8 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
   const [jobPostingUrl, setJobPostingUrl] = useState('');
   const [salaryRange, setSalaryRange] = useState('');
   const [stageDate, setStageDate] = useState(todayIso);
-  const [referrerValue, setReferrerValue] = useState<NetworkContact | string | null>(null);
-  const [referrerInput, setReferrerInput] = useState('');
   const [duplicateError, setDuplicateError] = useState(false);
-
-  const { data: contacts } = useQuery({
-    queryKey: ['network'],
-    queryFn: fetchContacts,
-    enabled: open,
-  });
+  const referrerRef = useRef<ReferrerAutocompleteHandle>(null);
 
   const mutation = useMutation({
     mutationFn: (input: CreateApplicationInput) => createApplication(input),
@@ -59,8 +51,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
     setJobPostingUrl('');
     setSalaryRange('');
     setStageDate(todayIso());
-    setReferrerValue(null);
-    setReferrerInput('');
+    referrerRef.current?.reset();
     setDuplicateError(false);
     mutation.reset();
     onClose();
@@ -69,17 +60,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
   const handleSubmit = async (initialStage: 'Applied' | 'Referred') => {
     setDuplicateError(false);
 
-    let finalReferrerId: string | undefined;
-    if (referrerValue && typeof referrerValue === 'object') {
-      finalReferrerId = referrerValue.referrerId;
-    } else {
-      const newName = (typeof referrerValue === 'string' ? referrerValue : referrerInput).trim();
-      if (newName) {
-        const newContact = await createContact({ name: newName });
-        qc.invalidateQueries({ queryKey: ['network'] });
-        finalReferrerId = newContact.referrerId;
-      }
-    }
+    const finalReferrerId = await referrerRef.current?.resolveReferrerId();
 
     mutation.mutate({
       company: company.trim(),
@@ -140,22 +121,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
             value={salaryRange}
             onChange={(e) => setSalaryRange(e.target.value)}
           />
-          <Autocomplete
-            freeSolo
-            options={contacts ?? []}
-            getOptionLabel={(option) =>
-              typeof option === 'string'
-                ? option
-                : `${option.name}${option.type ? ` (${option.type})` : ''}`
-            }
-            value={referrerValue}
-            onChange={(_, newValue) => setReferrerValue(newValue)}
-            inputValue={referrerInput}
-            onInputChange={(_, newInput) => setReferrerInput(newInput)}
-            renderInput={(params) => (
-              <TextField {...params} label="Referred by (optional)" />
-            )}
-          />
+          <ReferrerAutocomplete ref={referrerRef} enabled={open} />
           <TextField
             label="Date"
             type="date"
