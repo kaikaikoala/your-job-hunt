@@ -55,7 +55,13 @@ export default function DashboardActionItemsPanel() {
         >
           To-Do List
         </Typography>
-        <span className="material-symbols-outlined" style={{ color: onSurfaceVariant }}>pending_actions</span>
+        <span
+          className="material-symbols-outlined"
+          onClick={() => setAddOpen(true)}
+          style={{ color: onSurfaceVariant, cursor: 'pointer' }}
+        >
+          add_task
+        </span>
       </Box>
 
       {/* Items */}
@@ -69,7 +75,7 @@ export default function DashboardActionItemsPanel() {
         </Box>
       ) : (
         <Stack spacing={2} sx={{ overflow: 'auto', flex: 1 }}>
-          {items.map((item: ActionItem, idx: number) => (
+          {items.slice(0, 3).map((item: ActionItem, idx: number) => (
             <Box
               key={item.actionItemId}
               sx={{
@@ -128,7 +134,7 @@ export default function DashboardActionItemsPanel() {
       <Button
         fullWidth
         variant="outlined"
-        onClick={() => setAddOpen(true)}
+        onClick={() => navigate('/action-items')}
         sx={{
           mt: 3,
           py: 1.5,
@@ -145,7 +151,7 @@ export default function DashboardActionItemsPanel() {
           },
         }}
       >
-        + Add Task
+        See More
       </Button>
 
       <AddActionItemDialog open={addOpen} onClose={() => setAddOpen(false)} />
