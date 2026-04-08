@@ -31,6 +31,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
   const [salaryRange, setSalaryRange] = useState('');
   const [stageDate, setStageDate] = useState(todayIso);
   const [referrerValue, setReferrerValue] = useState<NetworkContact | string | null>(null);
+  const [referrerInput, setReferrerInput] = useState('');
   const [duplicateError, setDuplicateError] = useState(false);
 
   const { data: contacts } = useQuery({
@@ -59,6 +60,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
     setSalaryRange('');
     setStageDate(todayIso());
     setReferrerValue(null);
+    setReferrerInput('');
     setDuplicateError(false);
     mutation.reset();
     onClose();
@@ -68,12 +70,15 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
     setDuplicateError(false);
 
     let finalReferrerId: string | undefined;
-    if (typeof referrerValue === 'string' && referrerValue.trim()) {
-      const newContact = await createContact({ name: referrerValue.trim() });
-      qc.invalidateQueries({ queryKey: ['network'] });
-      finalReferrerId = newContact.referrerId;
-    } else if (referrerValue && typeof referrerValue === 'object') {
+    if (referrerValue && typeof referrerValue === 'object') {
       finalReferrerId = referrerValue.referrerId;
+    } else {
+      const newName = (typeof referrerValue === 'string' ? referrerValue : referrerInput).trim();
+      if (newName) {
+        const newContact = await createContact({ name: newName });
+        qc.invalidateQueries({ queryKey: ['network'] });
+        finalReferrerId = newContact.referrerId;
+      }
     }
 
     mutation.mutate({
@@ -145,6 +150,8 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
             }
             value={referrerValue}
             onChange={(_, newValue) => setReferrerValue(newValue)}
+            inputValue={referrerInput}
+            onInputChange={(_, newInput) => setReferrerInput(newInput)}
             renderInput={(params) => (
               <TextField {...params} label="Referred by (optional)" />
             )}
