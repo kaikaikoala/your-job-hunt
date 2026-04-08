@@ -2,17 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import * as d3Sankey from "d3-sankey";
 import { type ApplicationWithStages, type Stage } from "../api/applications";
+import { borderSubtle, outlineVariant, onSurfaceVariant, stageColor } from "../colors";
 
 // ─── Node colours ─────────────────────────────────────────────────────────────
 
-const NODE_COLORS: Record<string, string> = {
-  Rejected: "#BA1A1A",
-  Offer: "#4EDEA3",
-};
-const DEFAULT_NODE_COLOR = "#607CEC";
-
 function nodeColor(stage: string) {
-  return NODE_COLORS[stage] ?? DEFAULT_NODE_COLOR;
+  return stageColor(stage);
 }
 
 // ─── Sankey helpers ───────────────────────────────────────────────────────────
@@ -81,14 +76,14 @@ export default function ConversionFlowCard({
         sx={{
           p: 3,
           borderRadius: 3,
-          border: "1px solid #eceef0",
+          border: `1px solid ${borderSubtle}`,
           minHeight: 240,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Typography sx={{ color: "#c6c6cd" }}>
+        <Typography sx={{ color: outlineVariant }}>
           No stage transitions yet
         </Typography>
       </Paper>
@@ -133,14 +128,14 @@ export default function ConversionFlowCard({
         sx={{
           p: 3,
           borderRadius: 3,
-          border: "1px solid #eceef0",
+          border: `1px solid ${borderSubtle}`,
           minHeight: 240,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Typography sx={{ color: "#c6c6cd" }}>
+        <Typography sx={{ color: outlineVariant }}>
           Cannot render flow — stage data contains cycles
         </Typography>
       </Paper>
@@ -151,7 +146,7 @@ export default function ConversionFlowCard({
   return (
     <Paper
       elevation={0}
-      sx={{ p: 3, borderRadius: 3, border: "1px solid #eceef0" }}
+      sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}` }}
     >
       <Box
         sx={{
@@ -189,7 +184,7 @@ export default function ConversionFlowCard({
               link.target as d3Sankey.SankeyNode<{ id: string }, object>
             ).id;
             const isRejected = targetId === "Rejected";
-            const strokeColor = isRejected ? "#BA1A1A" : "#607CEC";
+            const strokeColor = stageColor(targetId);
             const strokeW = Math.max(1, link.width ?? 4);
             return (
               <path
@@ -237,7 +232,7 @@ export default function ConversionFlowCard({
                   fontSize={12}
                   fontFamily="Manrope, sans-serif"
                   fontWeight={isSelected ? 700 : 500}
-                  fill="#45464D"
+                  fill={onSurfaceVariant}
                 >
                   {id}
                 </text>

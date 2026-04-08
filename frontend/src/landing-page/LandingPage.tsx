@@ -5,12 +5,25 @@ import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import heroPng from '../assets/corp-man.png';
 import NavBar from '../shared/NavBar';
+import {
+  surface,
+  surfaceContainerLowest,
+  primary,
+  primaryLight,
+  primarySubtle,
+  primaryHover,
+  onSurface,
+  onSurfaceVariant,
+  borderLight,
+  borderFaint,
+  dark,
+} from '../colors';
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ bgcolor: '#F7F9FB', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: surface, minHeight: '100vh' }}>
       <NavBar />
 
       {/* Page content */}
@@ -32,20 +45,20 @@ export default function LandingPage() {
               fontFamily: 'Manrope, sans-serif',
               fontWeight: 800,
               fontSize: { xs: '2.8rem', md: '4.5rem' },
-              color: '#0F172A',
+              color: onSurface,
               letterSpacing: '-0.03em',
               lineHeight: 1.1,
               mb: 3,
             }}
           >
             Master Your <br />
-            <Box component="span" sx={{ color: '#607CEC' }}>
+            <Box component="span" sx={{ color: primary }}>
               Career Trajectory.
             </Box>
           </Typography>
           <Typography
             sx={{
-              color: '#45464D',
+              color: onSurfaceVariant,
               fontSize: '1.2rem',
               maxWidth: '42rem',
               mx: 'auto',
@@ -63,8 +76,8 @@ export default function LandingPage() {
           <Grid size={{ xs: 12, md: 6 }}>
             <Box
               sx={{
-                bgcolor: 'white',
-                border: '1px solid #f1f5f9',
+                bgcolor: surfaceContainerLowest,
+                border: `1px solid ${borderFaint}`,
                 borderRadius: '12px',
                 p: 5,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
@@ -101,8 +114,8 @@ export default function LandingPage() {
                   sx={{
                     width: 56,
                     height: 56,
-                    bgcolor: '#EEF2FF',
-                    color: '#607CEC',
+                    bgcolor: primarySubtle,
+                    color: primary,
                     borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
@@ -124,13 +137,13 @@ export default function LandingPage() {
                     fontFamily: 'Manrope, sans-serif',
                     fontWeight: 800,
                     fontSize: '1.75rem',
-                    color: '#0F172A',
+                    color: onSurface,
                     mb: 2,
                   }}
                 >
                   Refine &amp; Tailor
                 </Typography>
-                <Typography sx={{ color: '#45464D', fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}>
+                <Typography sx={{ color: onSurfaceVariant, fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}>
                   Editorial-grade resume refinement. Our AI aligns your experience to
                   specific roles with surgical precision.
                 </Typography>
@@ -140,9 +153,9 @@ export default function LandingPage() {
                     <Box
                       key={item}
                       component="li"
-                      sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, color: '#334155', fontWeight: 500 }}
+                      sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, color: dark.border, fontWeight: 500 }}
                     >
-                      <span className="material-symbols-outlined" style={{ color: '#607CEC', fontSize: '1.2rem' }}>
+                      <span className="material-symbols-outlined" style={{ color: primary, fontSize: '1.2rem' }}>
                         check_circle
                       </span>
                       {item}
@@ -156,7 +169,7 @@ export default function LandingPage() {
                 variant="contained"
                 onClick={() => navigate('/sign-in')}
                 sx={{
-                  bgcolor: '#0F172A',
+                  bgcolor: dark.surface,
                   color: 'white',
                   fontFamily: 'Manrope, sans-serif',
                   fontWeight: 700,
@@ -164,7 +177,7 @@ export default function LandingPage() {
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontSize: '1rem',
-                  '&:hover': { bgcolor: '#1e293b' },
+                  '&:hover': { bgcolor: dark.surfaceSubtle },
                 }}
                 endIcon={
                   <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>
@@ -181,8 +194,8 @@ export default function LandingPage() {
           <Grid size={{ xs: 12, md: 6 }}>
             <Box
               sx={{
-                bgcolor: '#0F172A',
-                border: '1px solid #1e293b',
+                bgcolor: dark.surface,
+                border: `1px solid ${dark.surfaceSubtle}`,
                 borderRadius: '12px',
                 p: 5,
                 boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
@@ -217,7 +230,7 @@ export default function LandingPage() {
                   sx={{
                     width: 56,
                     height: 56,
-                    bgcolor: '#607CEC',
+                    bgcolor: primary,
                     color: 'white',
                     borderRadius: '8px',
                     display: 'flex',
@@ -250,7 +263,7 @@ export default function LandingPage() {
                     component="span"
                     sx={{
                       bgcolor: 'rgba(96,124,236,0.2)',
-                      color: '#a5b4fc',
+                      color: primaryLight,
                       fontSize: '0.625rem',
                       px: 1,
                       py: 0.25,
@@ -265,7 +278,7 @@ export default function LandingPage() {
                   </Box>
                 </Box>
 
-                <Typography sx={{ color: '#cbd5e1', fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}>
+                <Typography sx={{ color: dark.textFaint, fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}>
                   Already have a resume? Jump straight into your hunt. Track applications,
                   interviews, and offers in one premium pipeline.
                 </Typography>
@@ -274,19 +287,19 @@ export default function LandingPage() {
                 <Box
                   sx={{
                     bgcolor: 'rgba(30,41,59,0.5)',
-                    border: '1px solid #334155',
+                    border: `1px solid ${dark.border}`,
                     borderRadius: '8px',
                     p: 2.5,
                     mb: 6,
                   }}
                 >
                   <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                    <Box sx={{ height: 8, width: 32, bgcolor: '#607CEC', borderRadius: '999px' }} />
-                    <Box sx={{ height: 8, width: 48, bgcolor: '#475569', borderRadius: '999px' }} />
+                    <Box sx={{ height: 8, width: 32, bgcolor: primary, borderRadius: '999px' }} />
+                    <Box sx={{ height: 8, width: 48, bgcolor: dark.border, borderRadius: '999px' }} />
                   </Box>
                   {[
                     { role: 'Senior Product Designer', stage: 'Interview', stageBg: 'rgba(74,222,128,0.1)', stageColor: '#4ade80' },
-                    { role: 'Design Systems Lead', stage: 'Applied', stageBg: 'rgba(96,124,236,0.1)', stageColor: '#a5b4fc', dim: true },
+                    { role: 'Design Systems Lead', stage: 'Applied', stageBg: 'rgba(96,124,236,0.1)', stageColor: primaryLight, dim: true },
                   ].map(({ role, stage, stageBg, stageColor, dim }) => (
                     <Box
                       key={role}
@@ -302,7 +315,7 @@ export default function LandingPage() {
                         opacity: dim ? 0.6 : 1,
                       }}
                     >
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: '#94a3b8' }}>
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: dark.textSubtle }}>
                         {role}
                       </Typography>
                       <Box
@@ -328,7 +341,7 @@ export default function LandingPage() {
                 variant="contained"
                 onClick={() => navigate('/sign-in')}
                 sx={{
-                  bgcolor: '#607CEC',
+                  bgcolor: primary,
                   color: 'white',
                   fontFamily: 'Manrope, sans-serif',
                   fontWeight: 700,
@@ -338,7 +351,7 @@ export default function LandingPage() {
                   fontSize: '1rem',
                   boxShadow: '0 0 20px rgba(96,124,236,0.3)',
                   position: 'relative',
-                  '&:hover': { bgcolor: '#7c93f0' },
+                  '&:hover': { bgcolor: primaryHover },
                 }}
                 endIcon={
                   <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>
@@ -357,8 +370,8 @@ export default function LandingPage() {
           component="section"
           sx={{
             mt: 12,
-            bgcolor: '#f8fafc',
-            border: '1px solid #f1f5f9',
+            bgcolor: surface,
+            border: `1px solid ${borderFaint}`,
             borderRadius: '16px',
             p: { xs: 6, md: 8 },
           }}
@@ -372,13 +385,13 @@ export default function LandingPage() {
                   fontFamily: 'Manrope, sans-serif',
                   fontWeight: 800,
                   fontSize: '1.875rem',
-                  color: '#0F172A',
+                  color: onSurface,
                   mb: 5,
                   lineHeight: 1.2,
                 }}
               >
                 Designed for the{' '}
-                <Box component="span" sx={{ color: '#607CEC' }}>
+                <Box component="span" sx={{ color: primary }}>
                   Discerning
                 </Box>{' '}
                 Professional
@@ -402,7 +415,7 @@ export default function LandingPage() {
                       sx={{
                         width: 40,
                         height: 40,
-                        bgcolor: 'white',
+                        bgcolor: surfaceContainerLowest,
                         boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                         borderRadius: '8px',
                         display: 'flex',
@@ -411,15 +424,15 @@ export default function LandingPage() {
                         flexShrink: 0,
                       }}
                     >
-                      <span className="material-symbols-outlined" style={{ color: '#607CEC' }}>
+                      <span className="material-symbols-outlined" style={{ color: primary }}>
                         {icon}
                       </span>
                     </Box>
                     <Box>
-                      <Typography sx={{ fontWeight: 700, color: '#0F172A', mb: 0.5 }}>
+                      <Typography sx={{ fontWeight: 700, color: onSurface, mb: 0.5 }}>
                         {title}
                       </Typography>
-                      <Typography sx={{ color: '#45464D', fontSize: '0.875rem', lineHeight: 1.7 }}>
+                      <Typography sx={{ color: onSurfaceVariant, fontSize: '0.875rem', lineHeight: 1.7 }}>
                         {body}
                       </Typography>
                     </Box>
@@ -435,7 +448,7 @@ export default function LandingPage() {
                   borderRadius: '12px',
                   overflow: 'hidden',
                   boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
-                  border: '1px solid #e2e8f0',
+                  border: `1px solid ${borderLight}`,
                   position: 'relative',
                 }}
               >
@@ -462,8 +475,8 @@ export default function LandingPage() {
       <Box
         component="footer"
         sx={{
-          bgcolor: 'white',
-          borderTop: '1px solid #f1f5f9',
+          bgcolor: surfaceContainerLowest,
+          borderTop: `1px solid ${borderFaint}`,
           py: 8,
           px: { xs: 4, md: 6 },
         }}
@@ -485,14 +498,14 @@ export default function LandingPage() {
                 fontFamily: 'Manrope, sans-serif',
                 fontWeight: 900,
                 fontSize: '1.2rem',
-                color: '#0F172A',
+                color: onSurface,
                 letterSpacing: '-0.03em',
                 mb: 0.5,
               }}
             >
               Your Job Hunt
             </Typography>
-            <Typography sx={{ color: '#45464D', fontSize: '0.875rem' }}>
+            <Typography sx={{ color: onSurfaceVariant, fontSize: '0.875rem' }}>
               © 2025 Your Job Hunt.
             </Typography>
           </Box>
@@ -504,11 +517,11 @@ export default function LandingPage() {
                 component="a"
                 href="#"
                 sx={{
-                  color: '#45464D',
+                  color: onSurfaceVariant,
                   textDecoration: 'none',
                   fontWeight: 700,
                   fontSize: '0.875rem',
-                  '&:hover': { color: '#607CEC' },
+                  '&:hover': { color: primary },
                   transition: 'color 0.15s',
                 }}
               >

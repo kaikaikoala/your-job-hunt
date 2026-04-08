@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { useAuth } from '../context/AuthContext';
+import { surface, surfaceContainerLowest, onSurface, onSurfaceVariant, primary, primaryFixed, borderLight, borderFaint } from '../colors';
 
 export default function SignInPage() {
   const { user, signInWithGoogle } = useAuth();
@@ -31,7 +32,7 @@ export default function SignInPage() {
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: '#F7F9FB',
+        bgcolor: surface,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -40,8 +41,8 @@ export default function SignInPage() {
     >
       <Box
         sx={{
-          bgcolor: 'white',
-          border: '1px solid #f1f5f9',
+          bgcolor: surfaceContainerLowest,
+          border: `1px solid ${borderFaint}`,
           borderRadius: '16px',
           p: { xs: 5, sm: 8 },
           maxWidth: 440,
@@ -55,7 +56,7 @@ export default function SignInPage() {
             fontFamily: 'Manrope, sans-serif',
             fontWeight: 900,
             fontSize: '1.4rem',
-            color: '#0F172A',
+            color: onSurface,
             letterSpacing: '-0.03em',
             mb: 1,
           }}
@@ -69,7 +70,7 @@ export default function SignInPage() {
             fontFamily: 'Manrope, sans-serif',
             fontWeight: 800,
             fontSize: '1.75rem',
-            color: '#0F172A',
+            color: onSurface,
             mt: 4,
             mb: 1,
           }}
@@ -77,7 +78,7 @@ export default function SignInPage() {
           Welcome back
         </Typography>
 
-        <Typography sx={{ color: '#45464D', fontSize: '0.95rem', mb: 5 }}>
+        <Typography sx={{ color: onSurfaceVariant, fontSize: '0.95rem', mb: 5 }}>
           Sign in to continue to your job hunt dashboard.
         </Typography>
 
@@ -105,9 +106,9 @@ export default function SignInPage() {
             textTransform: 'none',
             borderRadius: '8px',
             py: 1.5,
-            borderColor: '#e2e8f0',
-            color: '#0F172A',
-            '&:hover': { borderColor: '#607CEC', bgcolor: '#f8faff' },
+            borderColor: borderLight,
+            color: onSurface,
+            '&:hover': { borderColor: primary, bgcolor: primaryFixed + '33' },
           }}
         >
           {loading ? 'Signing in…' : 'Sign in with Google'}

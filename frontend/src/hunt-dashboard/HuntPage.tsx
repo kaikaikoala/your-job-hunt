@@ -19,21 +19,7 @@ import AddActionItemDialog from './AddActionItemDialog';
 import DashboardActionItemsPanel from './DashboardActionItemsPanel';
 import NavBar from '../shared/NavBar';
 import ConversionFlowCard, { computeSankeyLinks } from './ConversionFlowCard';
-
-// ─── Stage colours ────────────────────────────────────────────────────────────
-
-const STAGE_COLORS: Record<string, string> = {
-  Applied: '#a5b4fc',
-  Referred: '#a5b4fc',
-  Technical: '#607CEC',
-  Offer: '#4EDEA3',
-  Rejected: '#BA1A1A',
-};
-
-function stageColor(stage?: string) {
-  if (!stage) return '#c6c6cd';
-  return STAGE_COLORS[stage] ?? '#607CEC';
-}
+import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, surfaceContainerHigh, error, stageColor } from '../colors';
 
 // ─── Misc ─────────────────────────────────────────────────────────────────────
 
@@ -58,7 +44,7 @@ export default function DashboardPage() {
     : applications;
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#F7F9FB' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
       <NavBar activeLink="hunt-tracker" />
 
       <Box component="main" sx={{ pt: '64px', px: 4, pb: 4, maxWidth: 1280, mx: 'auto' }}>
@@ -76,11 +62,11 @@ export default function DashboardPage() {
           <Box>
             <Typography
               variant="h4"
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: '#0F172A', mb: 1 }}
+              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface, mb: 1 }}
             >
               The Hunt Dashboard
             </Typography>
-            <Typography sx={{ color: '#45464D', fontSize: 16 }}>
+            <Typography sx={{ color: onSurfaceVariant, fontSize: 16 }}>
               Your professional journey, curated.
             </Typography>
           </Box>
@@ -123,11 +109,11 @@ export default function DashboardPage() {
           </Box>
         ) : visibleApps && visibleApps.length === 0 ? (
           <Box sx={{ textAlign: 'center', mt: 8 }}>
-            <Typography variant="h6" sx={{ color: '#45464D', mb: 1 }}>
+            <Typography variant="h6" sx={{ color: onSurfaceVariant, mb: 1 }}>
               {selectedNode ? `No applications at "${selectedNode}" stage.` : 'No applications yet.'}
             </Typography>
             {!selectedNode && (
-              <Typography sx={{ color: '#45464D' }}>
+              <Typography sx={{ color: onSurfaceVariant }}>
                 Click "New Application" to add your first one!
               </Typography>
             )}
@@ -175,8 +161,8 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          bgcolor: '#fff',
-          border: '1px solid #eceef0',
+          bgcolor: surfaceContainerLowest,
+          border: `1px solid ${borderSubtle}`,
           '&:hover': { boxShadow: '0 4px 16px rgba(25,28,30,0.08)' },
           transition: 'box-shadow 0.2s',
           cursor: 'pointer',
@@ -187,20 +173,20 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
           <Avatar
             variant="rounded"
-            sx={{ width: 52, height: 52, bgcolor: '#eceef0', color: '#45464D', fontWeight: 700, fontSize: 20, borderRadius: 2 }}
+            sx={{ width: 52, height: 52, bgcolor: surfaceContainerHigh, color: onSurfaceVariant, fontWeight: 700, fontSize: 20, borderRadius: 2 }}
           >
             {app.company.charAt(0).toUpperCase()}
           </Avatar>
           <Box>
-            <Typography sx={{ fontWeight: 700, fontSize: 16, color: '#607CEC' }}>
+            <Typography sx={{ fontWeight: 700, fontSize: 16, color: primary }}>
               {app.role}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-              <Typography sx={{ fontSize: 14, fontWeight: 500, color: '#45464D' }}>
+              <Typography sx={{ fontSize: 14, fontWeight: 500, color: onSurfaceVariant }}>
                 {app.company}
               </Typography>
-              <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: '#c6c6cd' }} />
-              <Typography sx={{ fontSize: 14, color: '#45464D' }}>Applied recently</Typography>
+              <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: outlineVariant }} />
+              <Typography sx={{ fontSize: 14, color: onSurfaceVariant }}>Applied recently</Typography>
             </Box>
           </Box>
         </Box>
@@ -208,18 +194,18 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
         {/* Right: stage + actions */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }} onClick={(e) => e.stopPropagation()}>
           <Box sx={{ textAlign: 'right' }}>
-            <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#45464D', textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
               Current Stage
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: dotColor }} />
-              <Typography sx={{ fontSize: 14, color: '#45464D' }}>
+              <Typography sx={{ fontSize: 14, color: onSurfaceVariant }}>
                 {latestStage ?? '—'}
               </Typography>
             </Box>
           </Box>
 
-          <Box sx={{ width: '1px', height: 36, bgcolor: '#eceef0' }} />
+          <Box sx={{ width: '1px', height: 36, bgcolor: borderSubtle }} />
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Button
@@ -227,7 +213,7 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
               size="small"
               disabled={rejectMutation.isPending}
               onClick={() => rejectMutation.mutate()}
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderColor: '#c6c6cd', color: '#45464D', fontSize: 13, px: 1.5 }}
+              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderColor: outlineVariant, color: onSurfaceVariant, fontSize: 13, px: 1.5 }}
             >
               Rejected
             </Button>
@@ -240,7 +226,7 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
               Passed Round
             </Button>
             <Tooltip title="Add Action Item">
-              <IconButton size="small" sx={{ color: '#45464D' }} onClick={() => setAddActionItemOpen(true)}>
+              <IconButton size="small" sx={{ color: onSurfaceVariant }} onClick={() => setAddActionItemOpen(true)}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add_task</span>
               </IconButton>
             </Tooltip>

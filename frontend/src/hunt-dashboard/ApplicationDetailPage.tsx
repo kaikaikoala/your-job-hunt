@@ -20,18 +20,7 @@ import { fetchActionItems, updateActionItem, deleteActionItem, type ActionItem }
 import AddStageDialog from './AddStageDialog';
 import AddActionItemDialog from './AddActionItemDialog';
 import NavBar from '../shared/NavBar';
-
-const STAGE_COLORS: Record<string, string> = {
-  Applied: '#a5b4fc',
-  Referred: '#a5b4fc',
-  Technical: '#607CEC',
-  Offer: '#4EDEA3',
-  Rejected: '#BA1A1A',
-};
-
-function stageColor(stage: string) {
-  return STAGE_COLORS[stage] ?? '#607CEC';
-}
+import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, error, stageColor } from '../colors';
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
@@ -64,7 +53,7 @@ export default function ApplicationDetailPage() {
 
   if (appLoading) {
     return (
-      <Box sx={{ minHeight: '100vh', bgcolor: '#F7F9FB' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
         <NavBar activeLink="hunt-tracker" />
         <Box sx={{ display: 'flex', justifyContent: 'center', pt: '96px' }}>
           <CircularProgress />
@@ -75,10 +64,10 @@ export default function ApplicationDetailPage() {
 
   if (!app) {
     return (
-      <Box sx={{ minHeight: '100vh', bgcolor: '#F7F9FB' }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
         <NavBar activeLink="hunt-tracker" />
         <Box sx={{ textAlign: 'center', pt: '96px' }}>
-          <Typography variant="h6" sx={{ color: '#45464D' }}>Application not found.</Typography>
+          <Typography variant="h6" sx={{ color: onSurfaceVariant }}>Application not found.</Typography>
           <Button onClick={() => navigate('/hunt')} sx={{ mt: 2 }}>Back to Dashboard</Button>
         </Box>
       </Box>
@@ -86,7 +75,7 @@ export default function ApplicationDetailPage() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#F7F9FB' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
       <NavBar activeLink="hunt-tracker" />
       <Box component="main" sx={{ pt: '80px', px: 4, pb: 6, maxWidth: 860, mx: 'auto' }}>
 
@@ -94,33 +83,33 @@ export default function ApplicationDetailPage() {
         <Button
           startIcon={<span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>}
           onClick={() => navigate('/hunt')}
-          sx={{ mb: 3, color: '#45464D', fontFamily: 'Manrope, sans-serif', fontWeight: 600 }}
+          sx={{ mb: 3, color: onSurfaceVariant, fontFamily: 'Manrope, sans-serif', fontWeight: 600 }}
         >
           Dashboard
         </Button>
 
         {/* Application metadata */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #eceef0', bgcolor: '#fff', mb: 3 }}>
-          <Typography variant="h5" sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: '#0F172A', mb: 0.5 }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest, mb: 3 }}>
+          <Typography variant="h5" sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface, mb: 0.5 }}>
             {app.role}
           </Typography>
-          <Typography sx={{ fontSize: 16, color: '#45464D', fontWeight: 500, mb: 2 }}>{app.company}</Typography>
+          <Typography sx={{ fontSize: 16, color: onSurfaceVariant, fontWeight: 500, mb: 2 }}>{app.company}</Typography>
           <Stack direction="row" spacing={3} flexWrap="wrap">
             {app.salaryRange && (
               <Box>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#45464D', textTransform: 'uppercase', letterSpacing: 0.5 }}>Salary</Typography>
-                <Typography sx={{ fontSize: 14, color: '#0F172A' }}>{app.salaryRange}</Typography>
+                <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5 }}>Salary</Typography>
+                <Typography sx={{ fontSize: 14, color: onSurface }}>{app.salaryRange}</Typography>
               </Box>
             )}
             {app.jobPostingUrl && (
               <Box>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#45464D', textTransform: 'uppercase', letterSpacing: 0.5 }}>Job Posting</Typography>
+                <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5 }}>Job Posting</Typography>
                 <Typography
                   component="a"
                   href={app.jobPostingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  sx={{ fontSize: 14, color: '#607CEC', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                  sx={{ fontSize: 14, color: primary, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
                 >
                   View posting
                 </Typography>
@@ -130,9 +119,9 @@ export default function ApplicationDetailPage() {
         </Paper>
 
         {/* Stages timeline */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #eceef0', bgcolor: '#fff' }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: '#0F172A' }}>
+            <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: onSurface }}>
               Stages
             </Typography>
             <Button
@@ -148,7 +137,7 @@ export default function ApplicationDetailPage() {
           {stagesLoading ? (
             <CircularProgress size={24} />
           ) : !stages || stages.length === 0 ? (
-            <Typography sx={{ color: '#45464D', fontSize: 14 }}>No stages yet.</Typography>
+            <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>No stages yet.</Typography>
           ) : (
             <Stack spacing={0}>
               {stages.map((s, idx) => (
@@ -158,9 +147,9 @@ export default function ApplicationDetailPage() {
           )}
         </Paper>
         {/* Action items */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #eceef0', bgcolor: '#fff', mt: 3 }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest, mt: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: '#0F172A' }}>
+            <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: onSurface }}>
               Action Items
             </Typography>
             <Button
@@ -176,7 +165,7 @@ export default function ApplicationDetailPage() {
           {actionItemsLoading ? (
             <CircularProgress size={24} />
           ) : !actionItems || actionItems.length === 0 ? (
-            <Typography sx={{ color: '#45464D', fontSize: 14 }}>No action items yet.</Typography>
+            <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>No action items yet.</Typography>
           ) : (
             <Stack spacing={0}>
               {actionItems.map((item) => (
@@ -212,7 +201,7 @@ function ActionItemRow({ item }: { item: ActionItem }) {
         display: 'flex',
         alignItems: 'flex-start',
         py: 1,
-        borderBottom: '1px solid #eceef0',
+        borderBottom: `1px solid ${borderSubtle}`,
         '&:last-child': { borderBottom: 'none' },
       }}
     >
@@ -221,20 +210,20 @@ function ActionItemRow({ item }: { item: ActionItem }) {
         checked={item.status === 'completed'}
         disabled={completeMutation.isPending}
         onChange={() => completeMutation.mutate()}
-        sx={{ mt: -0.5, color: '#c6c6cd' }}
+        sx={{ mt: -0.5, color: outlineVariant }}
       />
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
           sx={{
             fontSize: 14,
-            color: item.status === 'completed' ? '#c6c6cd' : '#0F172A',
+            color: item.status === 'completed' ? outlineVariant : onSurface,
             textDecoration: item.status === 'completed' ? 'line-through' : 'none',
           }}
         >
           {item.description}
         </Typography>
         {item.dueDate && (
-          <Typography sx={{ fontSize: 12, color: '#45464D', mt: 0.25 }}>
+          <Typography sx={{ fontSize: 12, color: onSurfaceVariant, mt: 0.25 }}>
             Due {formatDate(item.dueDate)}
           </Typography>
         )}
@@ -244,7 +233,7 @@ function ActionItemRow({ item }: { item: ActionItem }) {
           size="small"
           onClick={() => deleteMutation.mutate()}
           disabled={deleteMutation.isPending}
-          sx={{ color: '#BA1A1A', ml: 1 }}
+          sx={{ color: error, ml: 1 }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
         </IconButton>
@@ -281,7 +270,7 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
 
   if (editing) {
     return (
-      <Box sx={{ py: 1.5, borderBottom: isLast ? 'none' : '1px solid #eceef0' }}>
+      <Box sx={{ py: 1.5, borderBottom: isLast ? 'none' : `1px solid ${borderSubtle}` }}>
         <Stack direction="row" spacing={1.5} alignItems="flex-end" flexWrap="wrap">
           <TextField
             size="small"
@@ -332,14 +321,14 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
         alignItems: 'center',
         justifyContent: 'space-between',
         py: 1.5,
-        borderBottom: isLast ? 'none' : '1px solid #eceef0',
+        borderBottom: isLast ? 'none' : `1px solid ${borderSubtle}`,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color, flexShrink: 0 }} />
         <Box>
-          <Typography sx={{ fontWeight: 600, fontSize: 14, color: '#0F172A' }}>{stage.stage}</Typography>
-          <Typography sx={{ fontSize: 12, color: '#45464D' }}>{formatDate(stage.stageDate)}</Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: 14, color: onSurface }}>{stage.stage}</Typography>
+          <Typography sx={{ fontSize: 12, color: onSurfaceVariant }}>{formatDate(stage.stageDate)}</Typography>
         </Box>
         {stage.result && (
           <Chip
@@ -347,7 +336,7 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
             size="small"
             sx={{
               bgcolor: `${color}22`,
-              color: color === '#BA1A1A' ? color : '#0F172A',
+              color: color === error ? color : onSurface,
               fontWeight: 600,
               fontSize: 11,
             }}
@@ -356,7 +345,7 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
       </Box>
       <Box sx={{ display: 'flex', gap: 0.5 }}>
         <Tooltip title="Edit">
-          <IconButton size="small" onClick={() => setEditing(true)} sx={{ color: '#45464D' }}>
+          <IconButton size="small" onClick={() => setEditing(true)} sx={{ color: onSurfaceVariant }}>
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>edit</span>
           </IconButton>
         </Tooltip>
@@ -365,7 +354,7 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
             size="small"
             onClick={() => deleteMutation.mutate()}
             disabled={deleteMutation.isPending}
-            sx={{ color: '#BA1A1A' }}
+            sx={{ color: error }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
           </IconButton>

@@ -6,6 +6,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { onSurface, onSurfaceVariant, primary, borderLight, dark } from '../colors';
 
 const NAV_LINKS = [
   { label: 'Resume Builder', key: 'resume-builder', href: '#' },
@@ -29,7 +30,7 @@ export default function NavBar({ activeLink }: NavBarProps) {
       sx={{
         bgcolor: 'rgba(255,255,255,0.85)',
         backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid #e2e8f0',
+        borderBottom: `1px solid ${borderLight}`,
       }}
     >
       <Toolbar sx={{ height: 64, px: { xs: 3, md: 4 }, maxWidth: 1280, width: '100%', mx: 'auto' }}>
@@ -41,7 +42,7 @@ export default function NavBar({ activeLink }: NavBarProps) {
             fontFamily: 'Manrope, sans-serif',
             fontWeight: 900,
             fontSize: '1.2rem',
-            color: '#0F172A',
+            color: onSurface,
             letterSpacing: '-0.03em',
             flexShrink: 0,
             textDecoration: 'none',
@@ -68,13 +69,13 @@ export default function NavBar({ activeLink }: NavBarProps) {
                 component="a"
                 href={href}
                 sx={{
-                  color: isActive ? '#607CEC' : '#45464D',
+                  color: isActive ? primary : onSurfaceVariant,
                   textDecoration: 'none',
                   fontWeight: isActive ? 700 : 500,
                   fontSize: '0.9rem',
-                  borderBottom: isActive ? '2px solid #607CEC' : 'none',
+                  borderBottom: isActive ? `2px solid ${primary}` : 'none',
                   pb: isActive ? 0.5 : 0,
-                  '&:hover': { color: '#0F172A' },
+                  '&:hover': { color: onSurface },
                   transition: 'color 0.15s',
                 }}
               >
@@ -101,7 +102,7 @@ export default function NavBar({ activeLink }: NavBarProps) {
                 fontWeight: 500,
                 textTransform: 'none',
                 fontSize: '0.875rem',
-                color: '#64748b',
+                color: dark.textMuted,
               }}
             >
               Sign Out

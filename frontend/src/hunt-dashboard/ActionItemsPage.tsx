@@ -17,6 +17,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchActionItems, updateActionItem, deleteActionItem, type ActionItem } from '../api/actionItems';
 import AddActionItemDialog from './AddActionItemDialog';
 import NavBar from '../shared/NavBar';
+import { surface, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, error } from '../colors';
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
@@ -38,7 +39,7 @@ export default function ActionItemsPage() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#F7F9FB' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
       <NavBar activeLink="action-items" />
 
       <Box component="main" sx={{ pt: '80px', px: 4, pb: 6, maxWidth: 860, mx: 'auto' }}>
@@ -55,11 +56,11 @@ export default function ActionItemsPage() {
           <Box>
             <Typography
               variant="h5"
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: '#0F172A', mb: 0.5 }}
+              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface, mb: 0.5 }}
             >
               Action Items
             </Typography>
-            <Typography sx={{ color: '#45464D', fontSize: 14 }}>
+            <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>
               Track tasks and follow-ups across your job hunt.
             </Typography>
           </Box>
@@ -93,12 +94,12 @@ export default function ActionItemsPage() {
           </Box>
         ) : !items || items.length === 0 ? (
           <Box sx={{ textAlign: 'center', mt: 8 }}>
-            <Typography variant="h6" sx={{ color: '#45464D', mb: 1 }}>
+            <Typography variant="h6" sx={{ color: onSurfaceVariant, mb: 1 }}>
               No {status} tasks.
             </Typography>
           </Box>
         ) : (
-          <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #eceef0', bgcolor: '#fff' }}>
+          <Paper elevation={0} sx={{ borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest }}>
             <Stack spacing={0}>
               {items.map((item) => (
                 <ActionItemRow key={item.actionItemId} item={item} />
@@ -133,7 +134,7 @@ function ActionItemRow({ item }: { item: ActionItem }) {
         alignItems: 'flex-start',
         px: 2,
         py: 1.5,
-        borderBottom: '1px solid #eceef0',
+        borderBottom: `1px solid ${borderSubtle}`,
         '&:last-child': { borderBottom: 'none' },
       }}
     >
@@ -142,13 +143,13 @@ function ActionItemRow({ item }: { item: ActionItem }) {
         checked={item.status === 'completed'}
         disabled={completeMutation.isPending}
         onChange={() => completeMutation.mutate()}
-        sx={{ mt: -0.5, color: '#c6c6cd' }}
+        sx={{ mt: -0.5, color: outlineVariant }}
       />
       <Box sx={{ flex: 1, minWidth: 0, ml: 0.5 }}>
         <Typography
           sx={{
             fontSize: 14,
-            color: item.status === 'completed' ? '#c6c6cd' : '#0F172A',
+            color: item.status === 'completed' ? outlineVariant : onSurface,
             textDecoration: item.status === 'completed' ? 'line-through' : 'none',
           }}
         >
@@ -156,11 +157,11 @@ function ActionItemRow({ item }: { item: ActionItem }) {
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, mt: 0.5, flexWrap: 'wrap' }}>
           {item.dueDate && (
-            <Typography sx={{ fontSize: 12, color: '#45464D' }}>
+            <Typography sx={{ fontSize: 12, color: onSurfaceVariant }}>
               Due {formatDate(item.dueDate)}
             </Typography>
           )}
-          <Typography sx={{ fontSize: 12, color: '#c6c6cd' }}>
+          <Typography sx={{ fontSize: 12, color: outlineVariant }}>
             Created {formatDate(item.createDate.slice(0, 10))}
           </Typography>
         </Box>
@@ -170,7 +171,7 @@ function ActionItemRow({ item }: { item: ActionItem }) {
           size="small"
           onClick={() => deleteMutation.mutate()}
           disabled={deleteMutation.isPending}
-          sx={{ color: '#BA1A1A', ml: 1 }}
+          sx={{ color: error, ml: 1 }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
         </IconButton>

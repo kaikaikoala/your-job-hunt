@@ -1,12 +1,13 @@
 import { createTheme } from '@mui/material/styles';
+import { surface, primary, error, success, onSurface, onSurfaceVariant } from './colors';
 
 export const theme = createTheme({
   palette: {
-    background: { default: '#F7F9FB' },
-    primary: { main: '#607CEC' },
-    error: { main: '#BA1A1A' },
-    success: { main: '#4EDEA3' },
-    text: { primary: '#0F172A', secondary: '#45464D' },
+    background: { default: surface },
+    primary: { main: primary },
+    error: { main: error },
+    success: { main: success },
+    text: { primary: onSurface, secondary: onSurfaceVariant },
   },
   typography: {
     fontFamily: 'Inter, sans-serif',

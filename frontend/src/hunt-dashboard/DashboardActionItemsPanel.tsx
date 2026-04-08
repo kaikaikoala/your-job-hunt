@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { fetchActionItems, updateActionItem, type ActionItem } from '../api/actionItems';
 import AddActionItemDialog from './AddActionItemDialog';
+import { surfaceContainerLow, surfaceContainerLowest, onSurface, onSurfaceVariant, primary, outlineVariant } from '../colors';
 
 function formatDue(iso?: string) {
   if (!iso) return null;
@@ -41,7 +42,7 @@ export default function DashboardActionItemsPanel() {
         minHeight: 240,
         p: 4,
         borderRadius: 3,
-        bgcolor: '#ECF0F5', // surface-container-low
+        bgcolor: surfaceContainerLow,
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -50,11 +51,11 @@ export default function DashboardActionItemsPanel() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography
           onClick={() => navigate('/action-items')}
-          sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 20, color: '#0F172A', cursor: 'pointer', '&:hover': { color: '#607CEC' } }}
+          sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 20, color: onSurface, cursor: 'pointer', '&:hover': { color: primary } }}
         >
           To-Do List
         </Typography>
-        <span className="material-symbols-outlined" style={{ color: '#45464D' }}>pending_actions</span>
+        <span className="material-symbols-outlined" style={{ color: onSurfaceVariant }}>pending_actions</span>
       </Box>
 
       {/* Items */}
@@ -64,7 +65,7 @@ export default function DashboardActionItemsPanel() {
         </Box>
       ) : !items || items.length === 0 ? (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography sx={{ color: '#45464D', fontSize: 14 }}>No open tasks</Typography>
+          <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>No open tasks</Typography>
         </Box>
       ) : (
         <Stack spacing={2} sx={{ overflow: 'auto', flex: 1 }}>
@@ -75,11 +76,11 @@ export default function DashboardActionItemsPanel() {
                 display: 'flex',
                 alignItems: 'flex-start',
                 p: 2,
-                bgcolor: '#FFFFFF', // surface-container-lowest
+                bgcolor: surfaceContainerLowest,
                 borderRadius: 3,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                 ...(idx === 0 && {
-                  borderLeft: '4px solid #607CEC',
+                  borderLeft: `4px solid ${primary}`,
                 }),
                 opacity: idx === 0 ? 1 : 0.85,
               }}
@@ -89,7 +90,7 @@ export default function DashboardActionItemsPanel() {
                 checked={false}
                 disabled={completeMutation.isPending}
                 onChange={() => completeMutation.mutate(item.actionItemId)}
-                sx={{ mt: -0.5, mr: 0.5, p: 0.5, color: '#c6c6cd' }}
+                sx={{ mt: -0.5, mr: 0.5, p: 0.5, color: outlineVariant }}
               />
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography
@@ -97,7 +98,7 @@ export default function DashboardActionItemsPanel() {
                     fontFamily: 'Manrope, sans-serif',
                     fontSize: 14,
                     fontWeight: idx === 0 ? 700 : 500,
-                    color: '#0F172A',
+                    color: onSurface,
                     lineHeight: 1.4,
                   }}
                 >
@@ -107,7 +108,7 @@ export default function DashboardActionItemsPanel() {
                   <Typography
                     sx={{
                       fontSize: 11,
-                      color: '#45464D',
+                      color: onSurfaceVariant,
                       mt: 0.5,
                       fontStyle: idx === 0 ? 'italic' : 'normal',
                     }}
@@ -115,7 +116,7 @@ export default function DashboardActionItemsPanel() {
                     Due {formatDue(item.dueDate)}
                   </Typography>
                 ) : (
-                  <Typography sx={{ fontSize: 11, color: '#45464D', mt: 0.5 }}>No due date</Typography>
+                  <Typography sx={{ fontSize: 11, color: onSurfaceVariant, mt: 0.5 }}>No due date</Typography>
                 )}
               </Box>
             </Box>
@@ -134,12 +135,12 @@ export default function DashboardActionItemsPanel() {
           fontFamily: 'Manrope, sans-serif',
           fontWeight: 700,
           fontSize: 14,
-          color: '#45464D',
+          color: onSurfaceVariant,
           borderColor: 'rgba(0,0,0,0.15)',
           borderRadius: 2,
           textTransform: 'none',
           '&:hover': {
-            bgcolor: '#DDE3EC',
+            bgcolor: surfaceContainerLow,
             borderColor: 'rgba(0,0,0,0.15)',
           },
         }}
