@@ -33,6 +33,7 @@ data class StageResponse(
     val stage: String,
     val stageDate: String?,
     val result: String?,
+    val createdAt: String,
 )
 
 @RestController
@@ -127,5 +128,6 @@ class StageController(
         stage = stage,
         stageDate = stageDate?.toString(),
         result = result,
+        createdAt = createdAt.toString(),
     )
 }

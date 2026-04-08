@@ -26,6 +26,8 @@ export interface SankeyLink {
 export function computeSankeyLinks(
   applications: ApplicationWithStages[],
 ): SankeyLink[] {
+  // Composite string key instead of object key: Map uses reference equality for
+  // objects, so { source, target } lookups would always miss.
   const counts = new Map<string, number>();
   for (const app of applications) {
     const sorted = [...app.stages].sort((a: Stage, b: Stage) => {

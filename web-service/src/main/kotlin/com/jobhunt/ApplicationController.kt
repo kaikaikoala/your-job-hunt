@@ -40,6 +40,20 @@ data class ApplicationResponse(
     val latestStage: LatestStageResponse? = null,
 )
 
+data class ApplicationWithStagesResponse(
+    val appId: String,
+    val company: String,
+    val role: String,
+    val jobPostingUrl: String?,
+    val salaryRange: String?,
+    val latestStage: LatestStageResponse?,
+    val stages: List<StageResponse>,
+)
+
+data class DashboardResponse(
+    val applications: List<ApplicationWithStagesResponse>,
+)
+
 @RestController
 @RequestMapping("/applications")
 class ApplicationController(
@@ -83,6 +97,28 @@ class ApplicationController(
         }
     }
 
+    @GetMapping("/dashboard")
+    @ResponseStatus(HttpStatus.OK)
+    fun getDashboard(): DashboardResponse {
+        val uid = SecurityContextHolder.getContext().authentication.name
+        val apps = repo.findAllByUserId(uid).map { app ->
+            val allStages = stageRepo.findAllByAppId(app.appId)
+            val latest = allStages
+                .sortedWith(compareByDescending<ApplicationStage> { it.stageDate }.thenByDescending { it.createdAt })
+                .firstOrNull()
+            ApplicationWithStagesResponse(
+                appId = app.appId.toString(),
+                company = app.company,
+                role = app.role,
+                jobPostingUrl = app.jobPostingUrl,
+                salaryRange = app.salaryRange,
+                latestStage = latest?.toLatestStageResponse(),
+                stages = allStages.map { it.toDashboardStageResponse() },
+            )
+        }
+        return DashboardResponse(applications = apps)
+    }
+
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun getApplication(@PathVariable id: String): ApplicationResponse {
@@ -100,6 +136,15 @@ class ApplicationController(
         stage = stage,
         stageDate = stageDate?.toString(),
         result = result,
+    )
+
+    private fun ApplicationStage.toDashboardStageResponse() = StageResponse(
+        appStageId = appStageId.toString(),
+        appId = appId.toString(),
+        stage = stage,
+        stageDate = stageDate?.toString(),
+        result = result,
+        createdAt = createdAt.toString(),
     )
 
     private fun JobApplication.toResponse(latestStage: LatestStageResponse? = null) = ApplicationResponse(
