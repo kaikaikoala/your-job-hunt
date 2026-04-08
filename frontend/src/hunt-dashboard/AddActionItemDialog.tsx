@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createActionItem, type CreateActionItemInput } from '../api/actionItems';
+import NetworkAutocomplete, { type NetworkAutocompleteHandle } from './NetworkAutocomplete';
 
 interface Props {
   open: boolean;
@@ -22,6 +23,7 @@ export default function AddActionItemDialog({ open, onClose, appId }: Props) {
   const qc = useQueryClient();
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const referrerRef = useRef<NetworkAutocompleteHandle>(null);
 
   const mutation = useMutation({
     mutationFn: (input: CreateActionItemInput) => createActionItem(input),
@@ -34,15 +36,18 @@ export default function AddActionItemDialog({ open, onClose, appId }: Props) {
   const handleClose = () => {
     setDescription('');
     setDueDate('');
+    referrerRef.current?.reset();
     mutation.reset();
     onClose();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const referrerId = await referrerRef.current?.resolveReferrerId();
     mutation.mutate({
       description: description.trim(),
       appId: appId,
       dueDate: dueDate || undefined,
+      referrerId,
     });
   };
 
@@ -81,6 +86,7 @@ export default function AddActionItemDialog({ open, onClose, appId }: Props) {
             onChange={(e) => setDueDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
           />
+          <NetworkAutocomplete ref={referrerRef} enabled={open} label="For (optional contact)" />
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>

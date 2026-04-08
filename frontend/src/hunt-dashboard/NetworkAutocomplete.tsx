@@ -3,17 +3,18 @@ import { Autocomplete, TextField } from '@mui/material';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchContacts, createContact, type NetworkContact } from '../api/network';
 
-export interface ReferrerAutocompleteHandle {
+export interface NetworkAutocompleteHandle {
   resolveReferrerId: () => Promise<string | undefined>;
   reset: () => void;
 }
 
 interface Props {
   enabled?: boolean;
+  label?: string;
 }
 
-const ReferrerAutocomplete = forwardRef<ReferrerAutocompleteHandle, Props>(
-  ({ enabled = true }, ref) => {
+const NetworkAutocomplete = forwardRef<NetworkAutocompleteHandle, Props>(
+  ({ enabled = true, label = 'Referred by (optional)' }, ref) => {
     const qc = useQueryClient();
     const [referrerValue, setReferrerValue] = useState<NetworkContact | string | null>(null);
     const [referrerInput, setReferrerInput] = useState('');
@@ -57,11 +58,11 @@ const ReferrerAutocomplete = forwardRef<ReferrerAutocompleteHandle, Props>(
         inputValue={referrerInput}
         onInputChange={(_, newInput) => setReferrerInput(newInput)}
         renderInput={(params) => (
-          <TextField {...params} label="Referred by (optional)" />
+          <TextField {...params} label={label} />
         )}
       />
     );
   },
 );
 
-export default ReferrerAutocomplete;
+export default NetworkAutocomplete;

@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createApplication, type CreateApplicationInput } from '../api/applications';
-import ReferrerAutocomplete, { type ReferrerAutocompleteHandle } from './ReferrerAutocomplete';
+import NetworkAutocomplete, { type NetworkAutocompleteHandle } from './NetworkAutocomplete';
 import axios from 'axios';
 
 interface Props {
@@ -30,7 +30,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
   const [salaryRange, setSalaryRange] = useState('');
   const [stageDate, setStageDate] = useState(todayIso);
   const [duplicateError, setDuplicateError] = useState(false);
-  const referrerRef = useRef<ReferrerAutocompleteHandle>(null);
+  const referrerRef = useRef<NetworkAutocompleteHandle>(null);
 
   const mutation = useMutation({
     mutationFn: (input: CreateApplicationInput) => createApplication(input),
@@ -121,7 +121,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
             value={salaryRange}
             onChange={(e) => setSalaryRange(e.target.value)}
           />
-          <ReferrerAutocomplete ref={referrerRef} enabled={open} />
+          <NetworkAutocomplete ref={referrerRef} enabled={open} />
           <TextField
             label="Date"
             type="date"
