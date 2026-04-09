@@ -126,12 +126,12 @@ The app is deployed on [Render](https://render.com/) using the `render.yaml` blu
 
 | Service | URL |
 |:--------|:----|
-| Web service (API) | https://jobhunt-api-8cwf.onrender.com |
-| Frontend | https://jobhunt-frontend-4g9s.onrender.com |
+| Web service (API) | https://api.your-job-hunt.com |
+| Frontend | https://your-job-hunt.com |
 
 ### Health check
 ```bash
-curl https://jobhunt-api-8cwf.onrender.com/health
+curl https://api.your-job-hunt.com/health
 # → {"status":"ok"}
 ```
 

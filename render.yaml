@@ -9,6 +9,8 @@ services:
     env: docker
     dockerfilePath: ./web-service/Dockerfile
     dockerContext: .
+    domains:
+      - api.your-job-hunt.com
     envVars:
       - key: DB_HOST
         fromDatabase:
@@ -33,13 +35,15 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
       - key: APP_CORS_ALLOWED_ORIGIN
-        value: https://jobhunt-frontend-4g9s.onrender.com
+        value: https://your-job-hunt.com
 
   - type: web
     name: jobhunt-frontend
     env: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
+    domains:
+      - your-job-hunt.com
     headers:
       - path: /sign-in
         name: Cross-Origin-Opener-Policy
@@ -50,7 +54,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://jobhunt-api-8cwf.onrender.com
+        value: https://api.your-job-hunt.com
       - key: VITE_FIREBASE_API_KEY
         sync: false
       - key: VITE_FIREBASE_AUTH_DOMAIN
