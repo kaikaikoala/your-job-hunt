@@ -1,5 +1,7 @@
 # Frontend
 
+![App Icon](src/assets/icon.png)
+
 React + TypeScript frontend built with Vite, MUI, TanStack React Query, and Firebase Auth.
 
 ## src/ file scaffold
