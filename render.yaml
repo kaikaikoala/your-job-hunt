@@ -40,6 +40,14 @@ services:
     env: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
+    headers:
+      - path: /sign-in
+        name: Cross-Origin-Opener-Policy
+        value: same-origin-allow-popups
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: VITE_API_URL
         value: https://jobhunt-api-8cwf.onrender.com
