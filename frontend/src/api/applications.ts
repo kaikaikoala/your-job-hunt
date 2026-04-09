@@ -51,5 +51,20 @@ export const fetchDashboard = (): Promise<DashboardData> =>
 export const fetchApplication = (id: string): Promise<Application> =>
   axiosInstance.get(`/applications/${id}`).then((r) => r.data);
 
+export interface PatchApplicationInput {
+  company?: string;
+  role?: string;
+  jobPostingUrl?: string | null;
+  salaryRange?: string | null;
+  referrerId?: string | null;
+  clearReferrer?: boolean;
+}
+
 export const createApplication = (input: CreateApplicationInput): Promise<Application> =>
   axiosInstance.post('/applications', input).then((r) => r.data);
+
+export const updateApplication = (id: string, input: PatchApplicationInput): Promise<Application> =>
+  axiosInstance.patch(`/applications/${id}`, input).then((r) => r.data);
+
+export const deleteApplication = (id: string): Promise<void> =>
+  axiosInstance.delete(`/applications/${id}`).then(() => undefined);

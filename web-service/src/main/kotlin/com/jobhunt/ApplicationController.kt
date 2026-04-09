@@ -5,7 +5,9 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,6 +17,15 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.util.UUID
+
+data class PatchApplicationRequest(
+    val company: String? = null,
+    val role: String? = null,
+    val jobPostingUrl: String? = null,
+    val salaryRange: String? = null,
+    val referrerId: String? = null,
+    val clearReferrer: Boolean = false,
+)
 
 data class CreateApplicationRequest(
     val company: String,
@@ -62,6 +73,7 @@ data class DashboardResponse(
 class ApplicationController(
     private val repo: ApplicationRepository,
     private val stageRepo: ApplicationStageRepository,
+    private val actionItemRepo: ActionItemRepository,
 ) {
 
     @PostMapping
@@ -135,6 +147,54 @@ class ApplicationController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val latest = stageRepo.findLatestByAppId(app.appId, PageRequest.of(0, 1)).firstOrNull()
         return app.toResponse(latest?.toLatestStageResponse())
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateApplication(
+        @PathVariable id: String,
+        @RequestBody request: PatchApplicationRequest,
+    ): ApplicationResponse {
+        val uid = SecurityContextHolder.getContext().authentication.name
+        val appId = runCatching { UUID.fromString(id) }.getOrElse {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+        val existing = repo.findByAppIdAndUserId(appId, uid)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val newReferrerId = when {
+            request.clearReferrer -> null
+            request.referrerId != null -> runCatching { UUID.fromString(request.referrerId) }.getOrNull()
+            else -> existing.referrerId
+        }
+        val updated = repo.save(
+            JobApplication(
+                appId = existing.appId,
+                userId = existing.userId,
+                company = request.company ?: existing.company,
+                role = request.role ?: existing.role,
+                jobPostingUrl = if (request.jobPostingUrl != null) request.jobPostingUrl.ifBlank { null } else existing.jobPostingUrl,
+                salaryRange = if (request.salaryRange != null) request.salaryRange.ifBlank { null } else existing.salaryRange,
+                referrerId = newReferrerId,
+            )
+        )
+        val latest = stageRepo.findLatestByAppId(updated.appId, org.springframework.data.domain.PageRequest.of(0, 1)).firstOrNull()
+        return updated.toResponse(latest?.toLatestStageResponse())
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteApplication(@PathVariable id: String) {
+        val uid = SecurityContextHolder.getContext().authentication.name
+        val appId = runCatching { UUID.fromString(id) }.getOrElse {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+        repo.findByAppIdAndUserId(appId, uid)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val actionItemCount = actionItemRepo.countByAppId(appId)
+        if (actionItemCount > 0) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete application with active action items")
+        }
+        repo.deleteById(appId)
     }
 
     private fun ApplicationStage.toLatestStageResponse() = LatestStageResponse(

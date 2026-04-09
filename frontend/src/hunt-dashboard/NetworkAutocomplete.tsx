@@ -6,6 +6,7 @@ import { fetchContacts, createContact, type NetworkContact } from '../api/networ
 export interface NetworkAutocompleteHandle {
   resolveReferrerId: () => Promise<string | undefined>;
   reset: () => void;
+  init: (contact: NetworkContact | null) => void;
 }
 
 interface Props {
@@ -41,6 +42,15 @@ const NetworkAutocomplete = forwardRef<NetworkAutocompleteHandle, Props>(
       reset() {
         setReferrerValue(null);
         setReferrerInput('');
+      },
+      init(contact: NetworkContact | null) {
+        if (contact) {
+          setReferrerValue(contact);
+          setReferrerInput(`${contact.name}${contact.type ? ` (${contact.type})` : ''}`);
+        } else {
+          setReferrerValue(null);
+          setReferrerInput('');
+        }
       },
     }));
 

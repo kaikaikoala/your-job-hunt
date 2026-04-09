@@ -6,4 +6,5 @@ import java.util.UUID
 interface ActionItemRepository : JpaRepository<ActionItem, UUID> {
     fun findAllByUserId(userId: String): List<ActionItem>
     fun countByReferrerId(referrerId: UUID): Int
+    fun countByAppId(appId: UUID): Int
 }

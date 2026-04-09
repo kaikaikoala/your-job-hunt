@@ -6,6 +6,11 @@ import {
   Checkbox,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   Paper,
   Stack,
@@ -14,12 +19,13 @@ import {
   Typography,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchApplication } from '../api/applications';
+import { fetchApplication, deleteApplication } from '../api/applications';
 import { fetchStages, updateStage, deleteStage, type Stage, type PatchStageInput } from '../api/stages';
 import { fetchActionItems, updateActionItem, deleteActionItem, type ActionItem } from '../api/actionItems';
 import { fetchContact } from '../api/network';
 import AddStageDialog from './AddStageDialog';
 import AddActionItemDialog from './AddActionItemDialog';
+import EditApplicationDialog from './EditApplicationDialog';
 import NavBar from '../shared/NavBar';
 import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, error, stageColor } from '../colors';
 
@@ -31,8 +37,11 @@ function formatDate(iso?: string) {
 export default function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [addStageOpen, setAddStageOpen] = useState(false);
   const [addActionItemOpen, setAddActionItemOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const { data: app, isLoading: appLoading } = useQuery({
     queryKey: ['application', id],
@@ -56,6 +65,14 @@ export default function ApplicationDetailPage() {
     queryKey: ['contact', app?.referrerId],
     queryFn: () => fetchContact(app!.referrerId!),
     enabled: !!app?.referrerId,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteApplication(id!),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['dashboard'] });
+      navigate('/hunt');
+    },
   });
 
   if (appLoading) {
@@ -97,9 +114,23 @@ export default function ApplicationDetailPage() {
 
         {/* Application metadata */}
         <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest, mb: 3 }}>
-          <Typography variant="h5" sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface, mb: 0.5 }}>
-            {app.role}
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
+            <Typography variant="h5" sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface }}>
+              {app.role}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <Tooltip title="Edit">
+                <IconButton size="small" onClick={() => setEditOpen(true)} sx={{ color: onSurfaceVariant }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete">
+                <IconButton size="small" onClick={() => setDeleteConfirmOpen(true)} sx={{ color: error }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
           <Typography sx={{ fontSize: 16, color: onSurfaceVariant, fontWeight: 500, mb: 2 }}>{app.company}</Typography>
           <Stack direction="row" spacing={3} flexWrap="wrap">
             {app.salaryRange && (
@@ -193,6 +224,38 @@ export default function ApplicationDetailPage() {
 
       <AddStageDialog open={addStageOpen} appId={id!} onClose={() => setAddStageOpen(false)} />
       <AddActionItemDialog open={addActionItemOpen} appId={id!} onClose={() => setAddActionItemOpen(false)} />
+      <EditApplicationDialog
+        open={editOpen}
+        app={app}
+        referrer={referrer}
+        onClose={() => setEditOpen(false)}
+      />
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700 }}>Delete Application?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This will permanently delete <strong>{app.role}</strong> at <strong>{app.company}</strong> and all its stages. This cannot be undone.
+          </DialogContentText>
+          {deleteMutation.isError && (
+            <DialogContentText sx={{ color: error, mt: 1, fontSize: 14 }}>
+              Cannot delete — this application has action items. Remove them first.
+            </DialogContentText>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => { setDeleteConfirmOpen(false); deleteMutation.reset(); }} disabled={deleteMutation.isPending}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            disabled={deleteMutation.isPending}
+            onClick={() => deleteMutation.mutate()}
+          >
+            {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

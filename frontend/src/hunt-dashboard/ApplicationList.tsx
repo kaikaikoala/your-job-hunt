@@ -5,17 +5,22 @@ import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   Paper,
   Tooltip,
   Typography,
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { type ApplicationWithStages } from '../api/applications';
+import { type ApplicationWithStages, type DashboardData, deleteApplication } from '../api/applications';
 import { createStage } from '../api/stages';
 import AddStageDialog from './AddStageDialog';
 import AddActionItemDialog from './AddActionItemDialog';
-import { primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLow, surfaceContainerLowest, surfaceContainerHigh, stageColor } from '../colors';
+import { primary, onSurface, onSurfaceVariant, outlineVariant, error, borderSubtle, surfaceContainerLow, surfaceContainerLowest, surfaceContainerHigh, stageColor } from '../colors';
 
 // ─── Misc ─────────────────────────────────────────────────────────────────────
 
@@ -90,6 +95,7 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
   const qc = useQueryClient();
   const [addStageOpen, setAddStageOpen] = useState(false);
   const [addActionItemOpen, setAddActionItemOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const latestStage = app.latestStage?.stage;
   const dotColor = stageColor(latestStage);
@@ -98,6 +104,24 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
     mutationFn: () =>
       createStage(app.appId, { stage: 'Rejected', stageDate: todayIso(), result: 'Rejected' }),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteApplication(app.appId),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ['dashboard'] });
+      const previous = qc.getQueryData<DashboardData>(['dashboard']);
+      qc.setQueryData<DashboardData>(['dashboard'], (old) =>
+        old ? { ...old, applications: old.applications.filter((a) => a.appId !== app.appId) } : old
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) qc.setQueryData(['dashboard'], context.previous);
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
@@ -181,9 +205,45 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add_task</span>
               </IconButton>
             </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton size="small" sx={{ color: error }} onClick={() => setDeleteConfirmOpen(true)}>
+                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
       </Paper>
+
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} maxWidth="xs" fullWidth onClick={(e) => e.stopPropagation()}>
+        <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700 }}>Delete Application?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Permanently delete <strong>{app.role}</strong> at <strong>{app.company}</strong>? This cannot be undone.
+          </DialogContentText>
+          {deleteMutation.isError && (
+            <DialogContentText sx={{ color: error, mt: 1, fontSize: 14 }}>
+              Cannot delete — this application has action items. Remove them first.
+            </DialogContentText>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => { setDeleteConfirmOpen(false); deleteMutation.reset(); }} disabled={deleteMutation.isPending}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            disabled={deleteMutation.isPending}
+            onClick={() => {
+              deleteMutation.mutate(undefined, {
+                onSuccess: () => setDeleteConfirmOpen(false),
+              });
+            }}
+          >
+            {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <AddStageDialog open={addStageOpen} appId={app.appId} onClose={() => setAddStageOpen(false)} />
       <AddActionItemDialog open={addActionItemOpen} appId={app.appId} onClose={() => setAddActionItemOpen(false)} />
