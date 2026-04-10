@@ -27,7 +27,7 @@ uv run python -m grpc_tools.protoc \
     --grpc_python_out=. \
     ../proto/agent_service.proto
 
-python main.py   # listens on :50051
+uv run main.py   # listens on :50051
 ```
 
 ## Running tests

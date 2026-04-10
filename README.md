@@ -108,7 +108,7 @@ cd agent-service
 uv sync --extra dev
 # Generate gRPC stubs (re-run whenever proto/agent_service.proto changes)
 uv run python -m grpc_tools.protoc -I../proto --python_out=. --grpc_python_out=. ../proto/agent_service.proto
-python main.py
+uv run main.py
 ```
 The agent service listens on `:50051` (internal gRPC, not HTTP).
 

@@ -94,7 +94,7 @@ Wire up the full roundtrip — frontend chat button → web service → agent se
 - `agent-service/main.py` — `AgentServiceServicer.InvokeHuntAgent` returns `"Hello, world!"`; listens on `:50051`
 - `agent-service/conftest.py` — auto-generates stubs before pytest
 - `agent-service/.gitignore` — excludes generated `*_pb2.py` files
-- `agent-service/Dockerfile` — context `.` (repo root); generates stubs from `proto/`; runs `python main.py`
+- `agent-service/Dockerfile` — context `.` (repo root); generates stubs from `proto/`; runs `uv run main.py`
 - `proto/agent_service.proto` — `InvokeHuntAgent(HuntInvokeRequest) returns (HuntInvokeResponse)`
 
 ### Web service additions

@@ -1,23 +1,28 @@
-FROM python:3.12-slim
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+# Stage 1: generate gRPC stubs (build-time only)
+FROM python:3.12-slim AS builder
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-# Install runtime + stub-generation deps
-COPY agent-service/pyproject.toml .
-RUN uv pip install --system --no-cache \
-    "grpcio>=1.67.0" \
-    "grpcio-tools>=1.67.0" \
-    "python-dotenv>=1.0.0"
-
-# Generate gRPC stubs from the canonical proto
 COPY proto/ ./proto/
-RUN python -m grpc_tools.protoc \
+RUN uvx --from grpcio-tools python -m grpc_tools.protoc \
     -I./proto \
     --python_out=. \
     --grpc_python_out=. \
     ./proto/agent_service.proto
 
+
+# Stage 2: runtime image (no grpcio-tools, no proto source)
+FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+WORKDIR /app
+
+COPY agent-service/pyproject.toml agent-service/uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    UV_SYSTEM_PYTHON=1 uv sync --frozen --no-install-project
+
+COPY --from=builder /app/agent_service_pb2.py /app/agent_service_pb2_grpc.py ./
 COPY agent-service/main.py .
 
 EXPOSE 50051
