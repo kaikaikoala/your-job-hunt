@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
@@ -21,6 +21,8 @@ import { createStage } from '../api/stages';
 import AddStageDialog from './AddStageDialog';
 import AddActionItemDialog from './AddActionItemDialog';
 import { primary, onSurface, onSurfaceVariant, outlineVariant, error, borderSubtle, surfaceContainerLow, surfaceContainerLowest, surfaceContainerHigh, stageColor } from '../colors';
+
+const AppAiAssistant = React.lazy(() => import('./AppAiAssistant'));
 
 // ─── Misc ─────────────────────────────────────────────────────────────────────
 
@@ -96,6 +98,8 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
   const [addStageOpen, setAddStageOpen] = useState(false);
   const [addActionItemOpen, setAddActionItemOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatAnchorEl, setChatAnchorEl] = useState<HTMLElement | null>(null);
 
   const latestStage = app.latestStage?.stage;
   const dotColor = stageColor(latestStage);
@@ -210,6 +214,15 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
               </IconButton>
             </Tooltip>
+            <Tooltip title="AI Assistant">
+              <IconButton
+                size="small"
+                sx={{ color: onSurfaceVariant }}
+                onClick={(e) => { setChatAnchorEl(e.currentTarget); setChatOpen(true); }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>smart_toy</span>
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
       </Paper>
@@ -247,6 +260,15 @@ function ApplicationCard({ app }: { app: ApplicationWithStages }) {
 
       <AddStageDialog open={addStageOpen} appId={app.appId} onClose={() => setAddStageOpen(false)} />
       <AddActionItemDialog open={addActionItemOpen} appId={app.appId} onClose={() => setAddActionItemOpen(false)} />
+      <Suspense fallback={null}>
+        <AppAiAssistant
+          appId={app.appId}
+          company={app.company}
+          anchorEl={chatAnchorEl}
+          open={chatOpen}
+          onClose={() => setChatOpen(false)}
+        />
+      </Suspense>
     </>
   );
 }

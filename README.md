@@ -15,9 +15,25 @@ There are 2 feature paths: resume tailoring and job hunt tracking.
 * Allow users to track action items through natural language
 * Provide users with a sankey graph for their job hunt
 
+### UI mocks
+| Home | Hunt Dashboard | Resume Builder |
+|:----:|:--------------:|:--------------:|
+| ![Home](./docs/home.png) | ![Hunt dashboard](./docs/hunt-dashboard.png) | ![Resume builder](./docs/resume-builder.png) |
+
 ## Project overview
 
-![System diagram](./docs/system-diagram.png)
+```mermaid
+graph LR
+    C[client]
+    WS[web service]
+    AS[ai service]
+    DB[(database)]
+
+    C --> WS
+    WS <-->|gRpc| AS
+    WS -->|read/write| DB
+    AS -->|read only| DB
+```
 
 ### Tech stack
 
@@ -25,10 +41,10 @@ There are 2 feature paths: resume tailoring and job hunt tracking.
 |:--------|:---------|:-----------|:------|:----------|
 | Frontend | TypeScript | React, [MUI X](https://mui.com/x/react-charts/), [TanStack Query](https://tanstack.com/query/latest) | Vite | — (Render static site) |
 | Web service | Kotlin | [Spring Boot](https://spring.io/projects/spring-boot) | Gradle (Kotlin DSL) | Docker (JDK 21) |
-| Agent service | Python | [FastAPI](https://fastapi.tiangolo.com/), [LangGraph](https://langchain-ai.github.io/langgraph/) | uv / pyproject.toml | Docker (Python 3.11) |
+| Agent service | Python | [grpcio](https://grpc.io/docs/languages/python/), [LangGraph](https://langchain-ai.github.io/langgraph/) | uv / pyproject.toml | Docker (Python 3.12) |
 | Database | SQL | PostgreSQL | Flyway migrations | Docker |
 
-- **Internal comms:** gRPC (proto contracts in `/proto`)
+- **Internal comms:** gRPC (proto contracts in `/proto`) — web service is gRPC client, agent service is gRPC server
 - **Auth:** Firebase
 - **Deployment:** [Render](https://render.com/) — orchestrated via `render.yaml`
 - **Version control:** git
@@ -40,14 +56,9 @@ your-job-hunt/
 ├── proto/                   # gRPC service & message definitions
 ├── database/                # Flyway migrations and optional seed data
 ├── web-service/             # Spring Boot REST API
-├── agent-service/           # FastAPI + LangGraph agent service
+├── agent-service/           # gRPC server — AI agents (internal only)
 └── frontend/                # React SPA
 ```
-
-### UI mocks
-| Home | Hunt Dashboard | Resume Builder |
-|:----:|:--------------:|:--------------:|
-| ![Home](./docs/home.png) | ![Hunt dashboard](./docs/hunt-dashboard.png) | ![Resume builder](./docs/resume-builder.png) |
 
 ## Development Plan
 
@@ -73,6 +84,7 @@ The app is built in three phases. Each phase ships working, deployed functionali
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - JDK 21 — see [web-service/README.md](./web-service/README.md)
 - [Node.js 20+](https://nodejs.org/)
+- [Python 3.12+](https://www.python.org/) and [uv](https://docs.astral.sh/uv/)
 - Firebase project configured — see [docs/Firebase Playbook.md](./docs/Firebase%20Playbook.md)
 
 ### 1. Start PostgreSQL
@@ -89,7 +101,18 @@ cd web-service
 ```
 The API will be available at `http://localhost:8080`.
 
-### 3. Run the frontend
+### 3. Run the agent service
+In a separate terminal:
+```bash
+cd agent-service
+uv sync --extra dev
+# Generate gRPC stubs (re-run whenever proto/agent_service.proto changes)
+uv run python -m grpc_tools.protoc -I../proto --python_out=. --grpc_python_out=. ../proto/agent_service.proto
+python main.py
+```
+The agent service listens on `:50051` (internal gRPC, not HTTP).
+
+### 4. Run the frontend
 In a separate terminal:
 ```bash
 cd frontend
@@ -109,6 +132,9 @@ curl http://localhost:8080/health
 # Backend unit tests
 cd web-service && ./gradlew test
 
+# Agent service tests
+cd agent-service && uv run pytest
+
 # Frontend unit tests
 cd frontend && npm test
 ```
@@ -127,6 +153,7 @@ The app is deployed on [Render](https://render.com/) using the `render.yaml` blu
 | Service | URL |
 |:--------|:----|
 | Web service (API) | https://api.your-job-hunt.com |
+| Agent service | Internal only (Render private network, port 50051) |
 | Frontend | https://your-job-hunt.com |
 
 ### Health check
@@ -140,7 +167,8 @@ The `render.yaml` blueprint provisions:
 
 - **`jobhunt-db`** — PostgreSQL (free tier)
 - **`jobhunt-api`** — Docker web service (Spring Boot); DB connection env vars are injected automatically from the database
-- **`jobhunt-frontend`** — Static site built with `npm run build` from `./frontend`; `VITE_API_URL` points to the deployed API
+- **`jobhunt-agent`** — Docker private service (gRPC, port 50051); hosts all AI agents; accessible only from within Render's private network
+- **`jobhunt-frontend`** — Static site built with `npm run build` from `./frontend`; `VITE_API_URL` points to the deployed web service
 
 ### Environment variables
 
@@ -156,6 +184,18 @@ Variables are set **per service** in the Render dashboard (or via `render.yaml`)
 | `DB_USER` | Auto-injected from `jobhunt-db` | |
 | `DB_PASSWORD` | Auto-injected from `jobhunt-db` | |
 | `FIREBASE_SERVICE_ACCOUNT` | Manual (`sync: false`) | Paste the contents of your Firebase service account JSON |
+
+**Web service (`jobhunt-api`) — additional**
+
+| Variable | Source | Notes |
+|:---------|:-------|:------|
+| `AGENT_GRPC_HOST` | Set in `render.yaml` | Render private network hostname of the agent service (`jobhunt-agent`) |
+
+**Agent service (`jobhunt-agent`)**
+
+| Variable | Source | Notes |
+|:---------|:-------|:------|
+| `ANTHROPIC_API_KEY` | Manual (`sync: false`) | Required from Sub-task 2 onward |
 
 **Frontend (`jobhunt-frontend`)**
 

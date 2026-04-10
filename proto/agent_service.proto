@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package agent;
+
+option java_package = "com.jobhunt.grpc.agent";
+option java_multiple_files = true;
+
+service AgentService {
+  rpc InvokeHuntAgent(HuntInvokeRequest) returns (HuntInvokeResponse);
+  // TODO Sub-task 3: rpc StreamHuntAgent(HuntInvokeRequest) returns (stream HuntStreamChunk);
+  // TODO Phase 3: resume agent RPCs here
+}
+
+message HuntInvokeRequest {
+  string sid     = 1;
+  string message = 2;
+  string uid     = 3; // Firebase UID forwarded by the web service
+}
+
+message HuntInvokeResponse {
+  string response = 1;
+}

@@ -7,3 +7,8 @@ frontend/node_modules/
 your_crew/
 
 .venv/
+
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.egg-info/

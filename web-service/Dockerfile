@@ -3,6 +3,7 @@ FROM gradle:8.7-jdk21 AS build
 WORKDIR /workspace
 COPY web-service/ ./web-service/
 COPY database/ ./database/
+COPY proto/ ./proto/
 WORKDIR /workspace/web-service
 RUN gradle bootJar --no-daemon
 

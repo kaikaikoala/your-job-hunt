@@ -7,15 +7,15 @@ Add a conversational AI layer to the job hunt tracker. Users can describe action
 **Architecture:**
 ```
 Browser (React SPA)
-  ↓ REST (invoke)  /  SSE (stream)
-Agent Service (FastAPI + LangChain/LangGraph, Python 3.12)
-  ↓ REST + Firebase JWT forwarding
+  ↓ REST
 Web Service (Spring Boot, existing)
-  ↓ JDBC / JPA
+  ↓ gRPC (proto/agent_service.proto)
+Agent Service (grpcio + LangGraph, Python 3.12)   ← internal only, never public
+  ↓ read-only SQL (Phase 3+)
 PostgreSQL (existing)
 ```
 
-**Auth:** Agent service verifies Firebase JWT on every request. The same token is forwarded to the Java service so user data remains scoped by UID.
+**Auth:** Firebase JWT is verified by the web service (existing `FirebaseTokenFilter`). The Firebase UID is forwarded to the agent service via `HuntInvokeRequest.uid` — the agent service never handles tokens directly.
 
 **LLM:** `claude-sonnet-4-6` via Anthropic SDK (`langchain-anthropic`).
 
@@ -31,15 +31,16 @@ PostgreSQL (existing)
 
 | Concern | Decision |
 |:--------|:---------|
-| Agent framework | LangChain `create_react_agent` for `/invoke`; LangGraph `StateGraph` for `/stream` |
-| LLM | `claude-sonnet-4-6` (Anthropic) |
-| Python service location | `hunt_agent/` (new directory, separate from `hunt_flow/` prototypes) |
-| Port | 8001 |
+| Agent framework | LangChain `create_react_agent` for `InvokeHuntAgent`; LangGraph `StateGraph` for streaming (Sub-task 3) |
+| LLM | `claude-sonnet-4-6` via Anthropic SDK |
+| Python service location | `agent-service/` (new directory, separate from `hunt_flow/` prototypes) |
+| Transport | gRPC (proto: `proto/agent_service.proto`); port 50051 |
+| Render service type | `pserv` (private service — binds a port, internal-only) |
 | Session ID source | `app_id` for card-level chat; client-generated UUID for global chat |
 | Session storage | In-memory (Phase 2); no DB persistence |
-| Auth forwarding | Firebase JWT passed as-is from frontend → agent → Java service |
-| CLI testing | `hunt_agent/cli.py` with dev-mode flag (bypasses Firebase verification) |
-| Streaming protocol | Server-Sent Events (SSE) — `text/event-stream` |
+| Auth | Firebase JWT verified at web service; UID forwarded via `HuntInvokeRequest.uid` |
+| CLI testing | `agent-service/cli.py` with a static dev token (Sub-task 2) |
+| Streaming protocol | gRPC server streaming (Sub-task 3) |
 
 ---
 
@@ -60,73 +61,114 @@ The agent has read/write access to the Java web service REST API via `httpx`. Ea
 
 ## Agent Service API
 
-All routes require `Authorization: Bearer <firebase_id_token>`.
+The agent service exposes gRPC RPCs defined in `proto/agent_service.proto`. The web service is the only caller — the frontend never contacts the agent service directly.
+
+**Public REST API** (web service, Firebase-authenticated):
 
 | Method | Path | Body | Response |
 |:-------|:-----|:-----|:---------|
 | POST | `/agents/hunt/{sid}/invoke` | `{message: str}` | `200 {response: str}` |
-| POST | `/agents/hunt/{sid}/stream` | `{message: str}` | `200 text/event-stream` |
-| GET | `/agents/hunt/{sid}/history` | — | `200 [{role, content}]` |
-| DELETE | `/agents/{sid}` | — | `204` / `404` |
+| POST | `/agents/hunt/{sid}/stream` | `{message: str}` | `200 text/event-stream` (Sub-task 3) |
+| GET | `/agents/hunt/{sid}/history` | — | `200 [{role, content}]` (Sub-task 3) |
+| DELETE | `/agents/{sid}` | — | `204` / `404` (Sub-task 3) |
 
-**SSE event format** (`/stream`):
-```
-data: {"type": "token", "content": "..."}
+**Internal gRPC RPCs** (agent service, called by web service):
 
-data: {"type": "done"}
-```
+| RPC | Request | Response |
+|:----|:--------|:---------|
+| `InvokeHuntAgent` | `HuntInvokeRequest {sid, message, uid}` | `HuntInvokeResponse {response}` |
+| `StreamHuntAgent` *(Sub-task 3)* | `HuntInvokeRequest` | `stream HuntStreamChunk {type, content}` |
 
 ---
 
 ## Sub-task 1: Hello World
 
-Wire up the full roundtrip — frontend chat button → agent service → response displayed to user. Agent returns a hardcoded string; no LLM yet.
+Wire up the full roundtrip — frontend chat button → web service → agent service → response displayed to user. Agent returns a hardcoded string; no LLM yet.
 
-### `hunt_agent/` service
+### `agent-service/` (gRPC server)
 
-**Files to create:**
-- `hunt_agent/pyproject.toml` — deps: `fastapi`, `uvicorn[standard]`, `firebase-admin`, `httpx`, `python-dotenv`
-- `hunt_agent/main.py`:
-  - `verify_token` FastAPI dependency — extracts Bearer token, calls `firebase_admin.auth.verify_id_token()`, returns `uid`
-  - `POST /agents/hunt/{sid}/invoke` — returns `{"response": "Hello, world!"}`
-  - CORS: `CORS_ALLOWED_ORIGIN` env var
-- `hunt_agent/.env.example` — `FIREBASE_SERVICE_ACCOUNT`, `JAVA_API_URL`, `CORS_ALLOWED_ORIGIN`, `ANTHROPIC_API_KEY`
-- `hunt_agent/Dockerfile` — Python 3.12-slim, `uvicorn main:app --host 0.0.0.0 --port 8001`
+`agent-service/` is the single Python gRPC server that hosts all agents across phases. RPCs are defined in `proto/agent_service.proto`.
+
+**Files:**
+- `agent-service/pyproject.toml` — deps: `grpcio`; dev: `grpcio-tools`, `pytest`
+- `agent-service/main.py` — `AgentServiceServicer.InvokeHuntAgent` returns `"Hello, world!"`; listens on `:50051`
+- `agent-service/conftest.py` — auto-generates stubs before pytest
+- `agent-service/.gitignore` — excludes generated `*_pb2.py` files
+- `agent-service/Dockerfile` — context `.` (repo root); generates stubs from `proto/`; runs `python main.py`
+- `proto/agent_service.proto` — `InvokeHuntAgent(HuntInvokeRequest) returns (HuntInvokeResponse)`
+
+### Web service additions
+
+**New files:**
+- `AgentController.kt` — `POST /agents/hunt/{sid}/invoke`; forwards to `AgentGrpcClient`; authenticated by existing `FirebaseTokenFilter`
+- `AgentGrpcClient.kt` — blocking gRPC stub connecting to `agent.grpc.host:agent.grpc.port`
+
+**Modified files:**
+- `build.gradle.kts` — protobuf plugin + gRPC deps
+- `Dockerfile` — `COPY proto/` in build stage
+- `application.properties` — `agent.grpc.host/port` properties
 
 ### Frontend
+
+Use a [MUI Popper](https://mui.com/material-ui/react-popper/) anchored to the AI icon button on the application card. The popper must not block or obscure the rest of the dashboard — the user should be able to read other cards while it is open.
+
+This is a **single-message interaction**: the user describes a data update, the agent responds with a confirmation of what changed. There is no conversation history and no multi-turn UI.
 
 **New file:** `frontend/src/api/agents.ts`
 ```ts
 invokeHuntAgent(sid: string, message: string): Promise<{ response: string }>
-// POST ${VITE_AGENT_URL}/agents/hunt/${sid}/invoke via axiosInstance
+// POST /agents/hunt/${sid}/invoke via existing axiosInstance (calls web service)
 ```
 
+**New file:** `frontend/src/hunt-dashboard/AppAiAssistant.tsx`
+- Lazy-loaded component (`React.lazy`); only bundled and fetched when first opened
+- Props: `appId: string`, `company: string`, `anchorEl: HTMLElement | null`, `open: boolean`, `onClose: () => void`
+- Renders a `Popper` (`placement="bottom-start"`, `disablePortal=false`) anchored to `anchorEl`
+- Internal state: `chatInput`, `chatResponse`, `chatLoading`
+- Title: `"AI Assistant — {company}"`
+- Input: single `TextField` for the user's message
+- Response: `Box` (`bgcolor: surfaceContainerLow`, rounded, `minHeight: 60`) — shown only after a response arrives; displays the agent's confirmation of what was changed
+- Submit button: calls `invokeHuntAgent(appId, chatInput)`, sets `chatLoading` while waiting
+- Close (X) icon: calls `onClose`; reset `chatResponse` and `chatInput` on close (via `useEffect` on `open`)
+- While `chatLoading`: disable input and submit button
+- No conversation history displayed
+
 **Modify:** `frontend/src/hunt-dashboard/ApplicationList.tsx`
-- Add state: `chatOpen`, `chatInput`, `chatResponse`, `chatLoading`
+- Lazy-load the component:
+  ```tsx
+  const AppAiAssistant = React.lazy(() => import('./AppAiAssistant'));
+  ```
+- Add state per card: `chatOpen`, `chatAnchorEl`
 - New icon button after Delete (same action row, `e.stopPropagation()`):
   ```tsx
   <Tooltip title="AI Assistant">
-    <IconButton size="small" sx={{ color: onSurfaceVariant }} onClick={() => setChatOpen(true)}>
+    <IconButton size="small" sx={{ color: onSurfaceVariant }}
+      onClick={(e) => { setChatAnchorEl(e.currentTarget); setChatOpen(true); }}>
       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>smart_toy</span>
     </IconButton>
   </Tooltip>
   ```
-- New Dialog (`chatOpen`):
-  - Title: `"AI Assistant — {app.company}"`
-  - Content: multiline `TextField` for input; response display `Box` (`bgcolor: surfaceContainerLow`, rounded, `minHeight: 60`)
-  - Actions: Cancel + Submit (calls `invokeHuntAgent(app.appId, chatInput)`)
-  - Reset `chatResponse` on close
+- Render (after the icon button, still inside the card):
+  ```tsx
+  <Suspense fallback={null}>
+    <AppAiAssistant
+      appId={app.appId}
+      company={app.company}
+      anchorEl={chatAnchorEl}
+      open={chatOpen}
+      onClose={() => setChatOpen(false)}
+    />
+  </Suspense>
+  ```
 
-**New env var** (add to `frontend/.env.local`): `VITE_AGENT_URL=http://localhost:8001`
-
-**Update** `frontend/src/api/axiosInstance.ts` — no change needed; `agents.ts` imports existing instance.
+**Note:** No new env vars needed for the frontend — `agents.ts` calls the web service via the existing `axiosInstance` (uses `VITE_API_URL`).
 
 ### Deployment
-- Add `hunt-agent` to `render.yaml` (Docker, port 8001)
-- Add env vars: `JAVA_API_URL`, `FIREBASE_SERVICE_ACCOUNT` (from secret), `CORS_ALLOWED_ORIGIN`, `ANTHROPIC_API_KEY` (from secret)
-- Add `VITE_AGENT_URL` to `jobhunt-frontend` service in `render.yaml`
+- Add `jobhunt-agent` to `render.yaml` as `type: pserv` (private service, port 50051, `dockerContext: .`)
+- Add `AGENT_GRPC_HOST=jobhunt-agent` to `jobhunt-api` env vars in `render.yaml`
+- Add `ANTHROPIC_API_KEY` (secret) to `jobhunt-agent` env vars
 
-**Done when:** Click chat icon on any ApplicationCard → type any message → submit → "Hello, world!" appears in dialog. Deployed and working on Render.
+**Done when:** Click chat icon on any ApplicationCard → type any message → submit → "Hello, world!" appears. Deployed and working on Render.
 
 ---
 
@@ -134,14 +176,15 @@ invokeHuntAgent(sid: string, message: string): Promise<{ response: string }>
 
 Replace the stub with a real LangChain ReAct agent. Validate locally via CLI before touching the frontend.
 
-### `hunt_agent/` additions
+### `agent_service/` additions
+Note for claude: Agent service needs to route to a hunt agent graph. The hunt agent will be a separate graph from the phase 3 resume agent.
 
-**New file:** `hunt_agent/tools.py`
+**New file:** `agent_service/tools.py`
 - One `@tool`-decorated function per agent tool (see table above)
 - Each tool accepts a `token: str` parameter and calls the Java service via `httpx.AsyncClient`
 - `JAVA_API_URL` read from environment
 
-**New file:** `hunt_agent/agent.py`
+**New file:** `agent_service/hunt_agent.py`
 ```python
 def make_agent(token: str):
     # Returns a LangChain AgentExecutor (create_react_agent)
@@ -156,10 +199,10 @@ def invoke_agent(sid: str, message: str, token: str) -> str:
     ...
 ```
 
-**Update** `hunt_agent/main.py`
+**Update** `agent_service/main.py`
 - Wire `POST /agents/hunt/{sid}/invoke` to call `invoke_agent(sid, message, token)`
 
-**New file:** `hunt_agent/cli.py`
+**New file:** `agent_service/cli.py`
 ```
 Usage: python cli.py
 Env: JAVA_API_URL, JAVA_API_TOKEN (static dev token, bypasses Firebase)
@@ -184,14 +227,14 @@ Agent: Done! I've recorded a "Phone Screen" stage with today's date.
 
 Replace the synchronous invoke with streaming. Add a persistent chat panel accessible from anywhere on the Hunt dashboard.
 
-### `hunt_agent/` additions
+### `agent_service/` additions
 
-**New file:** `hunt_agent/graph.py`
+**New file:** `agent_service/graph.py`
 - LangGraph `StateGraph` mirroring the ReAct loop from Sub-task 2
 - Exposes `astream_events()` for token-level streaming
 - Same tools as Sub-task 2
 
-**Update** `hunt_agent/main.py`
+**Update** `agent_service/main.py`
 - `POST /agents/hunt/{sid}/stream` — `StreamingResponse(content=event_generator(), media_type="text/event-stream")`
   - Calls `graph.astream_events(...)`, yields `data: {type: token, content: ...}` per LLM token
   - Final event: `data: {type: done}`
@@ -229,7 +272,7 @@ clearHuntSession(sid: string): Promise<void>
 - Add `<HuntChatPanel />` as the last child in the page root `Box`
 
 ### Deployment
-- Update `hunt_agent/` with new endpoints; redeploy `hunt-agent` service on Render
+- Update `agent_service/` with new endpoints; redeploy `hunt-agent` service on Render
 - `jobhunt-frontend` redeploys automatically via Render static site on push
 
 **Done when:**
