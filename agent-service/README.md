@@ -30,6 +30,22 @@ uv run python -m grpc_tools.protoc \
 uv run main.py   # listens on :50051
 ```
 
+## Docker verification
+
+Build and run the image from the **repo root** (required — the Dockerfile copies from both `proto/` and `agent-service/`):
+
+```bash
+docker build -f agent-service/Dockerfile -t agent-service .
+docker run -p 50051:50051 agent-service
+# → Agent service listening on :50051
+```
+
+To pass an API key:
+
+```bash
+docker run -p 50051:50051 -e ANTHROPIC_API_KEY=your_key agent-service
+```
+
 ## Running tests
 
 `conftest.py` auto-generates the stubs before each run — no manual step needed:
