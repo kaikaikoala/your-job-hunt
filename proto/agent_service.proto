@@ -12,9 +12,10 @@ service AgentService {
 }
 
 message HuntInvokeRequest {
-  string sid     = 1;
+  string app_id  = 1;
   string message = 2;
   string uid     = 3; // Firebase UID forwarded by the web service
+  string token   = 4; // Firebase JWT forwarded for agent→web-service REST callbacks
 }
 
 message HuntInvokeResponse {

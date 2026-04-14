@@ -3,8 +3,11 @@ package com.jobhunt
 import com.jobhunt.grpc.agent.AgentServiceGrpc
 import com.jobhunt.grpc.agent.HuntInvokeRequest
 import io.grpc.ManagedChannelBuilder
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+
+private val logger = LoggerFactory.getLogger(AgentGrpcClient::class.java)
 
 @Service
 class AgentGrpcClient(
@@ -15,12 +18,17 @@ class AgentGrpcClient(
         ManagedChannelBuilder.forAddress(host, port).usePlaintext().build()
     )
 
-    fun invokeHuntAgent(sid: String, message: String, uid: String): String =
-        stub.invokeHuntAgent(
+    fun invokeHuntAgent(appId: String, message: String, uid: String, token: String): String {
+        logger.info("gRPC InvokeHuntAgent: appId={}", appId)
+        val response = stub.invokeHuntAgent(
             HuntInvokeRequest.newBuilder()
-                .setSid(sid)
+                .setAppId(appId)
                 .setMessage(message)
                 .setUid(uid)
+                .setToken(token)
                 .build()
         ).response
+        logger.info("gRPC InvokeHuntAgent completed: appId={}", appId)
+        return response
+    }
 }

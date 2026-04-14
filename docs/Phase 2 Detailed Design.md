@@ -174,52 +174,34 @@ invokeHuntAgent(sid: string, message: string): Promise<{ response: string }>
 
 ## Sub-task 2: LangChain Agent + CLI Testing
 
-Replace the stub with a real LangChain ReAct agent. Validate locally via CLI before touching the frontend.
+Replace the stub with a real LangChain ReAct agent. in: agent-service/hunt/
 
-### `agent_service/` additions
-Note for claude: Agent service needs to route to a hunt agent graph. The hunt agent will be a separate graph from the phase 3 resume agent.
+Design and implement a LangChain routing architecture using LCEL that processes an input message and updates our application records via the server-java API.
 
-**New file:** `agent_service/tools.py`
-- One `@tool`-decorated function per agent tool (see table above)
-- Each tool accepts a `token: str` parameter and calls the Java service via `httpx.AsyncClient`
-- `JAVA_API_URL` read from environment
+new chain should be defined at: agent-service/hunt/update_app_chain.py
 
-**New file:** `agent_service/hunt_agent.py`
-```python
-def make_agent(token: str):
-    # Returns a LangChain AgentExecutor (create_react_agent)
-    # System prompt: job hunt assistant with today's date injected
-    # Tools: all tools from tools.py, partially applied with token
-    ...
+The Architecture:
 
-def invoke_agent(sid: str, message: str, token: str) -> str:
-    # Retrieves or creates session history (dict[sid, list[BaseMessage]])
-    # Runs agent with history, appends new messages
-    # Returns string response
-    ...
-```
+Intent Router: A specialized node that classifies the message into one of three intents: UPDATE_METADATA, ADD_STAGE, or UPDATE_STAGE.
+Ensure the Router is decoupled from extraction logic to maximize classification accuracy.
 
-**Update** `agent_service/main.py`
-- Wire `POST /agents/hunt/{sid}/invoke` to call `invoke_agent(sid, message, token)`
+Worker Nodes (The Heavy Lifters):
 
-**New file:** `agent_service/cli.py`
-```
-Usage: python cli.py
-Env: JAVA_API_URL, JAVA_API_TOKEN (static dev token, bypasses Firebase)
+MetadataWorker: Extracts fields like company_name, job_title, or salary and calls the Java /applications/{id} patch endpoint.
 
-Session: <uuid>
-> I applied to Google for a SWE role
-Agent: Got it — I've added a new application for Software Engineer at Google.
-> I just passed the phone screen
-Agent: Done! I've recorded a "Phone Screen" stage with today's date.
->
-```
-- `DEV_MODE=true` flag skips `verify_id_token`, uses `JAVA_API_TOKEN` directly
+AddStageWorker: Extracts stage_name and date, then calls the /applications/{id}/stages post endpoint.
+
+UpdateStageWorker: Lists existing stages for context, identifies the correct stage from the user's text, and calls the PUT endpoint for that specific stage.
+
+Terminal States:
+
+SuccessNode: Formats a human-friendly confirmation message summarizing exactly what was changed in the database.
+
+FailureNode: Diagnoses why the update failed (e.g., missing info, app not found, API error) and provides a clear troubleshooting response or clarification request.
 
 ### Done when:
-1. `python cli.py` → can create applications, stages, action items via natural language
-2. Click chat icon on frontend → real agent response (not hardcoded)
-3. Deploy to Render, verify in production
+1. Click chat icon on frontend → real agent response (not hardcoded)
+2. Deploy to Render, verify in production
 
 ---
 

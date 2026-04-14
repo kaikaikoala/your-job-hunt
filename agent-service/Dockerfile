@@ -28,6 +28,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 COPY --from=builder /app/agent_service_pb2.py /app/agent_service_pb2_grpc.py ./
 COPY agent-service/main.py .
+COPY agent-service/hunt/ ./hunt/
 
 EXPOSE 50051
 CMD ["uv", "run", "python", "main.py"]
