@@ -22,10 +22,12 @@ WORKDIR /app
 
 COPY agent-service/pyproject.toml agent-service/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
-    UV_SYSTEM_PYTHON=1 uv sync --frozen --no-install-project
+     uv sync --frozen --no-install-project
+ENV PATH="/app/.venv/bin:$PATH"
+
 
 COPY --from=builder /app/agent_service_pb2.py /app/agent_service_pb2_grpc.py ./
 COPY agent-service/main.py .
 
 EXPOSE 50051
-CMD ["python", "main.py"]
+CMD ["uv", "run", "python", "main.py"]
