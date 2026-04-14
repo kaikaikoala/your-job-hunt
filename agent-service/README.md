@@ -46,6 +46,25 @@ To pass an API key:
 docker run -p 50051:50051 -e ANTHROPIC_API_KEY=your_key agent-service
 ```
 
+## Debugging Docker locally
+
+Use this when the Docker image doesn't behave correctly on Render and you need to reproduce the production environment locally. Unlike the quick verification above, this loads your full local env and fixes networking so the container can reach other services running on your Mac.
+
+From the **repo root**:
+
+```bash
+docker build -f agent-service/Dockerfile -t agent-service .
+docker run --rm \
+  -p 50051:50051 \
+  --env-file agent-service/.env.local \
+  -e JAVA_API_URL=http://host.docker.internal:8080 \
+  agent-service
+```
+
+`host.docker.internal` is required instead of `localhost` — the container has its own network namespace and cannot reach services bound to the Mac host via `localhost`. Docker Desktop on Mac resolves `host.docker.internal` to the host machine automatically.
+
+Ensure `ANTHROPIC_API_KEY` is set in `agent-service/.env.local` before running.
+
 ## Running tests
 
 `conftest.py` auto-generates the stubs before each run — no manual step needed:
