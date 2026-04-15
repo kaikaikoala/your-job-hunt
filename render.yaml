@@ -1,6 +1,5 @@
 databases:
   - name: jobhunt-db
-    plan: free
     databaseName: jobhunt
 
 services:
