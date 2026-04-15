@@ -169,9 +169,9 @@ _add_stage_prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             """Extract application stage info from the user's message.
-- stage: stage type in UPPER_SNAKE_CASE (e.g. APPLIED, PHONE_SCREEN, OA, TECHNICAL_INTERVIEW, ONSITE, OFFER, REJECTED)
+- stage: stage type in Tile Case (e.g. Referred, Applied, Recruiter Screen, Team Lead/Manager Screen, Technical Screen, Onsite Technical, Offer, Rejected)
 - stageDate: date in YYYY-MM-DD format; use today ({today}) if the user doesn't specify
-- result: outcome if mentioned (PASSED, FAILED, PENDING); null otherwise""",
+- result: outcome (Passed, Failed, Pending) default to Pending""",
         ),
         ("human", "{message}"),
     ]
@@ -242,7 +242,7 @@ Existing stages:
 Extract:
 - stage_hint: which stage the user is referring to (enough detail to identify it from the list)
 - stageDate: new date in YYYY-MM-DD if mentioned, else null
-- result: new result (PASSED, FAILED, PENDING) if mentioned, else null""",
+- result: new result (Passed, Failed, Pending) if mentioned, else null""",
         ),
         ("human", "{message}"),
     ]
