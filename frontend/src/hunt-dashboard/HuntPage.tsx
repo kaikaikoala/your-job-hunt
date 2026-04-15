@@ -73,7 +73,7 @@ export default function DashboardPage() {
           }}
         >
           {/* Sankey hero — 8 col */}
-          <Box sx={{ gridColumn: { xs: '1 / -1', lg: '1 / 9' } }}>
+          <Box sx={{ gridColumn: { xs: '1 / -1', lg: '1 / 9' }, display: { xs: 'none', lg: 'block' } }}>
             <ConversionFlowCard
               links={sankeyLinks}
               selectedNode={selectedNode}
