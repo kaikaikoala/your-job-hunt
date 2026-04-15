@@ -37,7 +37,7 @@ services:
       - key: APP_CORS_ALLOWED_ORIGIN
         value: https://your-job-hunt.com
       - key: AGENT_GRPC_HOST
-        value: jobhunt-agent  # Render private network hostname for the agent service
+        value: jobhunt-agent # Render private network hostname for the agent service
 
   - type: pserv
     name: jobhunt-agent
@@ -45,8 +45,10 @@ services:
     dockerfilePath: ./agent-service/Dockerfile
     dockerContext: .
     envVars:
-      - key: ANTHROPIC_API_KEY
+      - key: GEMINI_API_KEY
         sync: false
+      - key: WEB_SERVICE_URL
+        value: http://jobhunt-api-8cwf:8080
 
   - type: web
     name: jobhunt-frontend
