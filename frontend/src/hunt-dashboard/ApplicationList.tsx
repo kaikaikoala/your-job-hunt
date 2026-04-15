@@ -21,7 +21,7 @@ export default function ApplicationList({
   const resultCount = visibleApps?.length ?? 0;
 
   return (
-    <Box sx={{ bgcolor: surfaceContainerLow, borderRadius: 3, p: 4 }}>
+    <Box sx={{ bgcolor: { xs: 'transparent', md: surfaceContainerLow }, borderRadius: { xs: 0, md: 3 }, p: { xs: 0, md: 4 } }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
         <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 24, color: onSurface }}>

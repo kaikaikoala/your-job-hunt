@@ -47,21 +47,23 @@ export default function ApplicationCard({ app }: { app: ApplicationWithStages })
           p: 2.5,
           borderRadius: 3,
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'center' },
           justifyContent: 'space-between',
           bgcolor: surfaceContainerLowest,
           border: `1px solid ${borderSubtle}`,
           '&:hover': { boxShadow: '0 4px 16px rgba(25,28,30,0.08)' },
           transition: 'box-shadow 0.2s',
           cursor: 'pointer',
+          gap: { xs: 1.5, sm: 0 },
         }}
         onClick={() => navigate(`/applications/${app.appId}`)}
       >
-        {/* Left: logo + info */}
+        {/* Left: info (no avatar on mobile) */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
           <Avatar
             variant="rounded"
-            sx={{ width: 52, height: 52, bgcolor: surfaceContainerHigh, color: onSurfaceVariant, fontWeight: 700, fontSize: 20, borderRadius: 2 }}
+            sx={{ width: 52, height: 52, bgcolor: surfaceContainerHigh, color: onSurfaceVariant, fontWeight: 700, fontSize: 20, borderRadius: 2, display: { xs: 'none', sm: 'flex' } }}
           >
             {app.company.charAt(0).toUpperCase()}
           </Avatar>
@@ -80,8 +82,8 @@ export default function ApplicationCard({ app }: { app: ApplicationWithStages })
         </Box>
 
         {/* Right: stage + actions */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }} onClick={(e) => e.stopPropagation()}>
-          <Box sx={{ textAlign: 'right' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, width: { xs: '100%', sm: 'auto' } }} onClick={(e) => e.stopPropagation()}>
+          <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
             <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5 }}>
               Current Stage
             </Typography>
@@ -95,7 +97,7 @@ export default function ApplicationCard({ app }: { app: ApplicationWithStages })
 
           <Box sx={{ width: '1px', height: 36, bgcolor: borderSubtle }} />
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
             <Button
               variant="outlined"
               size="small"

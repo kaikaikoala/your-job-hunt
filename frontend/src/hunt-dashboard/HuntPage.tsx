@@ -25,7 +25,7 @@ export default function DashboardPage() {
 
   const visibleApps = selectedNode
     ? applications?.filter((app) => app.stages.some((s) => s.stage === selectedNode))
-    : applications;
+    : applications?.filter((app) => app.latestStage?.stage !== 'Rejected');
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
