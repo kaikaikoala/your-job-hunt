@@ -16,7 +16,7 @@ class ActionItem(
     val actionItemId: UUID = UUID.randomUUID(),
 
     @Column(name = "user_id", nullable = false)
-    val userId: String,
+    val userId: UUID,
 
     @Column(name = "app_id")
     val appId: UUID? = null,

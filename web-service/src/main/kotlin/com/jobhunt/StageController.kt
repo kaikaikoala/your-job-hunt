@@ -114,11 +114,11 @@ class StageController(
     }
 
     private fun resolveApp(appId: String): JobApplication {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val uuid = runCatching { UUID.fromString(appId) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        return appRepo.findByAppIdAndUserId(uuid, uid)
+        return appRepo.findByAppIdAndUserId(uuid, userId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 

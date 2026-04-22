@@ -28,16 +28,28 @@ class ApplicationControllerTest {
     lateinit var firebaseAuth: FirebaseAuth
 
     @MockBean
+    lateinit var userService: UserService
+
+    @MockBean
     lateinit var repo: ApplicationRepository
 
-    private val testUid = "test-uid"
+    @MockBean
+    lateinit var stageRepo: ApplicationStageRepository
+
+    @MockBean
+    lateinit var actionItemRepo: ActionItemRepository
+
+    private val testFirebaseUid = "test-uid"
+    private val testUserId = UUID.fromString("00000000-0000-0000-0000-000000000099")
     private val validToken = "valid-token"
 
     @BeforeEach
     fun setupAuth() {
         val mockToken = mock(FirebaseToken::class.java)
-        `when`(mockToken.uid).thenReturn(testUid)
+        `when`(mockToken.uid).thenReturn(testFirebaseUid)
         `when`(firebaseAuth.verifyIdToken(validToken)).thenReturn(mockToken)
+        val testUser = User(userId = testUserId, firebaseUid = testFirebaseUid)
+        `when`(userService.findOrCreate(testFirebaseUid)).thenReturn(testUser)
     }
 
     // ── POST /applications ───────────────────────────────────────────────────
@@ -56,7 +68,7 @@ class ApplicationControllerTest {
     fun `POST applications with valid token creates application`() {
         val savedApp = JobApplication(
             appId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
-            userId = testUid,
+            userId = testUserId,
             company = "Stripe",
             role = "Engineer",
         )
@@ -99,7 +111,7 @@ class ApplicationControllerTest {
 
     @Test
     fun `GET applications with valid token returns empty list`() {
-        `when`(repo.findAllByUserId(testUid)).thenReturn(emptyList())
+        `when`(repo.findAllByUserId(testUserId)).thenReturn(emptyList())
 
         mvc.get("/applications") {
             header("Authorization", "Bearer $validToken")
@@ -114,13 +126,13 @@ class ApplicationControllerTest {
     fun `GET applications with valid token returns list of applications`() {
         val app = JobApplication(
             appId = UUID.fromString("00000000-0000-0000-0000-000000000001"),
-            userId = testUid,
+            userId = testUserId,
             company = "Stripe",
             role = "Staff Engineer",
             jobPostingUrl = "https://stripe.com/jobs/1",
             salaryRange = "200k-250k",
         )
-        `when`(repo.findAllByUserId(testUid)).thenReturn(listOf(app))
+        `when`(repo.findAllByUserId(testUserId)).thenReturn(listOf(app))
 
         mvc.get("/applications") {
             header("Authorization", "Bearer $validToken")

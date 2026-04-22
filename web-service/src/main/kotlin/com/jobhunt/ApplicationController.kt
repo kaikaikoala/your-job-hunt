@@ -80,9 +80,9 @@ class ApplicationController(
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     fun createApplication(@RequestBody request: CreateApplicationRequest): ApplicationResponse {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val entity = JobApplication(
-            userId = uid,
+            userId = userId,
             company = request.company,
             role = request.role,
             jobPostingUrl = request.jobPostingUrl,
@@ -106,8 +106,8 @@ class ApplicationController(
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     fun listApplications(): List<ApplicationResponse> {
-        val uid = SecurityContextHolder.getContext().authentication.name
-        return repo.findAllByUserId(uid).map { app ->
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
+        return repo.findAllByUserId(userId).map { app ->
             val latest = stageRepo.findLatestByAppId(app.appId, PageRequest.of(0, 1)).firstOrNull()
             app.toResponse(latest?.toLatestStageResponse())
         }
@@ -116,8 +116,8 @@ class ApplicationController(
     @GetMapping("/dashboard")
     @ResponseStatus(HttpStatus.OK)
     fun getDashboard(): DashboardResponse {
-        val uid = SecurityContextHolder.getContext().authentication.name
-        val apps = repo.findAllByUserId(uid).map { app ->
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
+        val apps = repo.findAllByUserId(userId).map { app ->
             val allStages = stageRepo.findAllByAppId(app.appId)
             val latest = allStages
                 .sortedWith(compareByDescending<ApplicationStage> { it.stageDate }.thenByDescending { it.createdAt })
@@ -139,11 +139,11 @@ class ApplicationController(
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun getApplication(@PathVariable id: String): ApplicationResponse {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val appId = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        val app = repo.findByAppIdAndUserId(appId, uid)
+        val app = repo.findByAppIdAndUserId(appId, userId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val latest = stageRepo.findLatestByAppId(app.appId, PageRequest.of(0, 1)).firstOrNull()
         return app.toResponse(latest?.toLatestStageResponse())
@@ -155,11 +155,11 @@ class ApplicationController(
         @PathVariable id: String,
         @RequestBody request: PatchApplicationRequest,
     ): ApplicationResponse {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val appId = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        val existing = repo.findByAppIdAndUserId(appId, uid)
+        val existing = repo.findByAppIdAndUserId(appId, userId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val newReferrerId = when {
             request.clearReferrer -> null
@@ -184,11 +184,11 @@ class ApplicationController(
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteApplication(@PathVariable id: String) {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val appId = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        repo.findByAppIdAndUserId(appId, uid)
+        repo.findByAppIdAndUserId(appId, userId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val actionItemCount = actionItemRepo.countByAppId(appId)
         if (actionItemCount > 0) {

@@ -49,7 +49,7 @@ class ActionItemController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody request: CreateActionItemRequest): ActionItemResponse {
-        val uid = uid()
+        val uid = userId()
         val parsedAppId = request.appId?.let { runCatching { UUID.fromString(it) }.getOrNull() }
         val parsedReferrerId = request.referrerId?.let { runCatching { UUID.fromString(it) }.getOrNull() }
         val parsedDueDate = request.dueDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
@@ -72,7 +72,7 @@ class ActionItemController(
         @RequestParam referrerId: String? = null,
         @RequestParam status: String? = null,
     ): List<ActionItemResponse> {
-        val uid = uid()
+        val uid = userId()
         val parsedAppId = appId?.let { runCatching { UUID.fromString(it) }.getOrNull() }
         val parsedReferrerId = referrerId?.let { runCatching { UUID.fromString(it) }.getOrNull() }
         return repo.findAllByUserId(uid)
@@ -89,7 +89,7 @@ class ActionItemController(
         @PathVariable id: String,
         @RequestBody request: PatchActionItemRequest,
     ): ActionItemResponse {
-        val uid = uid()
+        val uid = userId()
         val uuid = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
@@ -121,7 +121,7 @@ class ActionItemController(
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: String) {
-        val uid = uid()
+        val uid = userId()
         val uuid = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
@@ -132,11 +132,11 @@ class ActionItemController(
         repo.delete(existing)
     }
 
-    private fun uid() = SecurityContextHolder.getContext().authentication.name
+    private fun userId() = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
 
     private fun ActionItem.toResponse() = ActionItemResponse(
         actionItemId = actionItemId.toString(),
-        userId = userId,
+        userId = userId.toString(),
         appId = appId?.toString(),
         referrerId = referrerId?.toString(),
         description = description,

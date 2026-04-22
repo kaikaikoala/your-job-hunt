@@ -18,6 +18,9 @@ class HealthControllerTest {
     @MockBean
     lateinit var firebaseAuth: FirebaseAuth
 
+    @MockBean
+    lateinit var userService: UserService
+
     @Test
     fun `GET health returns 200 without auth`() {
         mvc.get("/health").andExpect {

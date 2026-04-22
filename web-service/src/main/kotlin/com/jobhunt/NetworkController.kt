@@ -37,8 +37,8 @@ class NetworkController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createContact(@RequestBody request: CreateNetworkContactRequest): NetworkContactResponse {
-        val uid = SecurityContextHolder.getContext().authentication.name
-        val entity = NetworkContact(userId = uid, name = request.name, type = request.type)
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
+        val entity = NetworkContact(userId = userId, name = request.name, type = request.type)
         val saved = repo.save(entity)
         return saved.toResponse(0)
     }
@@ -46,9 +46,9 @@ class NetworkController(
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     fun listContacts(): List<NetworkContactResponse> {
-        val uid = SecurityContextHolder.getContext().authentication.name
-        return repo.findAllByUserId(uid).map { contact ->
-            val count = appRepo.countByReferrerIdAndUserId(contact.referrerId, uid)
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
+        return repo.findAllByUserId(userId).map { contact ->
+            val count = appRepo.countByReferrerIdAndUserId(contact.referrerId, userId)
             contact.toResponse(count)
         }
     }
@@ -56,13 +56,13 @@ class NetworkController(
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun getContact(@PathVariable id: String): NetworkContactResponse {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val referrerId = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        val contact = repo.findByReferrerIdAndUserId(referrerId, uid)
+        val contact = repo.findByReferrerIdAndUserId(referrerId, userId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        val count = appRepo.countByReferrerIdAndUserId(contact.referrerId, uid)
+        val count = appRepo.countByReferrerIdAndUserId(contact.referrerId, userId)
         return contact.toResponse(count)
     }
 
@@ -72,11 +72,11 @@ class NetworkController(
         @PathVariable id: String,
         @RequestBody request: CreateNetworkContactRequest,
     ): NetworkContactResponse {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val referrerId = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        val existing = repo.findByReferrerIdAndUserId(referrerId, uid)
+        val existing = repo.findByReferrerIdAndUserId(referrerId, userId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val updated = NetworkContact(
             referrerId = existing.referrerId,
@@ -85,20 +85,20 @@ class NetworkController(
             type = request.type,
         )
         val saved = repo.save(updated)
-        val count = appRepo.countByReferrerIdAndUserId(saved.referrerId, uid)
+        val count = appRepo.countByReferrerIdAndUserId(saved.referrerId, userId)
         return saved.toResponse(count)
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteContact(@PathVariable id: String) {
-        val uid = SecurityContextHolder.getContext().authentication.name
+        val userId = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
         val referrerId = runCatching { UUID.fromString(id) }.getOrElse {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        repo.findByReferrerIdAndUserId(referrerId, uid)
+        repo.findByReferrerIdAndUserId(referrerId, userId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        val appCount = appRepo.countByReferrerIdAndUserId(referrerId, uid)
+        val appCount = appRepo.countByReferrerIdAndUserId(referrerId, userId)
         val itemCount = actionItemRepo.countByReferrerId(referrerId)
         if (appCount > 0 || itemCount > 0) {
             throw ResponseStatusException(HttpStatus.CONFLICT, "Contact is in use")

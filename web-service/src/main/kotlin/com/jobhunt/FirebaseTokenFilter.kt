@@ -10,7 +10,10 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
-class FirebaseTokenFilter(private val firebaseAuth: FirebaseAuth) : OncePerRequestFilter() {
+class FirebaseTokenFilter(
+    private val firebaseAuth: FirebaseAuth,
+    private val userService: UserService,
+) : OncePerRequestFilter() {
 
     override fun shouldNotFilter(request: HttpServletRequest) =
         request.method.equals("OPTIONS", ignoreCase = true)
@@ -25,8 +28,9 @@ class FirebaseTokenFilter(private val firebaseAuth: FirebaseAuth) : OncePerReque
             val token = authHeader.removePrefix("Bearer ")
             try {
                 val decodedToken = firebaseAuth.verifyIdToken(token)
+                val user = userService.findOrCreate(decodedToken.uid)
                 val authentication = UsernamePasswordAuthenticationToken(
-                    decodedToken.uid,
+                    user.userId.toString(),
                     null,
                     emptyList(),
                 )
