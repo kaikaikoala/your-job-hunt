@@ -14,6 +14,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchContacts, deleteContact, type NetworkContact } from '../api/network';
 import AddEditContactDialog from './AddEditContactDialog';
 import NavBar from '../shared/NavBar';
+import Footer from '../shared/Footer';
 import {
   surface,
   onSurface,
@@ -107,6 +108,7 @@ export default function NetworkPage() {
         onClose={() => setEditContact(undefined)}
         contact={editContact}
       />
+      <Footer />
     </Box>
   );
 }

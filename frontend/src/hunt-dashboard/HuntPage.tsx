@@ -5,6 +5,7 @@ import { fetchDashboard } from '../api/applications';
 import AddApplicationDialog from './AddApplicationDialog';
 import DashboardActionItemsPanel from './DashboardActionItemsPanel';
 import NavBar from '../shared/NavBar';
+import Footer from '../shared/Footer';
 import ConversionFlowCard, { computeSankeyLinks } from './ConversionFlowCard';
 import ApplicationList from './ApplicationList';
 import { surface, onSurface, onSurfaceVariant } from '../colors';
@@ -90,6 +91,7 @@ export default function DashboardPage() {
       </Box>
 
       <AddApplicationDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
+      <Footer />
     </Box>
   );
 }

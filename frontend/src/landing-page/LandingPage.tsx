@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import heroPng from '../assets/corp-man.png';
 import NavBar from '../shared/NavBar';
+import Footer from '../shared/Footer';
 import {
   surface,
   surfaceContainerLowest,
@@ -471,66 +472,7 @@ export default function LandingPage() {
         </Box>
       </Box>
 
-      {/* Footer */}
-      <Box
-        component="footer"
-        sx={{
-          bgcolor: surfaceContainerLowest,
-          borderTop: `1px solid ${borderFaint}`,
-          py: 8,
-          px: { xs: 4, md: 6 },
-        }}
-      >
-        <Box
-          sx={{
-            maxWidth: '88rem',
-            mx: 'auto',
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-            <Typography
-              sx={{
-                fontFamily: 'Manrope, sans-serif',
-                fontWeight: 900,
-                fontSize: '1.2rem',
-                color: onSurface,
-                letterSpacing: '-0.03em',
-                mb: 0.5,
-              }}
-            >
-              Your Job Hunt
-            </Typography>
-            <Typography sx={{ color: onSurfaceVariant, fontSize: '0.875rem' }}>
-              © 2025 Your Job Hunt.
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 5 }}>
-            {['Privacy', 'Terms', 'Contact'].map((label) => (
-              <Typography
-                key={label}
-                component="a"
-                href="#"
-                sx={{
-                  color: onSurfaceVariant,
-                  textDecoration: 'none',
-                  fontWeight: 700,
-                  fontSize: '0.875rem',
-                  '&:hover': { color: primary },
-                  transition: 'color 0.15s',
-                }}
-              >
-                {label}
-              </Typography>
-            ))}
-          </Box>
-        </Box>
-      </Box>
+      <Footer />
     </Box>
   );
 }

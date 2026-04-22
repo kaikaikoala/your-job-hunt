@@ -22,6 +22,7 @@ import {
 } from "../api/actionItems";
 import AddActionItemDialog from "./AddActionItemDialog";
 import NavBar from "../shared/NavBar";
+import Footer from "../shared/Footer";
 import {
   surface,
   onSurface,
@@ -166,6 +167,7 @@ export default function ActionItemsPage() {
       </Box>
 
       <AddActionItemDialog open={addOpen} onClose={() => setAddOpen(false)} />
+      <Footer />
     </Box>
   );
 }

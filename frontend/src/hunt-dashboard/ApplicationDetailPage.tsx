@@ -27,6 +27,7 @@ import AddStageDialog from './AddStageDialog';
 import AddActionItemDialog from './AddActionItemDialog';
 import EditApplicationDialog from './EditApplicationDialog';
 import NavBar from '../shared/NavBar';
+import Footer from '../shared/Footer';
 import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, error, stageColor } from '../colors';
 
 function formatDate(iso?: string) {
@@ -256,6 +257,7 @@ export default function ApplicationDetailPage() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Footer />
     </Box>
   );
 }
