@@ -1,16 +1,20 @@
 """
-OrchestratorAgent: classify a job-related email and call the right tool.
+OrchestratorAgent: understand email intent and call the right DB tool.
 """
 from __future__ import annotations
 
 import logging
 import os
 
-from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_agent
+from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
-from pydantic import BaseModel
 
-from chains.tools import add_application
+from chains.tools import (
+    add_application as _add_application,
+    add_application_stage as _add_application_stage,
+    update_application_stage as _update_application_stage,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,59 +24,81 @@ _llm = ChatGoogleGenerativeAI(
     temperature=0,
 )
 
+_SYSTEM_PROMPT = """\
+You are a job-hunt assistant. Given a job-related email, extract the relevant information \
+and call exactly one tool to record it.
 
-class _ApplicationExtraction(BaseModel):
-    company: str
-    role: str
-    job_posting_url: str | None = None
-    salary_range: str | None = None
+Tool selection rules:
+- add_application: the email is a first-time application receipt or acknowledgement \
+(e.g. "Thank you for applying", "We received your application").
+- add_application_stage: the email introduces a NEW stage on an existing application — \
+interview scheduled, OA invitation, take-home sent, next-round invite. Set result="Pending".
+- update_application_stage: the email updates the OUTCOME of an existing stage — \
+rejection, moved-forward confirmation, interview date confirmed. \
+Set result="Passed", "Failed", or add stage_date.
+
+Special cases:
+- Rejection email with no prior interview: call add_application_stage with stage="Rejected", result="Failed".
+- If you cannot determine company or role, do not call any tool.
+- stage_date format: YYYY-MM-DD. Only set if a specific date is mentioned.
+
+Valid stage values: Applied, Phone Screen, Technical Interview, OA, Offer, Rejected.
+Valid result values: Pending, Passed, Failed.\
+"""
 
 
-_extract_prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            """Extract job application details from this email.
-Fields:
-- company: the company name (required)
-- role: the job title or role (required; use 'Unknown' if not mentioned)
-- job_posting_url: URL to the job posting if present, else null
-- salary_range: salary range as a plain string if mentioned, else null""",
-        ),
-        (
-            "human",
-            "Subject: {subject}\nFrom: {from_}\n\n{body_text}",
-        ),
-    ]
-)
+def _build_tools(user_id: str) -> list:
+    @tool
+    def add_application(
+        company: str,
+        role: str,
+        job_posting_url: str | None = None,
+        salary_range: str | None = None,
+    ) -> str:
+        """Record a new job application. Use when the email is an application receipt or acknowledgement."""
+        result = _add_application(user_id, company, role, job_posting_url, salary_range)
+        return result or "Application already tracked or insert failed."
 
-_extract_chain = _extract_prompt | _llm.with_structured_output(_ApplicationExtraction)
+    @tool
+    def add_application_stage(
+        company: str,
+        role: str,
+        stage: str,
+        result: str | None = None,
+        stage_date: str | None = None,
+    ) -> str:
+        """Add a new stage to an existing application. Use for interview invites, OA, next-round emails, or rejections."""
+        return _add_application_stage(user_id, company, role, stage, result, stage_date)
+
+    @tool
+    def update_application_stage(
+        company: str,
+        role: str,
+        stage: str,
+        result: str | None = None,
+        stage_date: str | None = None,
+    ) -> str:
+        """Update the outcome or date of an existing stage. Use for confirmed interview dates, rejection updates, or pass/fail decisions."""
+        return _update_application_stage(user_id, company, role, stage, result, stage_date)
+
+    return [add_application, add_application_stage, update_application_stage]
 
 
 def process_email(user_id: str, email: dict) -> None:
-    """
-    Extract application fields from a job-related email and write to the DB.
-    # TODO Phase 2.x: add_action_item, add_application_stage, update_application_stage
-    """
+    """Route a job-related email to the appropriate DB tool via a tool-calling agent."""
     subject = email.get("subject", "")
     logger.info("OrchestratorAgent: processing subject=%r", subject)
 
-    try:
-        extraction: _ApplicationExtraction = _extract_chain.invoke(
-            {
-                "subject": subject,
-                "from_": email.get("from_", ""),
-                "body_text": email.get("body_text", "")[:3000],
-            }
-        )
-    except Exception as exc:
-        logger.warning("Extraction failed for subject=%r: %s", subject, exc)
-        return
+    tools = _build_tools(user_id)
+    agent = create_agent(_llm, tools, system_prompt=_SYSTEM_PROMPT)
 
-    add_application(
-        user_id=user_id,
-        company=extraction.company,
-        role=extraction.role,
-        job_posting_url=extraction.job_posting_url,
-        salary_range=extraction.salary_range,
+    email_text = (
+        f"Subject: {subject}\n"
+        f"From: {email.get('from_', '')}\n\n"
+        f"{email.get('body_text', '')[:3000]}"
     )
+
+    try:
+        agent.invoke({"messages": [{"role": "user", "content": email_text}]})
+    except Exception as exc:
+        logger.warning("OrchestratorAgent failed for subject=%r: %s", subject, exc)

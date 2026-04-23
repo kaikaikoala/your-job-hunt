@@ -96,7 +96,7 @@ def run_sync(req: SyncRequest):
 
     emails_processed = 0
     errors = []
-    for email in emails:
+    for email in reversed(emails):
         if not is_job_related(email):
             continue
         try:

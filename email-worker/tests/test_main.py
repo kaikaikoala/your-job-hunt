@@ -48,7 +48,7 @@ def test_sync_happy_path(client):
 
     with (
         patch("main.fetch_emails", return_value=mock_emails) as mock_fetch,
-        patch("main.is_job_related", side_effect=[True, False]) as mock_filter,
+        patch("main.is_job_related", side_effect=[False, True]) as mock_filter,
         patch("main.process_email") as mock_process,
         patch("main._update_sync") as mock_update,
     ):
