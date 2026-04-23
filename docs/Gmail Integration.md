@@ -134,17 +134,18 @@ email-worker/
 
 ## Development phases
 
-### Phase 1 — Enable email parsing
-- [ ] `database/migrations/V6__create_email_settings.sql`
-- [ ] `database/migrations/V7__create_email_syncs.sql`
-- [ ] `web-service`: `EmailSettingsController.kt` + entity/repo (`GET`, `POST`, `PATCH`, `DELETE /email-settings`)
-- [ ] `frontend`: "Enable Email Assistant" / "Sync Emails" toggle button in `HuntPage.tsx`
-- [ ] `frontend`: `/oauth/gmail/callback` route — receives `?code=` and calls `POST /email-settings`
-- [ ] `frontend/src/api/emailSettings.ts`
-- [ ] `render.yaml`: add `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET` (web-service); `VITE_GMAIL_CLIENT_ID` (frontend)
-- [ ] `README.md`: document new endpoints + env vars
+### Phase 1 — Enable email parsing ✅
+- [x] `database/migrations/V8__create_email_settings.sql`
+- [x] `database/migrations/V9__create_email_syncs.sql`
+- [x] `web-service`: `EmailSettingsController.kt` + entity/repo (`GET`, `POST`, `PATCH`, `DELETE /email-settings`)
+- [x] `frontend`: "Email Assistant" / "Sync Emails" toggle button in `HuntPage.tsx`
+- [x] `frontend`: `/oauth/gmail/callback` route — receives `?code=` and calls `POST /email-settings`
+- [x] `frontend/src/api/emailSettings.ts`
+- [x] `render.yaml`: add `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `TOKEN_ENCRYPTION_KEY` (web-service); `VITE_GMAIL_CLIENT_ID` (frontend)
+- [x] `README.md`: document new endpoints + env vars
+- [x] PKCE (`code_challenge`/`code_verifier`) added to OAuth flow
 
-**Verify:** DB tables exist → OAuth flow inserts row → `GET /email-settings` returns `{email, label}` → button toggles correctly in UI
+**Verify:** DB tables exist → OAuth flow inserts row → `GET /email-settings` returns `{email, label}` → button toggles correctly in UI ✅ (verified in prod)
 
 ### Phase 2 — Add applications from emails
 - [ ] Scaffold `email-worker/` (Dockerfile, pyproject.toml, main.py, gmail_client.py, db.py, config.py)

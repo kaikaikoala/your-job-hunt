@@ -43,9 +43,7 @@ class EmailSettingsController(
     fun getEmailSettings(): EmailSettingsResponse {
         val userId = currentUserId()
         log.info("GET /email-settings userId={}", userId)
-        val settings = repo.findById(userId)
-        log.info("GET /email-settings findById present={}", settings.isPresent)
-        return settings.orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }.toResponse()
+        return repo.findById(userId).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }.toResponse()
     }
 
     @PostMapping
