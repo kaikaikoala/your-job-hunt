@@ -33,6 +33,12 @@ services:
           property: password
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
+      - key: GMAIL_CLIENT_ID
+        sync: false
+      - key: GMAIL_CLIENT_SECRET
+        sync: false
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false
       - key: APP_CORS_ALLOWED_ORIGIN
         value: https://your-job-hunt.com
       - key: AGENT_GRPC_HOST
@@ -74,4 +80,6 @@ services:
       - key: VITE_FIREBASE_PROJECT_ID
         sync: false
       - key: VITE_FIREBASE_APP_ID
+        sync: false
+      - key: VITE_GMAIL_CLIENT_ID
         sync: false

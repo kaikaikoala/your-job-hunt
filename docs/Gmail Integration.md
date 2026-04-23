@@ -7,6 +7,45 @@ A Gmail-powered background worker that automatically parses job-related emails a
 ## System diagram
 ![email worker system design](./email-worker-system-design.png)
 
+## OAuth connect flow (PKCE)
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant FE as Frontend
+    participant SS as sessionStorage
+    participant Google as Google OAuth
+    participant WS as Web Service
+    participant DB as PostgreSQL
+
+    User->>FE: Click "Email Assistant"
+    FE->>FE: generatePKCE()<br/>→ verifier, challenge
+    FE->>SS: store pkce_verifier
+    FE->>Google: GET /o/oauth2/v2/auth<br/>?scope=gmail.readonly+email+openid<br/>&code_challenge=…&code_challenge_method=S256
+
+    Google->>User: Consent screen
+    User->>Google: Authorize
+
+    Google->>FE: Redirect /oauth/gmail/callback?code=…
+    FE->>SS: read + clear pkce_verifier
+    FE->>WS: POST /email-settings<br/>{code, redirectUri, codeVerifier}
+
+    WS->>Google: POST /token<br/>{code, client_secret, code_verifier}
+    Note over Google: Validates code_verifier<br/>matches stored challenge
+    Google-->>WS: {access_token, refresh_token, expires_in}
+
+    WS->>WS: Base64url-decode id_token payload<br/>→ extract email claim
+
+    WS->>WS: AES-256-GCM encrypt tokens
+    WS->>DB: INSERT email_settings
+    DB-->>WS: saved
+
+    WS-->>FE: 201 {email, label}
+    FE->>User: Navigate to /hunt<br/>Button reads "Sync Emails"
+```
+
+---
+
 ## Architecture decisions
 
 - **email-worker writes directly to PostgreSQL** via psycopg2 — no web-service HTTP calls needed, no service-to-service auth complexity

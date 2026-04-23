@@ -7,6 +7,7 @@ import ApplicationDetailPage from './hunt-dashboard/ApplicationDetailPage';
 import ActionItemsPage from './hunt-dashboard/ActionItemsPage';
 import NetworkPage from './hunt-dashboard/NetworkPage';
 import ProtectedRoute from './shared/ProtectedRoute';
+import GmailCallback from './oauth/GmailCallback';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/applications/:id" element={<ApplicationDetailPage />} />
             <Route path="/action-items" element={<ActionItemsPage />} />
             <Route path="/network" element={<NetworkPage />} />
+            <Route path="/oauth/gmail/callback" element={<GmailCallback />} />
           </Route>
         </Routes>
       </BrowserRouter>

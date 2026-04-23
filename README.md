@@ -190,6 +190,9 @@ Variables are set **per service** in the Render dashboard (or via `render.yaml`)
 | Variable | Source | Notes |
 |:---------|:-------|:------|
 | `AGENT_GRPC_HOST` | Set in `render.yaml` | Render private network hostname of the agent service (`jobhunt-agent`) |
+| `GMAIL_CLIENT_ID` | Manual (`sync: false`) | Google OAuth client ID |
+| `GMAIL_CLIENT_SECRET` | Manual (`sync: false`) | Google OAuth client secret |
+| `TOKEN_ENCRYPTION_KEY` | Manual (`sync: false`) | 32-byte random key, base64url-encoded; used for AES-256-GCM token encryption |
 
 **Agent service (`jobhunt-agent`)**
 
@@ -206,6 +209,7 @@ Variables are set **per service** in the Render dashboard (or via `render.yaml`)
 | `VITE_FIREBASE_AUTH_DOMAIN` | Manual (`sync: false`) | |
 | `VITE_FIREBASE_PROJECT_ID` | Manual (`sync: false`) | |
 | `VITE_FIREBASE_APP_ID` | Manual (`sync: false`) | |
+| `VITE_GMAIL_CLIENT_ID` | Manual (`sync: false`) | Google OAuth client ID (same value as `GMAIL_CLIENT_ID`) |
 
 ### Firebase configuration
 
@@ -221,6 +225,25 @@ Push to `main` on GitHub. Render picks up the change automatically. To trigger a
 ### Entities
 ```mermaid
 erDiagram
+    users {
+        uuid user_id PK
+        string firebase_uid
+        timestamp created_at
+    }
+    users ||--o| email_settings : ""
+    users ||--o{ applications : ""
+
+    email_settings {
+        uuid user_id PK
+        string email
+        string label
+        timestamp token_expiry
+        text access_token
+        text refresh_token
+        timestamp created_at
+        timestamp updated_at
+    }
+
     application_stage {
         uuid app_stage_id PK
         uuid app_id FK
@@ -232,6 +255,7 @@ erDiagram
 
     applications {
         uuid app_id PK
+        uuid user_id FK
         string company
         string role
         string job_posting_url
@@ -328,3 +352,13 @@ Follow-up tasks and networking "to-dos."
 | **GET** | `/action-items/{action_item_id}` | Get item | `200` / `404` |
 | **PATCH** | `/action-items/{action_item_id}` | Update item | `200` / `404` |
 | **DELETE** | `/action-items/{action_item_id}` | Delete item | `204` / `404` |
+
+#### Email Settings
+Gmail OAuth connect flow — stores encrypted tokens per user.
+
+| Method | Path | Description | Status Codes |
+|:-------|:-----|:------------|:-------------|
+| **GET** | `/email-settings` | Get linked Gmail account `{email, label}` | `200` / `404` |
+| **POST** | `/email-settings` | Exchange OAuth code for tokens; save encrypted | `201` / `409` |
+| **PATCH** | `/email-settings` | Update label | `200` / `404` |
+| **DELETE** | `/email-settings` | Revoke token at Google and delete row | `204` / `404` |

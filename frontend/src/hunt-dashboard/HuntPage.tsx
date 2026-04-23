@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDashboard } from '../api/applications';
+import { fetchEmailSettings } from '../api/emailSettings';
+import { generatePKCE } from '../oauth/pkce';
 import AddApplicationDialog from './AddApplicationDialog';
 import DashboardActionItemsPanel from './DashboardActionItemsPanel';
 import NavBar from '../shared/NavBar';
@@ -20,6 +22,29 @@ export default function DashboardPage() {
     queryKey: ['dashboard'],
     queryFn: fetchDashboard,
   });
+
+  const { data: emailSettings } = useQuery({
+    queryKey: ['emailSettings'],
+    queryFn: fetchEmailSettings,
+  });
+
+  const handleEnable = async () => {
+    const { verifier, challenge } = await generatePKCE();
+    sessionStorage.setItem('pkce_verifier', verifier);
+    const origin = window.location.origin;
+    const redirectUri = `${origin}/oauth/gmail/callback`;
+    const url =
+      `https://accounts.google.com/o/oauth2/v2/auth` +
+      `?client_id=${import.meta.env.VITE_GMAIL_CLIENT_ID}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&scope=${encodeURIComponent('https://www.googleapis.com/auth/gmail.readonly email openid')}` +
+      `&response_type=code` +
+      `&access_type=offline` +
+      `&prompt=consent` +
+      `&code_challenge=${challenge}` +
+      `&code_challenge_method=S256`;
+    window.location.href = url;
+  };
 
   const applications = data?.applications;
   const sankeyLinks = computeSankeyLinks(applications ?? []);
@@ -55,13 +80,32 @@ export default function DashboardPage() {
               Your professional journey, curated.
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            onClick={() => setDialogOpen(true)}
-            sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderRadius: 2, px: 3, py: 1.5 }}
-          >
-            New Application
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            {emailSettings ? (
+              <Button
+                variant="outlined"
+                disabled
+                sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderRadius: 2, px: 3, py: 1.5 }}
+              >
+                Sync Emails
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                onClick={handleEnable}
+                sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderRadius: 2, px: 3, py: 1.5 }}
+              >
+                Email Assistant
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              onClick={() => setDialogOpen(true)}
+              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderRadius: 2, px: 3, py: 1.5 }}
+            >
+              New Application
+            </Button>
+          </Box>
         </Box>
 
         {/* Bento grid */}

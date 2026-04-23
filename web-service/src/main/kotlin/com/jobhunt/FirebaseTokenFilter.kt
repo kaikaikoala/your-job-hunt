@@ -35,8 +35,8 @@ class FirebaseTokenFilter(
                     emptyList(),
                 )
                 SecurityContextHolder.getContext().authentication = authentication
-            } catch (_: Exception) {
-                // Invalid token — leave SecurityContext empty; security config will return 401
+            } catch (e: Exception) {
+                logger.warn("Firebase token validation failed: ${e.message}")
             }
         }
         filterChain.doFilter(request, response)
