@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDashboard } from '../api/applications';
-import { fetchEmailSettings } from '../api/emailSettings';
+import { fetchEmailSettings, fetchEmailSync, startEmailSync } from '../api/emailSettings';
 import { generatePKCE } from '../oauth/pkce';
 import AddApplicationDialog from './AddApplicationDialog';
 import DashboardActionItemsPanel from './DashboardActionItemsPanel';
@@ -17,6 +17,7 @@ import { surface, onSurface, onSurfaceVariant } from '../colors';
 export default function DashboardPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [activeSyncId, setActiveSyncId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
@@ -27,6 +28,26 @@ export default function DashboardPage() {
     queryKey: ['emailSettings'],
     queryFn: fetchEmailSettings,
   });
+
+  const { data: syncStatus } = useQuery({
+    queryKey: ['emailSync', activeSyncId],
+    queryFn: () => fetchEmailSync(activeSyncId!),
+    enabled: activeSyncId !== null,
+    refetchInterval: (query) => (query.state.data?.status === 'running' ? 2000 : false),
+  });
+
+  useEffect(() => {
+    if (syncStatus && syncStatus.status !== 'running') {
+      setActiveSyncId(null);
+    }
+  }, [syncStatus]);
+
+  const isSyncing = activeSyncId !== null;
+
+  const handleSync = async () => {
+    const { syncId } = await startEmailSync();
+    setActiveSyncId(syncId);
+  };
 
   const handleEnable = async () => {
     const { verifier, challenge } = await generatePKCE();
@@ -84,10 +105,11 @@ export default function DashboardPage() {
             {emailSettings ? (
               <Button
                 variant="outlined"
-                disabled
+                onClick={handleSync}
+                disabled={isSyncing}
                 sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderRadius: 2, px: 3, py: 1.5 }}
               >
-                Sync Emails
+                {isSyncing ? 'Syncing…' : 'Sync Emails'}
               </Button>
             ) : (
               <Button

@@ -27,11 +27,14 @@ graph LR
     C[client]
     WS[web service]
     AS[ai service]
+    EW[email worker]
     DB[(database)]
 
     C --> WS
     WS <-->|gRpc| AS
     WS -->|read/write| DB
+    WS -->|HTTP POST /sync| EW
+    EW -->|read/write| DB
     AS -->|read only| DB
 ```
 
@@ -42,6 +45,7 @@ graph LR
 | Frontend | TypeScript | React, [MUI X](https://mui.com/x/react-charts/), [TanStack Query](https://tanstack.com/query/latest) | Vite | — (Render static site) |
 | Web service | Kotlin | [Spring Boot](https://spring.io/projects/spring-boot) | Gradle (Kotlin DSL) | Docker (JDK 21) |
 | Agent service | Python | [grpcio](https://grpc.io/docs/languages/python/), [LangGraph](https://langchain-ai.github.io/langgraph/) | uv / pyproject.toml | Docker (Python 3.12) |
+| Email worker | Python | FastAPI, LangChain, psycopg2 | uv / pyproject.toml | Docker (Python 3.12) |
 | Database | SQL | PostgreSQL | Flyway migrations | Docker |
 
 - **Internal comms:** gRPC (proto contracts in `/proto`) — web service is gRPC client, agent service is gRPC server
@@ -57,6 +61,7 @@ your-job-hunt/
 ├── database/                # Flyway migrations and optional seed data
 ├── web-service/             # Spring Boot REST API
 ├── agent-service/           # gRPC server — AI agents (internal only)
+├── email-worker/            # FastAPI private service — Gmail sync worker
 └── frontend/                # React SPA
 ```
 
@@ -121,9 +126,20 @@ npm run dev
 ```
 The app will be available at `http://localhost:5173`.
 
+### 5. Run the email worker
+In a separate terminal (requires `GEMINI_API_KEY` and DB env vars in `email-worker/.env.local`):
+```bash
+cd email-worker
+uv sync --extra dev   # first time only
+uv run uvicorn main:app --port 8001 --reload
+```
+Also set `EMAIL_WORKER_URL=http://localhost:8001` in `web-service/.env.local` so the web service can reach it.
+
 ### Verify
 ```bash
 curl http://localhost:8080/health
+# → {"status":"ok"}
+curl http://localhost:8001/health
 # → {"status":"ok"}
 ```
 
@@ -134,6 +150,9 @@ cd web-service && ./gradlew test
 
 # Agent service tests
 cd agent-service && uv run pytest
+
+# Email worker tests
+cd email-worker && uv run pytest
 
 # Frontend unit tests
 cd frontend && npm test
@@ -154,6 +173,7 @@ The app is deployed on [Render](https://render.com/) using the `render.yaml` blu
 |:--------|:----|
 | Web service (API) | https://api.your-job-hunt.com |
 | Agent service | Internal only (Render private network, port 50051) |
+| Email worker | Internal only (Render private network, port 8001) |
 | Frontend | https://your-job-hunt.com |
 
 ### Health check
@@ -168,6 +188,7 @@ The `render.yaml` blueprint provisions:
 - **`jobhunt-db`** — PostgreSQL (free tier)
 - **`jobhunt-api`** — Docker web service (Spring Boot); DB connection env vars are injected automatically from the database
 - **`jobhunt-agent`** — Docker private service (gRPC, port 50051); hosts all AI agents; accessible only from within Render's private network
+- **`jobhunt-email-worker`** — Docker private service (HTTP, port 8001); Gmail sync worker; accessible only from within Render's private network
 - **`jobhunt-frontend`** — Static site built with `npm run build` from `./frontend`; `VITE_API_URL` points to the deployed web service
 
 ### Environment variables
@@ -190,6 +211,7 @@ Variables are set **per service** in the Render dashboard (or via `render.yaml`)
 | Variable | Source | Notes |
 |:---------|:-------|:------|
 | `AGENT_GRPC_HOST` | Set in `render.yaml` | Render private network hostname of the agent service (`jobhunt-agent`) |
+| `EMAIL_WORKER_URL` | Set in `render.yaml` | Render private network URL for the email worker (`http://jobhunt-email-worker:8001`) |
 | `GMAIL_CLIENT_ID` | Manual (`sync: false`) | Google OAuth client ID |
 | `GMAIL_CLIENT_SECRET` | Manual (`sync: false`) | Google OAuth client secret |
 | `TOKEN_ENCRYPTION_KEY` | Manual (`sync: false`) | 32-byte random key, base64url-encoded; used for AES-256-GCM token encryption |
@@ -199,6 +221,17 @@ Variables are set **per service** in the Render dashboard (or via `render.yaml`)
 | Variable | Source | Notes |
 |:---------|:-------|:------|
 | `ANTHROPIC_API_KEY` | Manual (`sync: false`) | Required from Sub-task 2 onward |
+
+**Email worker (`jobhunt-email-worker`)**
+
+| Variable | Source | Notes |
+|:---------|:-------|:------|
+| `DB_HOST` | Auto-injected from `jobhunt-db` | |
+| `DB_PORT` | Auto-injected from `jobhunt-db` | |
+| `DB_NAME` | Auto-injected from `jobhunt-db` | |
+| `DB_USER` | Auto-injected from `jobhunt-db` | |
+| `DB_PASSWORD` | Auto-injected from `jobhunt-db` | |
+| `GEMINI_API_KEY` | Manual (`sync: false`) | Gemini API key for LangChain filter and orchestrator agents |
 
 **Frontend (`jobhunt-frontend`)**
 
@@ -231,6 +264,7 @@ erDiagram
         timestamp created_at
     }
     users ||--o| email_settings : ""
+    users ||--o{ email_syncs : ""
     users ||--o{ applications : ""
 
     email_settings {
@@ -242,6 +276,17 @@ erDiagram
         text refresh_token
         timestamp created_at
         timestamp updated_at
+    }
+
+    email_syncs {
+        uuid sync_id PK
+        uuid user_id FK
+        string status
+        timestamp started_at
+        timestamp completed_at
+        int emails_fetched
+        int emails_processed
+        text error_message
     }
 
     application_stage {
@@ -362,3 +407,12 @@ Gmail OAuth connect flow — stores encrypted tokens per user.
 | **POST** | `/email-settings` | Exchange OAuth code for tokens; save encrypted | `201` / `409` |
 | **PATCH** | `/email-settings` | Update label | `200` / `404` |
 | **DELETE** | `/email-settings` | Revoke token at Google and delete row | `204` / `404` |
+
+#### Email Sync
+Trigger and monitor Gmail email sync operations. The worker fetches emails, filters with an LLM, and creates applications directly in PostgreSQL.
+
+| Method | Path | Description | Status Codes |
+|:-------|:-----|:------------|:-------------|
+| **POST** | `/email-syncs` | Start a Gmail sync; returns `{syncId}` immediately | `202` / `404 (no settings)` / `409 (sync running)` |
+| **GET** | `/email-syncs` | List all syncs for the user (most recent first) | `200` |
+| **GET** | `/email-syncs/{sync_id}` | Poll sync status | `200` / `404` |

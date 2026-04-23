@@ -1,124 +1,146 @@
-# Email worker
+# email-worker
 
-This background worker pulls from the users gmail to find job application data. Then a LangChain will process the emails and add relevant information to the users database.
+Private background service that syncs a user's Gmail inbox and creates job application records from job-related emails.
 
-## System diagram
-The color'd portion is what's relevant to this feature.
+## Architecture
 
-![email worker system design](../docs/email-worker-system-design.png)
+The email worker is a FastAPI HTTP service deployed on Render's private network. It is called by the web service after creating an `email_syncs` row — never directly by the frontend.
 
-## ERD
-
-We need to store new data for the users email parser settings
-
-```mermaid
-erDiagram
-    email_settings {
-        uuid user_id PK
-        string email 
-        string label
-        date token_expiry  
-        string access_token
-        string refresh_token 
-    }
+```
+frontend → web-service (POST /email-syncs)
+               ↓ creates email_syncs row (status='running')
+               ↓ HTTP POST /sync (Render internal network)
+          email-worker
+               ↓ Gmail API (fetch latest 100 emails)
+               ↓ FilterAgent  — LLM: is this job-related?
+               ↓ OrchestratorAgent — LLM: extract company/role
+               ↓ tools.add_application — psycopg2 → PostgreSQL
+               ↓ UPDATE email_syncs SET status='completed'
 ```
 
-## Email worker
+## File structure
 
-1. Querry gmail api for latest 100 relevant emails
-2. Feed emails into a LangChain
-  3. Use a filter agent to decide if the email is relevant
-  4. Use another agent to understand which tools to be applied
-  5. Tool agents: add application, add action item, add application stage, update application stage
-1. Call the web-service to update the data base
+```
+email-worker/
+├── Dockerfile
+├── pyproject.toml
+├── main.py               # FastAPI app — POST /sync, GET /health
+├── gmail_client.py       # Gmail API: fetch latest 100 emails filtered by label
+├── db.py                 # psycopg2 ThreadedConnectionPool (1–5 conns)
+├── config.py             # env vars (loads .env.local in dev)
+└── chains/
+    ├── __init__.py
+    ├── filter_agent.py        # LLM: is this email job-related?
+    ├── orchestrator_agent.py  # LLM: extract application fields
+    └── tools.py               # DB write: add_application
+```
 
-### Add application
-Example email subject: 
-* Thanks for applying to Loancrate
-* Your application to Synapse Health has been received
+## API
 
-In the body of the email we should look for:
-* Company name
-* Role
-* Salary range
+| Method | Path | Description |
+|:-------|:-----|:------------|
+| `POST` | `/sync` | Fetch and process emails; update sync row status |
+| `GET` | `/health` | Health check |
 
-### Add action item
-Example email subject:
-* Next Steps with Render
-* Confirming your Interview with Bikky
+### POST /sync — request body
 
-In the body of the email we should look for:
-* Please "replay-all" to confirm your attendance
-* please share your availability over the next two weeks
+```json
+{
+  "sync_id": "uuid",
+  "user_id": "uuid",
+  "access_token": "decrypted-google-oauth-token",
+  "refresh_token": "decrypted-google-oauth-refresh-token",
+  "token_expiry": "2024-01-01T00:00:00Z",
+  "label": "optional-gmail-label"
+}
+```
 
-For these types of emails we should find the relenvant user application, and add an action item.
+The web-service decrypts the tokens before sending — the email-worker never touches the encryption key.
 
-### Add application stage
-Example email subject: 
-1. Thanks for applying to Loancrate
-2. Next Steps with Render 
-3. Update from Bikky
-4. GitHub Application Follow Up
+## Local development
 
-For 1 we should find the application we would have created earlier in the LangChain, and then we should also create the application_stage applied.
+### Prerequisites
 
-For 2 we should find out what the Next Steps are (Hiring Manager/Lead Screen) then add that application stage with status as pending.
+- Python 3.12+, [uv](https://docs.astral.sh/uv/)
+- PostgreSQL running locally (`docker compose up -d db` from repo root)
+- Gmail OAuth access/refresh tokens (complete the OAuth flow via the frontend first)
+- Gemini API key
 
-For 3,4 sometimes this is a terminal state where we should add the application_stage Rejected
+### Setup
 
-### Update application stage
-Example email subject:
-1. Update from Bikky
-2. Confirmation: Render Hiring Manager Interview
-3. Next Steps with Render 
-4. GitHub Application Follow Up
+```bash
+cd email-worker
+cp .env.local.example .env.local   # fill in your values
+uv sync --extra dev
+```
 
-For 1,4 if the terminal state is reached and there was an application rejections then we should update the previous stage as result Failed.
+`.env.local` keys:
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=jobhunt
+DB_USER=jobhunt
+DB_PASSWORD=jobhunt
+GEMINI_API_KEY=your-key-here
+GMAIL_CLIENT_ID=your-client-id
+GMAIL_CLIENT_SECRET=your-client-secret
+```
 
-For 2 we should update the application_stage with the date
+Also set `EMAIL_WORKER_URL=http://localhost:8001` in `web-service/.env.local`.
 
-For 3 this indicates we passed a round so we should update the result as Passed.
+### Run
 
-## New API's
-* GET email-settings/ should only return the users email and label none of the private gmail api access tokens
-* POST email-settings/ should trigger the gmail oauth flow which will add a row
-* UDPATE email-settings/ when the credentials need to be refreshed
-* DELETE email-settings/ if the user want to revoke the email access
+```bash
+uv run uvicorn main:app --port 8001 --reload
+```
 
-* POST sync-emails/ should trigger the background worker
+### Test
 
-## Development Plan
+```bash
+uv run pytest
+```
 
-1. Enable email parsing 
-2. Add applications
-3. Add application_stage
-4. Update application_stage
-5. Add action items
-6. Add email settings page where user can configure what is a relevant email
+### Manual smoke test
 
-### Enable email parsing
-New api endpoints:
-* GET email-settings/ should only return the users email and label none of the private gmail api access tokens
-* POST email-settings/ should trigger the gmail oauth flow which will add a row
+```bash
+curl -X POST http://localhost:8001/sync \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sync_id": "00000000-0000-0000-0000-000000000001",
+    "user_id": "00000000-0000-0000-0000-000000000002",
+    "access_token": "your-access-token",
+    "refresh_token": "your-refresh-token",
+    "label": null
+  }'
+```
 
-Frontend change: 
-* in the HuntPage.tsx header we should add a new "Email Assistant" Button next to the "New Application" Button. If the get email settings returns nothing for the user then the button should be to enable
+## Deployment
 
-Web service change
-* We should call the GMAIL api to enable the user settings and update the db
+Deployed as a Render `pserv` (private service) — not internet-accessible. Reachable within Render's private network at `http://jobhunt-email-worker:8001`.
 
-We should update the root README with the api changes and the new development and deployment information/verification.
+After first deploy, set `GEMINI_API_KEY` manually in the Render dashboard (Dashboard → `jobhunt-email-worker` → Environment). No new DB migration is needed — the `email_syncs` table was created in Phase 1 (V9 migration).
 
-### Add applications
-In the frontend if the email-settings/ is not null then the "Email Assistant" button should read "Sync Emails".
+See the root `render.yaml` for the full service definition and `README.md` for complete environment variable documentation.
 
-We need to add a new background wroker to our render.yaml: see https://render.com/docs/workflows. This background worker is email-worker to be put in this directory. This will be a python service.
+## LangChain pipeline
 
-We need to add the sdk call from web-service to email-worker.
+### FilterAgent (`chains/filter_agent.py`)
 
-We need to add to email-worker calls to the gmail api.
+Uses Gemini 2.0 Flash with structured output (`is_job_related: bool, reason: str`). Returns `False` on any LLM error — safe default that avoids crashing the sync for a transient API issue.
 
-We should add 3 parts of our LangChain filter agent, orchestrator agent, tool agent.
+### OrchestratorAgent (`chains/orchestrator_agent.py`)
 
-### Other stages
-We should one by one add each new tool to the LangChain.
+Extracts `company`, `role`, `job_posting_url`, and `salary_range` from the email. Calls `add_application` with the result. Stubs for future tools are marked `# TODO Phase 2.x`.
+
+### Tools (`chains/tools.py`)
+
+`add_application(user_id, company, role, job_posting_url?, salary_range?)` — inserts into `applications` with `ON CONFLICT (user_id, job_posting_url) DO NOTHING` to avoid duplicates, then adds an `Applied` stage.
+
+## Phase roadmap
+
+| Phase | Tool | Description |
+|:------|:-----|:------------|
+| 2 (current) | `add_application` | Detect and record new job applications from Gmail |
+| 2.x | `add_action_item` | Detect interview scheduling requests → create action items |
+| 2.x | `add_application_stage` | Detect interview confirmations / rejections → add stages |
+| 2.x | `update_application_stage` | Update existing stage dates and results |

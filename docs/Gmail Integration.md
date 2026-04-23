@@ -147,13 +147,17 @@ email-worker/
 
 **Verify:** DB tables exist → OAuth flow inserts row → `GET /email-settings` returns `{email, label}` → button toggles correctly in UI ✅ (verified in prod)
 
-### Phase 2 — Add applications from emails
-- [ ] Scaffold `email-worker/` (Dockerfile, pyproject.toml, main.py, gmail_client.py, db.py, config.py)
-- [ ] `chains/filter_agent.py` — LLM filter: is this email job-related?
-- [ ] `chains/orchestrator_agent.py` — LLM router: which tools to call?
-- [ ] `chains/tools.py` — `add_application` tool (direct DB write)
-- [ ] `web-service`: `POST /email-syncs` + `GET /email-syncs/{sync_id}`
-- [ ] `render.yaml`: add `jobhunt-email-worker` private service with DB env vars
+### Phase 2 — Add applications from emails ✅
+- [x] Scaffold `email-worker/` (Dockerfile, pyproject.toml, main.py, gmail_client.py, db.py, config.py)
+- [x] `chains/filter_agent.py` — LLM filter: is this email job-related?
+- [x] `chains/orchestrator_agent.py` — LLM router: which tools to call?
+- [x] `chains/tools.py` — `add_application` tool (direct DB write)
+- [x] `web-service`: `EmailSync.kt` entity + `EmailSyncRepository.kt` + `EmailSyncController.kt` (`POST`, `GET /email-syncs`, `GET /email-syncs/{sync_id}`)
+- [x] `web-service`: `EmailSyncControllerTest.kt` — 11 tests
+- [x] `email-worker/tests/` — 11 pytest tests (filter agent, tools, main endpoint)
+- [x] `render.yaml`: add `jobhunt-email-worker` private service with DB env vars + `EMAIL_WORKER_URL` in `jobhunt-api`
+- [x] `README.md`: updated diagram, tech stack, file scaffold, local dev, deployment, env vars, API docs, ERD
+- [x] `email-worker/README.md`: full rewrite
 
 **Verify:** `POST /email-syncs` → worker triggered → applications created in DB from matching emails
 

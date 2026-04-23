@@ -43,6 +43,8 @@ services:
         value: https://your-job-hunt.com
       - key: AGENT_GRPC_HOST
         value: jobhunt-agent # Render private network hostname for the agent service
+      - key: EMAIL_WORKER_URL
+        value: http://jobhunt-email-worker:8001
 
   - type: pserv
     name: jobhunt-agent
@@ -54,6 +56,39 @@ services:
         sync: false
       - key: WEB_SERVICE_URL
         value: http://jobhunt-api-8cwf:8080
+
+  - type: pserv
+    name: jobhunt-email-worker
+    env: docker
+    dockerfilePath: ./email-worker/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: jobhunt-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: jobhunt-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: jobhunt-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: jobhunt-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: jobhunt-db
+          property: password
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GMAIL_CLIENT_ID
+        sync: false
+      - key: GMAIL_CLIENT_SECRET
+        sync: false
 
   - type: web
     name: jobhunt-frontend

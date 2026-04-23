@@ -5,6 +5,11 @@ export interface EmailSettings {
   label?: string;
 }
 
+export interface EmailSyncStatus {
+  syncId: string;
+  status: string;
+}
+
 export const fetchEmailSettings = (): Promise<EmailSettings | null> =>
   axiosInstance.get('/email-settings').then((r) => r.data).catch((err) => {
     if (err.response?.status === 404) return null;
@@ -19,3 +24,9 @@ export const updateEmailSettings = (label: string): Promise<EmailSettings> =>
 
 export const deleteEmailSettings = (): Promise<void> =>
   axiosInstance.delete('/email-settings').then(() => undefined);
+
+export const startEmailSync = (): Promise<EmailSyncStatus> =>
+  axiosInstance.post('/email-syncs').then((r) => r.data);
+
+export const fetchEmailSync = (syncId: string): Promise<EmailSyncStatus> =>
+  axiosInstance.get(`/email-syncs/${syncId}`).then((r) => r.data);
