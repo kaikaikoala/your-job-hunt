@@ -18,7 +18,7 @@ import { surface, onSurface, onSurfaceVariant } from "../colors";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function DashboardPage() {
+export default function ApplicationPipelinePage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [activeSyncId, setActiveSyncId] = useState<string | null>(null);
