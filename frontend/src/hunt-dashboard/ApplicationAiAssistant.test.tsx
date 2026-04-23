@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../theme';
-import AppAiAssistant from './AppAiAssistant';
+import ApplicationAiAssistant from './ApplicationAiAssistant';
 import * as agentsApi from '../api/agents';
 
 vi.mock('../api/agents');
@@ -15,7 +15,7 @@ function renderAssistant(open: boolean, onClose = vi.fn()) {
   document.body.appendChild(anchorEl);
   return render(
     <ThemeProvider theme={theme}>
-      <AppAiAssistant
+      <ApplicationAiAssistant
         appId="app-123"
         company="Acme Corp"
         anchorEl={anchorEl}
@@ -26,7 +26,7 @@ function renderAssistant(open: boolean, onClose = vi.fn()) {
   );
 }
 
-describe('AppAiAssistant', () => {
+describe('ApplicationAiAssistant', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -65,12 +65,12 @@ describe('AppAiAssistant', () => {
     const anchorEl = document.createElement('button');
     rerender(
       <ThemeProvider theme={theme}>
-        <AppAiAssistant appId="app-123" company="Acme Corp" anchorEl={anchorEl} open={false} onClose={vi.fn()} />
+        <ApplicationAiAssistant appId="app-123" company="Acme Corp" anchorEl={anchorEl} open={false} onClose={vi.fn()} />
       </ThemeProvider>,
     );
     rerender(
       <ThemeProvider theme={theme}>
-        <AppAiAssistant appId="app-123" company="Acme Corp" anchorEl={anchorEl} open={true} onClose={vi.fn()} />
+        <ApplicationAiAssistant appId="app-123" company="Acme Corp" anchorEl={anchorEl} open={true} onClose={vi.fn()} />
       </ThemeProvider>,
     );
 

@@ -1,20 +1,25 @@
-import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { onSurface, onSurfaceVariant, primary, borderLight, dark } from '../colors';
+import AppBar from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  onSurface,
+  onSurfaceVariant,
+  primary,
+  borderLight,
+  dark,
+} from "../colors";
 
 const NAV_LINKS = [
-  { label: 'Resume Builder', key: 'resume-builder', href: '#' },
-  { label: 'Hunt Tracker', key: 'hunt-tracker', href: '/hunt' },
-  { label: 'Network', key: 'network', href: '/network' },
+  { label: "Resume Builder", key: "resume-builder", href: "#" },
+  { label: "Hunt Tracker", key: "hunt-tracker", href: "/hunt" },
 ] as const;
 
-type NavLink = (typeof NAV_LINKS)[number]['key'];
+type NavLink = (typeof NAV_LINKS)[number]["key"];
 
 interface NavBarProps {
   activeLink?: NavLink;
@@ -29,24 +34,32 @@ export default function NavBar({ activeLink }: NavBarProps) {
       position="fixed"
       elevation={0}
       sx={{
-        bgcolor: 'rgba(255,255,255,0.85)',
-        backdropFilter: 'blur(16px)',
+        bgcolor: "rgba(255,255,255,0.85)",
+        backdropFilter: "blur(16px)",
         borderBottom: `1px solid ${borderLight}`,
       }}
     >
-      <Toolbar sx={{ height: 64, px: { xs: 3, md: 4 }, maxWidth: 1280, width: '100%', mx: 'auto' }}>
+      <Toolbar
+        sx={{
+          height: 64,
+          px: { xs: 3, md: 4 },
+          maxWidth: 1280,
+          width: "100%",
+          mx: "auto",
+        }}
+      >
         {/* Brand */}
         <Typography
           component="a"
           href="/"
           sx={{
-            fontFamily: 'Manrope, sans-serif',
+            fontFamily: "Manrope, sans-serif",
             fontWeight: 900,
-            fontSize: '1.2rem',
+            fontSize: "1.2rem",
             color: onSurface,
-            letterSpacing: '-0.03em',
+            letterSpacing: "-0.03em",
             flexShrink: 0,
-            textDecoration: 'none',
+            textDecoration: "none",
           }}
         >
           Your Job Hunt
@@ -57,8 +70,8 @@ export default function NavBar({ activeLink }: NavBarProps) {
           component="nav"
           sx={{
             flex: 1,
-            display: { xs: 'none', md: 'flex' },
-            justifyContent: 'center',
+            display: { xs: "none", md: "flex" },
+            justifyContent: "center",
             gap: 4,
           }}
         >
@@ -71,13 +84,13 @@ export default function NavBar({ activeLink }: NavBarProps) {
                 href={href}
                 sx={{
                   color: isActive ? primary : onSurfaceVariant,
-                  textDecoration: 'none',
+                  textDecoration: "none",
                   fontWeight: isActive ? 700 : 500,
-                  fontSize: '0.9rem',
-                  borderBottom: isActive ? `2px solid ${primary}` : 'none',
+                  fontSize: "0.9rem",
+                  borderBottom: isActive ? `2px solid ${primary}` : "none",
                   pb: isActive ? 0.5 : 0,
-                  '&:hover': { color: onSurface },
-                  transition: 'color 0.15s',
+                  "&:hover": { color: onSurface },
+                  transition: "color 0.15s",
                 }}
               >
                 {label}
@@ -88,21 +101,27 @@ export default function NavBar({ activeLink }: NavBarProps) {
 
         {/* Auth controls */}
         {user ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Avatar
               src={user.photoURL ?? undefined}
-              alt={user.displayName ?? 'User'}
-              sx={{ width: 36, height: 36, fontSize: '0.8rem', cursor: 'pointer' }}
+              alt={user.displayName ?? "User"}
+              sx={{
+                width: 36,
+                height: 36,
+                fontSize: "0.8rem",
+                cursor: "pointer",
+              }}
             >
-              {!user.photoURL && (user.displayName?.[0] ?? user.email?.[0] ?? 'U')}
+              {!user.photoURL &&
+                (user.displayName?.[0] ?? user.email?.[0] ?? "U")}
             </Avatar>
             <Button
               onClick={signOut}
               sx={{
-                fontFamily: 'Manrope, sans-serif',
+                fontFamily: "Manrope, sans-serif",
                 fontWeight: 500,
-                textTransform: 'none',
-                fontSize: '0.875rem',
+                textTransform: "none",
+                fontSize: "0.875rem",
                 color: dark.textMuted,
               }}
             >
@@ -112,15 +131,15 @@ export default function NavBar({ activeLink }: NavBarProps) {
         ) : (
           <Button
             variant="contained"
-            onClick={() => navigate('/sign-in')}
+            onClick={() => navigate("/sign-in")}
             sx={{
-              fontFamily: 'Manrope, sans-serif',
+              fontFamily: "Manrope, sans-serif",
               fontWeight: 700,
-              borderRadius: '8px',
-              textTransform: 'none',
+              borderRadius: "8px",
+              textTransform: "none",
               px: 2.5,
               py: 1,
-              fontSize: '0.875rem',
+              fontSize: "0.875rem",
             }}
           >
             Sign In

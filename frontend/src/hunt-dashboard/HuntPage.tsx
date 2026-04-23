@@ -4,10 +4,10 @@ import { Box, Button, Chip, Paper, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "../api/applications";
 import { fetchContacts } from "../api/network";
-import AddApplicationDialog from "./AddApplicationDialog";
+import ApplicationAddDialog from "./ApplicationAddDialog";
 import NavBar from "../shared/NavBar";
 import Footer from "../shared/Footer";
-import DashboardActionItemsPanel from "./DashboardActionItemsPanel";
+import HuntActionItemsPanel from "./HuntActionItemsPanel";
 import {
   surface,
   onSurface,
@@ -214,7 +214,7 @@ export default function DashboardPage() {
             <Box sx={{ position: "absolute", right: -80, bottom: -80, width: 256, height: 256, bgcolor: `${primary}08`, borderRadius: "50%", filter: "blur(48px)" }} />
           </Paper>
 
-          <DashboardActionItemsPanel />
+          <HuntActionItemsPanel />
         </Box>
 
         {/* ── Email AI assistant ─────────────────────────────────────────── */}
@@ -472,7 +472,7 @@ export default function DashboardPage() {
         </Box>
       </Box>
 
-      <AddApplicationDialog
+      <ApplicationAddDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
       />

@@ -11,7 +11,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { fetchActionItems, updateActionItem, type ActionItem } from '../api/actionItems';
-import AddActionItemDialog from './AddActionItemDialog';
+import ActionItemAddDialog from './ActionItemAddDialog';
 import { surfaceContainerLow, surfaceContainerLowest, onSurface, onSurfaceVariant, primary, outlineVariant } from '../colors';
 
 function formatDue(iso?: string) {
@@ -19,7 +19,7 @@ function formatDue(iso?: string) {
   return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-export default function DashboardActionItemsPanel() {
+export default function HuntActionItemsPanel() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
@@ -154,7 +154,7 @@ export default function DashboardActionItemsPanel() {
         See More
       </Button>
 
-      <AddActionItemDialog open={addOpen} onClose={() => setAddOpen(false)} />
+      <ActionItemAddDialog open={addOpen} onClose={() => setAddOpen(false)} />
     </Paper>
   );
 }

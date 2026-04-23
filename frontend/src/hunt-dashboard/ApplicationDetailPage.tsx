@@ -23,9 +23,9 @@ import { fetchApplication, deleteApplication } from '../api/applications';
 import { fetchStages, updateStage, deleteStage, type Stage, type PatchStageInput } from '../api/stages';
 import { fetchActionItems, updateActionItem, deleteActionItem, type ActionItem } from '../api/actionItems';
 import { fetchContact } from '../api/network';
-import AddStageDialog from './AddStageDialog';
-import AddActionItemDialog from './AddActionItemDialog';
-import EditApplicationDialog from './EditApplicationDialog';
+import ApplicationStageAddDialog from './ApplicationStageAddDialog';
+import ActionItemAddDialog from './ActionItemAddDialog';
+import ApplicationEditDialog from './ApplicationEditDialog';
 import NavBar from '../shared/NavBar';
 import Footer from '../shared/Footer';
 import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, error, stageColor } from '../colors';
@@ -223,9 +223,9 @@ export default function ApplicationDetailPage() {
         </Paper>
       </Box>
 
-      <AddStageDialog open={addStageOpen} appId={id!} onClose={() => setAddStageOpen(false)} />
-      <AddActionItemDialog open={addActionItemOpen} appId={id!} onClose={() => setAddActionItemOpen(false)} />
-      <EditApplicationDialog
+      <ApplicationStageAddDialog open={addStageOpen} appId={id!} onClose={() => setAddStageOpen(false)} />
+      <ActionItemAddDialog open={addActionItemOpen} appId={id!} onClose={() => setAddActionItemOpen(false)} />
+      <ApplicationEditDialog
         open={editOpen}
         app={app}
         referrer={referrer}

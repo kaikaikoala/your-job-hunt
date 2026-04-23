@@ -20,7 +20,7 @@ import {
   deleteActionItem,
   type ActionItem,
 } from "../api/actionItems";
-import AddActionItemDialog from "./AddActionItemDialog";
+import ActionItemAddDialog from "./ActionItemAddDialog";
 import NavBar from "../shared/NavBar";
 import Footer from "../shared/Footer";
 import {
@@ -166,7 +166,7 @@ export default function ActionItemsPage() {
         )}
       </Box>
 
-      <AddActionItemDialog open={addOpen} onClose={() => setAddOpen(false)} />
+      <ActionItemAddDialog open={addOpen} onClose={() => setAddOpen(false)} />
       <Footer />
     </Box>
   );

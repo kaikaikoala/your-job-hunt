@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateApplication, type Application, type PatchApplicationInput } from '../api/applications';
-import NetworkAutocomplete, { type NetworkAutocompleteHandle } from './NetworkAutocomplete';
+import NetworkContactAutocomplete, { type NetworkAutocompleteHandle } from './NetworkContactAutocomplete';
 import { type NetworkContact } from '../api/network';
 import axios from 'axios';
 
@@ -23,7 +23,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default function EditApplicationDialog({ open, app, referrer, onClose }: Props) {
+export default function ApplicationEditDialog({ open, app, referrer, onClose }: Props) {
   const qc = useQueryClient();
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
@@ -130,7 +130,7 @@ export default function EditApplicationDialog({ open, app, referrer, onClose }: 
             value={salaryRange}
             onChange={(e) => setSalaryRange(e.target.value)}
           />
-          <NetworkAutocomplete ref={referrerRef} enabled={open} />
+          <NetworkContactAutocomplete ref={referrerRef} enabled={open} />
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>

@@ -12,11 +12,11 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type ApplicationWithStages } from '../api/applications';
 import { createStage } from '../api/stages';
-import AddStageDialog from './AddStageDialog';
-import AddActionItemDialog from './AddActionItemDialog';
+import ApplicationStageAddDialog from './ApplicationStageAddDialog';
+import ActionItemAddDialog from './ActionItemAddDialog';
 import { primary, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, surfaceContainerHigh, stageColor } from '../colors';
 
-const AppAiAssistant = React.lazy(() => import('./AppAiAssistant'));
+const ApplicationAiAssistant = React.lazy(() => import('./ApplicationAiAssistant'));
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
@@ -133,10 +133,10 @@ export default function ApplicationCard({ app }: { app: ApplicationWithStages })
         </Box>
       </Paper>
 
-      <AddStageDialog open={addStageOpen} appId={app.appId} onClose={() => setAddStageOpen(false)} />
-      <AddActionItemDialog open={addActionItemOpen} appId={app.appId} onClose={() => setAddActionItemOpen(false)} />
+      <ApplicationStageAddDialog open={addStageOpen} appId={app.appId} onClose={() => setAddStageOpen(false)} />
+      <ActionItemAddDialog open={addActionItemOpen} appId={app.appId} onClose={() => setAddActionItemOpen(false)} />
       <Suspense fallback={null}>
-        <AppAiAssistant
+        <ApplicationAiAssistant
           appId={app.appId}
           company={app.company}
           anchorEl={chatAnchorEl}

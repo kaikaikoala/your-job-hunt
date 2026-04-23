@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchContacts, deleteContact, type NetworkContact } from '../api/network';
-import AddEditContactDialog from './AddEditContactDialog';
+import NetworkContactAddEditDialog from './NetworkContactAddEditDialog';
 import NavBar from '../shared/NavBar';
 import Footer from '../shared/Footer';
 import {
@@ -102,8 +102,8 @@ export default function NetworkPage() {
         )}
       </Box>
 
-      <AddEditContactDialog open={addOpen} onClose={() => setAddOpen(false)} />
-      <AddEditContactDialog
+      <NetworkContactAddEditDialog open={addOpen} onClose={() => setAddOpen(false)} />
+      <NetworkContactAddEditDialog
         open={editContact !== undefined}
         onClose={() => setEditContact(undefined)}
         contact={editContact}

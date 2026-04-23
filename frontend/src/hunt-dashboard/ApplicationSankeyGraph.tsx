@@ -52,7 +52,7 @@ export function computeSankeyLinks(
 
 // ─── Conversion Flow card ─────────────────────────────────────────────────────
 
-export default function ConversionFlowCard({
+export default function ApplicationSankeyGraph({
   links,
   selectedNode,
   onNodeClick,

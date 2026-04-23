@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "../api/applications";
-import {
-  fetchEmailSettings,
-  fetchEmailSync,
-  startEmailSync,
-} from "../api/emailSettings";
-import { generatePKCE } from "../oauth/pkce";
-import AddApplicationDialog from "./AddApplicationDialog";
-import DashboardActionItemsPanel from "./DashboardActionItemsPanel";
+import ApplicationAddDialog from "./ApplicationAddDialog";
 import NavBar from "../shared/NavBar";
 import Footer from "../shared/Footer";
-import ConversionFlowCard, { computeSankeyLinks } from "./ConversionFlowCard";
+import ApplicationSankeyGraph, { computeSankeyLinks } from "./ApplicationSankeyGraph";
 import ApplicationList from "./ApplicationList";
 import { surface, onSurface, onSurfaceVariant } from "../colors";
 
@@ -21,56 +15,11 @@ import { surface, onSurface, onSurfaceVariant } from "../colors";
 export default function ApplicationPipelinePage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [activeSyncId, setActiveSyncId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: fetchDashboard,
   });
-
-  const { data: emailSettings } = useQuery({
-    queryKey: ["emailSettings"],
-    queryFn: fetchEmailSettings,
-  });
-
-  const { data: syncStatus } = useQuery({
-    queryKey: ["emailSync", activeSyncId],
-    queryFn: () => fetchEmailSync(activeSyncId!),
-    enabled: activeSyncId !== null,
-    refetchInterval: (query) =>
-      query.state.data?.status === "running" ? 2000 : false,
-  });
-
-  useEffect(() => {
-    if (syncStatus && syncStatus.status !== "running") {
-      setActiveSyncId(null);
-    }
-  }, [syncStatus]);
-
-  const isSyncing = activeSyncId !== null;
-
-  const handleSync = async () => {
-    const { syncId } = await startEmailSync();
-    setActiveSyncId(syncId);
-  };
-
-  const handleEnable = async () => {
-    const { verifier, challenge } = await generatePKCE();
-    sessionStorage.setItem("pkce_verifier", verifier);
-    const origin = window.location.origin;
-    const redirectUri = `${origin}/oauth/gmail/callback`;
-    const url =
-      `https://accounts.google.com/o/oauth2/v2/auth` +
-      `?client_id=${import.meta.env.VITE_GMAIL_CLIENT_ID}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&scope=${encodeURIComponent("https://www.googleapis.com/auth/gmail.readonly email openid")}` +
-      `&response_type=code` +
-      `&access_type=offline` +
-      `&prompt=consent` +
-      `&code_challenge=${challenge}` +
-      `&code_challenge_method=S256`;
-    window.location.href = url;
-  };
 
   const applications = data?.applications;
   const sankeyLinks = computeSankeyLinks(applications ?? []);
@@ -117,36 +66,21 @@ export default function ApplicationPipelinePage() {
             </Typography>
           </Box>
           <Box sx={{ display: "flex", gap: 2 }}>
-            {emailSettings ? (
-              <Button
-                variant="outlined"
-                onClick={handleSync}
-                disabled={isSyncing}
-                sx={{
-                  fontFamily: "Manrope, sans-serif",
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                }}
-              >
-                {isSyncing ? "Syncing…" : "Sync Emails"}
-              </Button>
-            ) : (
-              <Button
-                variant="outlined"
-                onClick={handleEnable}
-                sx={{
-                  fontFamily: "Manrope, sans-serif",
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                }}
-              >
-                Email Assistant
-              </Button>
-            )}
+            <Button
+              component={Link}
+              to="/emailsettings"
+              variant="outlined"
+              sx={{
+                fontFamily: "Manrope, sans-serif",
+                fontWeight: 700,
+                borderRadius: 2,
+                px: 3,
+                py: 1.5,
+                textTransform: "none",
+              }}
+            >
+              Email Sync
+            </Button>
             <Button
               variant="contained"
               onClick={() => setDialogOpen(true)}
@@ -171,7 +105,7 @@ export default function ApplicationPipelinePage() {
         >
           {/* Sankey hero — 8 col */}
           <Box sx={{ display: { xs: "none", lg: "block" } }}>
-            <ConversionFlowCard
+            <ApplicationSankeyGraph
               links={sankeyLinks}
               selectedNode={selectedNode}
               onNodeClick={setSelectedNode}
@@ -186,7 +120,7 @@ export default function ApplicationPipelinePage() {
         />
       </Box>
 
-      <AddApplicationDialog
+      <ApplicationAddDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
       />

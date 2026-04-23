@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createActionItem, type CreateActionItemInput } from '../api/actionItems';
-import NetworkAutocomplete, { type NetworkAutocompleteHandle } from './NetworkAutocomplete';
+import NetworkContactAutocomplete, { type NetworkAutocompleteHandle } from './NetworkContactAutocomplete';
 
 interface Props {
   open: boolean;
@@ -19,7 +19,7 @@ interface Props {
   appId?: string;
 }
 
-export default function AddActionItemDialog({ open, onClose, appId }: Props) {
+export default function ActionItemAddDialog({ open, onClose, appId }: Props) {
   const qc = useQueryClient();
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -86,7 +86,7 @@ export default function AddActionItemDialog({ open, onClose, appId }: Props) {
             onChange={(e) => setDueDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
           />
-          <NetworkAutocomplete ref={referrerRef} enabled={open} label="For (optional contact)" />
+          <NetworkContactAutocomplete ref={referrerRef} enabled={open} label="For (optional contact)" />
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>

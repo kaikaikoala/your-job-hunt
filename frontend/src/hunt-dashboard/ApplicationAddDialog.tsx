@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createApplication, type CreateApplicationInput } from '../api/applications';
-import NetworkAutocomplete, { type NetworkAutocompleteHandle } from './NetworkAutocomplete';
+import NetworkContactAutocomplete, { type NetworkAutocompleteHandle } from './NetworkContactAutocomplete';
 import axios from 'axios';
 
 interface Props {
@@ -22,7 +22,7 @@ interface Props {
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
-export default function AddApplicationDialog({ open, onClose }: Props) {
+export default function ApplicationAddDialog({ open, onClose }: Props) {
   const qc = useQueryClient();
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
@@ -121,7 +121,7 @@ export default function AddApplicationDialog({ open, onClose }: Props) {
             value={salaryRange}
             onChange={(e) => setSalaryRange(e.target.value)}
           />
-          <NetworkAutocomplete ref={referrerRef} enabled={open} />
+          <NetworkContactAutocomplete ref={referrerRef} enabled={open} />
           <TextField
             label="Date"
             type="date"
