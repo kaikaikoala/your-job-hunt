@@ -4,6 +4,7 @@ import LandingPage from './landing-page/LandingPage';
 import SignInPage from './profile/SignInPage';
 import HuntPage from './hunt-dashboard/HuntPage';
 import ApplicationPipelinePage from './hunt-dashboard/ApplicationPipelinePage';
+import EmailSettingsPage from './hunt-dashboard/EmailSettingsPage';
 import ApplicationDetailPage from './hunt-dashboard/ApplicationDetailPage';
 import ActionItemsPage from './hunt-dashboard/ActionItemsPage';
 import NetworkPage from './hunt-dashboard/NetworkPage';
@@ -20,6 +21,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/hunt" element={<HuntPage />} />
             <Route path="/applicationpipeline" element={<ApplicationPipelinePage />} />
+            <Route path="/emailsettings" element={<EmailSettingsPage />} />
             <Route path="/applications/:id" element={<ApplicationDetailPage />} />
             <Route path="/action-items" element={<ActionItemsPage />} />
             <Route path="/network" element={<NetworkPage />} />

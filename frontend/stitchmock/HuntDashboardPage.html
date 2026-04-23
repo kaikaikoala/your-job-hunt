@@ -1,0 +1,581 @@
+<!doctype html>
+
+<html class="light" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>Hunt Dashboard | The Digital Curator</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "on-secondary": "#ffffff",
+                            "on-surface": "#191c1e",
+                            "on-tertiary-fixed": "#002113",
+                            outline: "#76777d",
+                            primary: "#000000",
+                            "surface-container-highest": "#e0e3e5",
+                            "tertiary-fixed-dim": "#4edea3",
+                            "surface-container-high": "#e6e8ea",
+                            "on-surface-variant": "#45464d",
+                            tertiary: "#000000",
+                            surface: "#f7f9fb",
+                            "surface-container-low": "#f2f4f6",
+                            "primary-container": "#001453",
+                            "on-background": "#191c1e",
+                            error: "#ba1a1a",
+                            "inverse-primary": "#b8c4ff",
+                            "surface-tint": "#3755c3",
+                            "on-error-container": "#93000a",
+                            "error-container": "#ffdad6",
+                            background: "#f7f9fb",
+                            "on-primary": "#ffffff",
+                            "on-error": "#ffffff",
+                            "on-secondary-container": "#54647a",
+                            "on-primary-fixed-variant": "#173bab",
+                            "secondary-fixed-dim": "#b7c8e1",
+                            "secondary-fixed": "#d3e4fe",
+                            "inverse-surface": "#2d3133",
+                            "tertiary-container": "#002113",
+                            "secondary-container": "#d0e1fb",
+                            "surface-container": "#eceef0",
+                            "primary-fixed-dim": "#b8c4ff",
+                            "on-primary-container": "#607cec",
+                            "on-tertiary": "#ffffff",
+                            "on-secondary-fixed": "#0b1c30",
+                            "on-secondary-fixed-variant": "#38485d",
+                            "surface-dim": "#d8dadc",
+                            "inverse-on-surface": "#eff1f3",
+                            "on-tertiary-fixed-variant": "#005236",
+                            "surface-container-lowest": "#ffffff",
+                            "outline-variant": "#c6c6cd",
+                            "primary-fixed": "#dde1ff",
+                            "on-tertiary-container": "#009668",
+                            "surface-bright": "#f7f9fb",
+                            "on-primary-fixed": "#001453",
+                            "tertiary-fixed": "#6ffbbe",
+                            secondary: "#505f76",
+                            "surface-variant": "#e0e3e5",
+                        },
+                        fontFamily: {
+                            headline: ["Manrope"],
+                            body: ["Inter"],
+                            label: ["Inter"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.25rem",
+                            lg: "0.5rem",
+                            xl: "0.75rem",
+                            full: "9999px",
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            .material-symbols-outlined {
+                font-variation-settings:
+                    "FILL" 0,
+                    "wght" 400,
+                    "GRAD" 0,
+                    "opsz" 24;
+            }
+            .sankey-node {
+                clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+            }
+        </style>
+    </head>
+    <body class="bg-surface font-body text-on-surface antialiased">
+        <!-- Main Content Canvas -->
+        <main class="pt-24 pb-12 px-6 md:px-12 max-w-7xl mx-auto">
+            <!-- Header Section -->
+            <header
+                class="mb-12 flex flex-col md:flex-row justify-between items-end gap-6"
+            >
+                <div class="max-w-2xl">
+                    <h1
+                        class="text-4xl md:text-5xl font-headline font-extrabold tracking-tighter text-on-surface mb-4"
+                        style=""
+                    >
+                        The Hunt Dashboard
+                    </h1>
+                    <p
+                        class="text-lg text-on-surface-variant leading-relaxed"
+                        style=""
+                    >
+                        Your professional journey, curated. Monitor every
+                        application milestone and leverage AI to optimize your
+                        strategy.
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <button
+                        class="px-6 py-3 bg-surface-container-lowest text-on-surface font-headline font-bold rounded-xl shadow-sm border border-outline-variant/15 hover:bg-surface-container-low transition-all"
+                        style=""
+                    >
+                        Email sync
+                    </button>
+                    <button
+                        class="px-6 py-3 bg-primary text-on-primary font-headline font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                        style=""
+                    >
+                        New Application
+                    </button>
+                </div>
+            </header>
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <!-- Sankey Visualization (Main Feature) -->
+                <section
+                    class="md:col-span-8 bg-surface-container-lowest rounded-xl p-8 shadow-sm relative overflow-hidden group"
+                >
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <h3
+                                class="text-xl font-headline font-bold text-on-surface"
+                                style=""
+                            >
+                                Application Pipeline
+                            </h3>
+                            <p class="text-sm text-on-surface-variant" style="">
+                                Real-time conversion flow
+                            </p>
+                        </div>
+                        <span
+                            class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs font-bold"
+                            style=""
+                            >See all</span
+                        >
+                    </div>
+                    <!-- Visual Placeholder for Sankey Graph -->
+                    <div
+                        class="h-64 flex items-center justify-between gap-2 relative"
+                    >
+                        <!-- Flow 1: Applied -->
+                        <div class="flex-1 h-full flex flex-col justify-center">
+                            <div
+                                class="h-32 bg-primary/10 rounded-lg flex items-center justify-center relative overflow-hidden"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent"
+                                ></div>
+                                <div class="z-10 text-center">
+                                    <p
+                                        class="text-3xl font-headline font-black text-primary"
+                                        style=""
+                                    >
+                                        124
+                                    </p>
+                                    <p
+                                        class="text-xs font-bold uppercase tracking-widest text-on-surface-variant"
+                                        style=""
+                                    >
+                                        Applied
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Connector 1 -->
+                        <div
+                            class="w-12 h-32 bg-primary/5 flex items-center"
+                            style="
+                                clip-path: polygon(
+                                    0 20%,
+                                    100% 40%,
+                                    100% 60%,
+                                    0 80%
+                                );
+                            "
+                        ></div>
+                        <!-- Flow 2: Interviews -->
+                        <div class="flex-1 h-full flex flex-col justify-center">
+                            <div
+                                class="h-24 bg-on-primary-container/10 rounded-lg flex items-center justify-center relative overflow-hidden"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-on-primary-container/20 to-transparent"
+                                ></div>
+                                <div class="z-10 text-center">
+                                    <p
+                                        class="text-2xl font-headline font-black text-on-primary-container"
+                                        style=""
+                                    >
+                                        18
+                                    </p>
+                                    <p
+                                        class="text-xs font-bold uppercase tracking-widest text-on-surface-variant"
+                                        style=""
+                                    >
+                                        Interviews
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Connector 2 -->
+                        <div
+                            class="w-12 h-24 bg-on-primary-container/5 flex items-center"
+                            style="
+                                clip-path: polygon(
+                                    0 30%,
+                                    100% 45%,
+                                    100% 55%,
+                                    0 70%
+                                );
+                            "
+                        ></div>
+                        <!-- Flow 3: Offers -->
+                        <div class="flex-1 h-full flex flex-col justify-center">
+                            <div
+                                class="h-16 bg-on-tertiary-container/10 rounded-lg flex items-center justify-center relative overflow-hidden"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-on-tertiary-container/20 to-transparent"
+                                ></div>
+                                <div class="z-10 text-center">
+                                    <p
+                                        class="text-xl font-headline font-black text-on-tertiary-container"
+                                        style=""
+                                    >
+                                        3
+                                    </p>
+                                    <p
+                                        class="text-xs font-bold uppercase tracking-widest text-on-surface-variant"
+                                        style=""
+                                    >
+                                        Offers
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Subtle Decorative Background -->
+                    <div
+                        class="absolute -right-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"
+                    ></div>
+                </section>
+                <!-- ToDo List Card -->
+                <section
+                    class="md:col-span-4 bg-surface-container-low rounded-xl p-8 flex flex-col"
+                >
+                    <div class="mb-6 flex items-center justify-between">
+                        <h3
+                            class="text-xl font-headline font-bold text-on-surface"
+                            style=""
+                        >
+                            To-Do list
+                        </h3>
+                        <span
+                            class="material-symbols-outlined text-on-surface-variant"
+                            style=""
+                            >pending_actions</span
+                        >
+                    </div>
+                    <div class="space-y-4 flex-1">
+                        <div
+                            class="p-4 bg-surface-container-lowest rounded-xl shadow-sm border-l-4 border-on-primary-container"
+                        >
+                            <p
+                                class="font-bold text-on-surface leading-tight"
+                                style=""
+                            >
+                                Follow up with Stripe
+                            </p>
+                            <p
+                                class="text-xs text-on-surface-variant mt-1 italic"
+                                style=""
+                            >
+                                Due in 2 hours
+                            </p>
+                        </div>
+                        <div
+                            class="p-4 bg-surface-container-lowest rounded-xl shadow-sm opacity-80"
+                        >
+                            <p
+                                class="font-medium text-on-surface leading-tight"
+                                style=""
+                            >
+                                Complete Take-home: Figma
+                            </p>
+                            <p
+                                class="text-xs text-on-surface-variant mt-1"
+                                style=""
+                            >
+                                Due Tomorrow
+                            </p>
+                        </div>
+                        <div
+                            class="p-4 bg-surface-container-lowest rounded-xl shadow-sm opacity-80"
+                        >
+                            <p
+                                class="font-medium text-on-surface leading-tight"
+                                style=""
+                            >
+                                Update Portfolio Case Study
+                            </p>
+                            <p
+                                class="text-xs text-on-surface-variant mt-1"
+                                style=""
+                            >
+                                No due date
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        class="mt-6 w-full py-3 border border-outline-variant/30 text-on-surface-variant text-sm font-bold rounded-lg hover:bg-surface-container-high transition-colors"
+                        style=""
+                    >
+                        + Add Task
+                    </button>
+                </section>
+                <!-- AI Chat Integration (Full Width Focus) -->
+                <section
+                    class="md:col-span-12 bg-primary-container text-on-primary rounded-2xl p-1 px-1 mt-6"
+                >
+                    <div
+                        class="bg-surface-container-lowest/10 backdrop-blur-md rounded-xl p-8 flex flex-col md:flex-row items-center gap-8"
+                    >
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span
+                                    class="w-10 h-10 rounded-full bg-gradient-to-tr from-tertiary-fixed to-on-primary-container flex items-center justify-center"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-primary text-xl"
+                                        data-icon="auto_awesome"
+                                        style="
+                                            font-variation-settings: &quot;FILL&quot;
+                                                1;
+                                        "
+                                        >auto_awesome</span
+                                    >
+                                </span>
+                                <h3
+                                    class="text-2xl font-headline font-extrabold tracking-tight"
+                                    style=""
+                                >
+                                    Email AI assistant
+                                </h3>
+                            </div>
+                            <p
+                                class="text-on-primary/70 max-w-lg mb-6 leading-relaxed"
+                                style=""
+                            >
+                                Grant Gmail access to let our AI agent monitor
+                                your application updates. We'll automatically
+                                update your dashboard milestones based on your
+                                email correspondence.
+                            </p>
+                            <button
+                                class="w-full md:w-auto px-8 py-4 bg-tertiary-fixed text-on-tertiary-fixed-variant font-headline font-bold rounded-xl shadow-lg hover:bg-tertiary-fixed-dim transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                            >
+                                <span class="material-symbols-outlined"
+                                    >sync</span
+                                >Enable Email Sync
+                            </button>
+                        </div>
+                        <div
+                            class="w-full md:w-64 h-64 rounded-2xl overflow-hidden relative shadow-2xl"
+                        >
+                            <img
+                                alt="AI Interface Visual"
+                                class="w-full h-full object-cover"
+                                data-alt="vibrant abstract digital art showing flowing nodes of light representing artificial intelligence neural networks in deep indigo and neon green"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6GB_Cpyfwnj7fZL43omVvbvjiCRqcWSetI2Og9jtbjKgdO2XkzaHn2ZomE_yQqIPnCrucKOwz1b9YEiWh4-hiLW2wAxlQK0fblSGtsx-32ffPBQD6T9j-dR5f7XM3-njMlRStLDayyTjUNnL2DM3K-LobdwSr22ZvZ-8iEvfYKkvK1CBK9gugn8C0SL1qlHGjZWKJVBsrYr5qRkPnZQf5mWfD6LRPckPN1GODCm94gG6MLQP9yan0BkBjfYV2osD6kMq3jN_iol3_"
+                                style=""
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-primary-container/80 to-transparent"
+                            ></div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Network Cards (Quick View) -->
+                <section class="md:col-span-12 mt-12">
+                    <div class="flex justify-between items-center mb-6 px-2">
+                        <h3
+                            class="text-2xl font-headline font-extrabold text-on-surface"
+                            style=""
+                        >
+                            Network
+                        </h3>
+                        <a
+                            class="text-sm font-bold text-on-primary-fixed-variant flex items-center gap-1 hover:underline"
+                            href="#"
+                            style=""
+                            >View All<span
+                                class="material-symbols-outlined text-sm"
+                                style=""
+                                >arrow_forward</span
+                            >
+                        </a>
+                    </div>
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                    >
+                        <!-- NetworkCard 1 -->
+                        <div
+                            class="group bg-surface-container-lowest p-6 rounded-2xl shadow-[0_8px_24px_rgba(25,28,30,0.04)] hover:shadow-lg transition-all cursor-default border border-transparent hover:border-indigo-100"
+                        >
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-slate-900">
+                                    Sarah Chen
+                                </h3>
+                                <span
+                                    class="text-[10px] px-2 py-1 bg-indigo-50 text-indigo-600 font-bold rounded"
+                                    >Tier 1</span
+                                >
+                            </div>
+                            <div class="space-y-3">
+                                <div
+                                    class="flex items-center gap-2 text-on-surface-variant"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-sm"
+                                        >link</span
+                                    >
+                                    <p class="text-xs font-medium">
+                                        Linked to:
+                                        <span class="text-slate-900"
+                                            >Product Designer @ Stripe</span
+                                        >
+                                    </p>
+                                </div>
+                                <div class="pt-3 border-t border-slate-100">
+                                    <p
+                                        class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2"
+                                    >
+                                        Next Steps
+                                    </p>
+                                    <ul class="space-y-2">
+                                        <li
+                                            class="flex items-center gap-2 text-sm text-slate-700"
+                                        >
+                                            <span
+                                                class="w-1.5 h-1.5 bg-indigo-500 rounded-full"
+                                            ></span>
+                                            Follow up on coffee chat
+                                        </li>
+                                        <li
+                                            class="flex items-center gap-2 text-sm text-slate-700"
+                                        >
+                                            <span
+                                                class="w-1.5 h-1.5 bg-indigo-500 rounded-full"
+                                            ></span>
+                                            Share portfolio update
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- NetworkCard 2 -->
+                        <div
+                            class="group bg-surface-container-lowest p-6 rounded-2xl shadow-[0_8px_24px_rgba(25,28,30,0.04)] hover:shadow-lg transition-all cursor-default border border-transparent hover:border-indigo-100"
+                        >
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-slate-900">
+                                    Marcus Thorne
+                                </h3>
+                                <span
+                                    class="text-[10px] px-2 py-1 bg-slate-100 text-slate-500 font-bold rounded"
+                                    >Alumni</span
+                                >
+                            </div>
+                            <div class="space-y-3">
+                                <div
+                                    class="flex items-center gap-2 text-on-surface-variant"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-sm"
+                                        >link</span
+                                    >
+                                    <p class="text-xs font-medium">
+                                        Linked to:
+                                        <span class="text-slate-900"
+                                            >Senior UX Researcher @ Airbnb</span
+                                        >
+                                    </p>
+                                </div>
+                                <div class="pt-3 border-t border-slate-100">
+                                    <p
+                                        class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2"
+                                    >
+                                        Next Steps
+                                    </p>
+                                    <ul class="space-y-2">
+                                        <li
+                                            class="flex items-center gap-2 text-sm text-slate-700"
+                                        >
+                                            <span
+                                                class="w-1.5 h-1.5 bg-indigo-500 rounded-full"
+                                            ></span>
+                                            Send thank you note
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- NetworkCard 3 -->
+                        <div
+                            class="group bg-surface-container-lowest p-6 rounded-2xl shadow-[0_8px_24px_rgba(25,28,30,0.04)] hover:shadow-lg transition-all cursor-default border border-transparent hover:border-indigo-100"
+                        >
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-slate-900">
+                                    Elena Rodriguez
+                                </h3>
+                                <span
+                                    class="text-[10px] px-2 py-1 bg-emerald-50 text-on-tertiary-container font-bold rounded"
+                                    >Recruiter</span
+                                >
+                            </div>
+                            <div class="space-y-3">
+                                <div
+                                    class="flex items-center gap-2 text-on-surface-variant"
+                                >
+                                    <span
+                                        class="material-symbols-outlined text-sm"
+                                        >link</span
+                                    >
+                                    <p class="text-xs font-medium">
+                                        Linked to:
+                                        <span class="text-slate-900"
+                                            >Design Manager @ Meta</span
+                                        >
+                                    </p>
+                                </div>
+                                <div class="pt-3 border-t border-slate-100">
+                                    <p
+                                        class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-2"
+                                    >
+                                        Next Steps
+                                    </p>
+                                    <ul class="space-y-2">
+                                        <li
+                                            class="flex items-center gap-2 text-sm text-slate-700"
+                                        >
+                                            <span
+                                                class="w-1.5 h-1.5 bg-indigo-500 rounded-full"
+                                            ></span>
+                                            Request referral link
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <!-- Resume Pulse (Custom Component) -->
+    </body>
+</html>
