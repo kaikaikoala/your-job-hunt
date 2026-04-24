@@ -7,7 +7,6 @@ import {
   primary,
   successDark,
   surfaceContainerLow,
-  surfaceContainerLowest,
 } from "../colors";
 
 interface Props {
@@ -50,7 +49,6 @@ export default function EmailSettingsConnectionCard({
       sx={{
         p: { xs: 3, md: 4 },
         borderRadius: 3,
-        bgcolor: surfaceContainerLowest,
         border: `1px solid ${borderSubtle}`,
         display: "flex",
         flexDirection: "column",
@@ -151,11 +149,6 @@ export default function EmailSettingsConnectionCard({
               disabled={isSyncing}
               fullWidth
               sx={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 700,
-                borderRadius: 2,
-                py: 1.5,
-                textTransform: "none",
                 background: `linear-gradient(to right, ${onSurface}, ${primary})`,
                 "&:hover": { opacity: 0.88 },
               }}
@@ -168,11 +161,6 @@ export default function EmailSettingsConnectionCard({
               disabled={isDisconnecting}
               fullWidth
               sx={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 700,
-                borderRadius: 2,
-                py: 1.5,
-                textTransform: "none",
                 color: onSurfaceVariant,
                 borderColor: borderSubtle,
               }}
@@ -186,11 +174,6 @@ export default function EmailSettingsConnectionCard({
             onClick={handleConnect}
             fullWidth
             sx={{
-              fontFamily: "Manrope, sans-serif",
-              fontWeight: 700,
-              borderRadius: 2,
-              py: 1.5,
-              textTransform: "none",
               background: `linear-gradient(to right, ${onSurface}, ${primary})`,
               "&:hover": { opacity: 0.88 },
             }}

@@ -86,7 +86,7 @@ export default function ApplicationEditDialog({ open, app, referrer, onClose }: 
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, pr: 6 }}>
+      <DialogTitle>
         Edit Application
         <IconButton
           onClick={handleClose}
@@ -133,7 +133,7 @@ export default function ApplicationEditDialog({ open, app, referrer, onClose }: 
           <NetworkContactAutocomplete ref={referrerRef} enabled={open} />
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions>
         <Button onClick={handleClose} disabled={mutation.isPending}>Cancel</Button>
         <Button variant="contained" onClick={handleSubmit} disabled={!canSubmit}>
           {mutation.isPending ? 'Saving…' : 'Save'}

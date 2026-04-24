@@ -74,7 +74,7 @@ export default function AddStageDialog({ open, appId, onClose }: Props) {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
-      <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, pr: 6 }}>
+      <DialogTitle>
         Add Stage
         <IconButton
           onClick={handleClose}
@@ -130,7 +130,7 @@ export default function AddStageDialog({ open, appId, onClose }: Props) {
           />
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions>
         <Button onClick={handleClose} disabled={mutation.isPending}>Cancel</Button>
         <Button variant="contained" onClick={handleSubmit} disabled={!canSubmit}>
           {mutation.isPending ? 'Adding…' : 'Add Stage'}

@@ -78,6 +78,19 @@ export function stageColor(stage?: string): string {
   return STAGE_COLORS[stage] ?? primary;
 }
 
+// ─── Shadows ─────────────────────────────────────────────────────────────────
+
+/** Subtle row / list item shadow */
+export const shadowSm = '0 1px 3px rgba(25,28,30,0.06)';
+/** Card hover / secondary floating elements */
+export const shadowMd = '0 4px 16px rgba(25,28,30,0.08)';
+/** Primary floating elements — per design spec (offset-y 8px, blur 24px) */
+export const shadowFloat = '0 8px 24px rgba(25,28,30,0.06)';
+/** Hero / feature card shadow */
+export const shadowLg = '0 20px 40px rgba(0,0,0,0.10)';
+/** Heavy lift — dark hero images */
+export const shadowXl = '0 25px 50px rgba(0,0,0,0.15)';
+
 // ─── Dark-section palette (LandingPage hero) ─────────────────────────────────
 
 export const dark = {

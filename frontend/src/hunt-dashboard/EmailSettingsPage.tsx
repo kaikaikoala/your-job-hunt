@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import EmailSettingsConnectionCard from "./EmailSettingsConnectionCard";
+import EmailSettingsBetaNotice from "./EmailSettingsBetaNotice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteEmailSettings,
@@ -146,6 +147,8 @@ export default function EmailSettingsPage() {
           mx: "auto",
         }}
       >
+        <EmailSettingsBetaNotice />
+
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <Box
           sx={{
@@ -162,7 +165,6 @@ export default function EmailSettingsPage() {
             <Typography
               variant="h3"
               sx={{
-                fontFamily: "Manrope, sans-serif",
                 fontWeight: 800,
                 color: onSurface,
                 letterSpacing: "-0.02em",
@@ -438,7 +440,6 @@ export default function EmailSettingsPage() {
               sx={{
                 p: 3,
                 borderRadius: 3,
-                bgcolor: surfaceContainerLowest,
                 border: `1px solid ${borderSubtle}`,
               }}
             >
@@ -575,7 +576,6 @@ export default function EmailSettingsPage() {
           sx={{
             p: { xs: 3, md: 4 },
             borderRadius: 3,
-            bgcolor: surfaceContainerLowest,
             border: `1px solid ${borderSubtle}`,
           }}
         >
@@ -599,13 +599,7 @@ export default function EmailSettingsPage() {
             </Typography>
             <Button
               variant="text"
-              sx={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 700,
-                fontSize: 13,
-                color: onPrimaryFixedVariant,
-                textTransform: "none",
-              }}
+              sx={{ fontSize: 13, color: onPrimaryFixedVariant }}
             >
               Export Log
             </Button>

@@ -14,7 +14,7 @@ import { type ApplicationWithStages } from '../api/applications';
 import { createStage } from '../api/stages';
 import ApplicationStageAddDialog from './ApplicationStageAddDialog';
 import ActionItemAddDialog from './ActionItemAddDialog';
-import { primary, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, surfaceContainerHigh, stageColor } from '../colors';
+import { primary, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerHigh, stageColor } from '../colors';
 
 const ApplicationAiAssistant = React.lazy(() => import('./ApplicationAiAssistant'));
 
@@ -50,7 +50,6 @@ export default function ApplicationCard({ app }: { app: ApplicationWithStages })
           flexDirection: { xs: 'column', sm: 'row' },
           alignItems: { xs: 'flex-start', sm: 'center' },
           justifyContent: 'space-between',
-          bgcolor: surfaceContainerLowest,
           border: `1px solid ${borderSubtle}`,
           '&:hover': { boxShadow: '0 4px 16px rgba(25,28,30,0.08)' },
           transition: 'box-shadow 0.2s',
@@ -103,7 +102,7 @@ export default function ApplicationCard({ app }: { app: ApplicationWithStages })
               size="small"
               disabled={rejectMutation.isPending}
               onClick={() => rejectMutation.mutate()}
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderColor: outlineVariant, color: onSurfaceVariant, fontSize: 13, px: 1.5 }}
+              sx={{ borderColor: outlineVariant, color: onSurfaceVariant, fontSize: 13, px: 1.5 }}
             >
               Rejected
             </Button>
@@ -111,7 +110,7 @@ export default function ApplicationCard({ app }: { app: ApplicationWithStages })
               variant="contained"
               size="small"
               onClick={() => setAddStageOpen(true)}
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13 }}
+              sx={{ fontSize: 13 }}
             >
               Passed Round
             </Button>

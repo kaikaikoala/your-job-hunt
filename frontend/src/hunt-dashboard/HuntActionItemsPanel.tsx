@@ -137,14 +137,8 @@ export default function HuntActionItemsPanel() {
         onClick={() => navigate('/action-items')}
         sx={{
           mt: 3,
-          py: 1.5,
-          fontFamily: 'Manrope, sans-serif',
-          fontWeight: 700,
-          fontSize: 14,
           color: onSurfaceVariant,
           borderColor: 'rgba(0,0,0,0.15)',
-          borderRadius: 2,
-          textTransform: 'none',
           '&:hover': {
             bgcolor: surfaceContainerLow,
             borderColor: 'rgba(0,0,0,0.15)',

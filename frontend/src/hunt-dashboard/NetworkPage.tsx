@@ -21,7 +21,6 @@ import {
   onSurfaceVariant,
   outlineVariant,
   borderSubtle,
-  surfaceContainerLowest,
   error,
 } from '../colors';
 import axios from 'axios';
@@ -53,7 +52,7 @@ export default function NetworkPage() {
           <Box>
             <Typography
               variant="h5"
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface, mb: 0.5 }}
+              sx={{ fontWeight: 800, color: onSurface, mb: 0.5 }}
             >
               Network
             </Typography>
@@ -64,7 +63,6 @@ export default function NetworkPage() {
           <Button
             variant="contained"
             onClick={() => setAddOpen(true)}
-            sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, borderRadius: 2, px: 3 }}
           >
             + Add Contact
           </Button>
@@ -86,7 +84,6 @@ export default function NetworkPage() {
             sx={{
               borderRadius: 3,
               border: `1px solid ${borderSubtle}`,
-              bgcolor: surfaceContainerLowest,
             }}
           >
             <Stack spacing={0}>

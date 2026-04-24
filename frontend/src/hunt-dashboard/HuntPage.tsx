@@ -83,7 +83,6 @@ export default function DashboardPage() {
             <Typography
               variant="h4"
               sx={{
-                fontFamily: "Manrope, sans-serif",
                 fontWeight: 800,
                 color: onSurface,
                 mb: 1,
@@ -98,31 +97,10 @@ export default function DashboardPage() {
             </Typography>
           </Box>
           <Box sx={{ display: "flex", gap: 2, flexShrink: 0 }}>
-            <Button
-              component={Link}
-              to="/emailsettings"
-              variant="outlined"
-              sx={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 700,
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-              }}
-            >
+            <Button component={Link} to="/emailsettings" variant="outlined">
               Email sync
             </Button>
-            <Button
-              variant="contained"
-              onClick={() => setDialogOpen(true)}
-              sx={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 700,
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-              }}
-            >
+            <Button variant="contained" onClick={() => setDialogOpen(true)}>
               New Application
             </Button>
           </Box>
@@ -144,7 +122,6 @@ export default function DashboardPage() {
             sx={{
               p: { xs: 3, md: 4 },
               borderRadius: 3,
-              bgcolor: surfaceContainerLowest,
               border: `1px solid ${borderSubtle}`,
               position: "relative",
               overflow: "hidden",
@@ -299,14 +276,9 @@ export default function DashboardPage() {
                   </span>
                 }
                 sx={{
-                  fontFamily: "Manrope, sans-serif",
-                  fontWeight: 700,
-                  borderRadius: 2,
                   px: 4,
-                  py: 1.5,
                   bgcolor: success,
                   color: successDark,
-                  textTransform: "none",
                   "&:hover": { bgcolor: success, opacity: 0.85 },
                 }}
               >
@@ -345,7 +317,6 @@ export default function DashboardPage() {
             <Typography
               variant="h5"
               sx={{
-                fontFamily: "Manrope, sans-serif",
                 fontWeight: 800,
                 color: onSurface,
                 letterSpacing: "-0.02em",
@@ -412,7 +383,6 @@ export default function DashboardPage() {
                   sx={{
                     p: 3,
                     borderRadius: 3,
-                    bgcolor: surfaceContainerLowest,
                     border: `1px solid ${borderSubtle}`,
                     transition: "box-shadow 0.2s",
                     "&:hover": { boxShadow: 3 },

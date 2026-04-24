@@ -77,7 +77,7 @@ export default function ApplicationAddDialog({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, pr: 6 }}>
+      <DialogTitle>
         New Application
         <IconButton
           onClick={handleClose}
@@ -132,7 +132,7 @@ export default function ApplicationAddDialog({ open, onClose }: Props) {
           />
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions>
         <Button
           variant="contained"
           onClick={() => handleSubmit('Referred')}

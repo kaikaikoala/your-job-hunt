@@ -28,7 +28,7 @@ import ActionItemAddDialog from './ActionItemAddDialog';
 import ApplicationEditDialog from './ApplicationEditDialog';
 import NavBar from '../shared/NavBar';
 import Footer from '../shared/Footer';
-import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, surfaceContainerLowest, error, stageColor } from '../colors';
+import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, error, stageColor } from '../colors';
 
 function formatDate(iso?: string) {
   if (!iso) return '—';
@@ -108,13 +108,13 @@ export default function ApplicationDetailPage() {
         <Button
           startIcon={<span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>}
           onClick={() => navigate('/hunt')}
-          sx={{ mb: 3, color: onSurfaceVariant, fontFamily: 'Manrope, sans-serif', fontWeight: 600 }}
+          sx={{ mb: 3, color: onSurfaceVariant, fontWeight: 600 }}
         >
           Dashboard
         </Button>
 
         {/* Application metadata */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest, mb: 3 }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, mb: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
             <Typography variant="h5" sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface }}>
               {app.role}
@@ -166,7 +166,7 @@ export default function ApplicationDetailPage() {
         </Paper>
 
         {/* Stages timeline */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}` }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: onSurface }}>
               Stages
@@ -175,7 +175,7 @@ export default function ApplicationDetailPage() {
               size="small"
               variant="contained"
               onClick={() => setAddStageOpen(true)}
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13 }}
+              sx={{ fontSize: 13 }}
             >
               + Add Stage
             </Button>
@@ -194,7 +194,7 @@ export default function ApplicationDetailPage() {
           )}
         </Paper>
         {/* Action items */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, bgcolor: surfaceContainerLowest, mt: 3 }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, mt: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: onSurface }}>
               Action Items
@@ -203,7 +203,7 @@ export default function ApplicationDetailPage() {
               size="small"
               variant="contained"
               onClick={() => setAddActionItemOpen(true)}
-              sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 13 }}
+              sx={{ fontSize: 13 }}
             >
               + Add Action Item
             </Button>
@@ -232,7 +232,7 @@ export default function ApplicationDetailPage() {
         onClose={() => setEditOpen(false)}
       />
       <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700 }}>Delete Application?</DialogTitle>
+        <DialogTitle>Delete Application?</DialogTitle>
         <DialogContent>
           <DialogContentText>
             This will permanently delete <strong>{app.role}</strong> at <strong>{app.company}</strong> and all its stages. This cannot be undone.
@@ -243,7 +243,7 @@ export default function ApplicationDetailPage() {
             </DialogContentText>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions>
           <Button onClick={() => { setDeleteConfirmOpen(false); deleteMutation.reset(); }} disabled={deleteMutation.isPending}>
             Cancel
           </Button>
@@ -384,7 +384,6 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
               stageDate: editDate || undefined,
               result: editResult.trim() || undefined,
             })}
-            sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700 }}
           >
             Save
           </Button>

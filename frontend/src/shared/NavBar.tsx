@@ -118,10 +118,7 @@ export default function NavBar({ activeLink }: NavBarProps) {
             <Button
               onClick={signOut}
               sx={{
-                fontFamily: "Manrope, sans-serif",
                 fontWeight: 500,
-                textTransform: "none",
-                fontSize: "0.875rem",
                 color: dark.textMuted,
               }}
             >
@@ -132,15 +129,7 @@ export default function NavBar({ activeLink }: NavBarProps) {
           <Button
             variant="contained"
             onClick={() => navigate("/sign-in")}
-            sx={{
-              fontFamily: "Manrope, sans-serif",
-              fontWeight: 700,
-              borderRadius: "8px",
-              textTransform: "none",
-              px: 2.5,
-              py: 1,
-              fontSize: "0.875rem",
-            }}
+            sx={{ px: 2.5, py: 1 }}
           >
             Sign In
           </Button>

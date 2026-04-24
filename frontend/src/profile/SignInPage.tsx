@@ -101,12 +101,7 @@ export default function SignInPage() {
               )
             }
             sx={{
-              fontFamily: 'Manrope, sans-serif',
-              fontWeight: 700,
               fontSize: '0.95rem',
-              textTransform: 'none',
-              borderRadius: '8px',
-              py: 1.5,
               borderColor: borderLight,
               color: onSurface,
               '&:hover': { borderColor: primary, bgcolor: primaryFixed + '33' },

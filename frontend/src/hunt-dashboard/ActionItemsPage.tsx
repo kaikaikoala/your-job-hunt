@@ -29,7 +29,6 @@ import {
   onSurfaceVariant,
   outlineVariant,
   borderSubtle,
-  surfaceContainerLowest,
   error,
 } from "../colors";
 
@@ -81,7 +80,6 @@ export default function ActionItemsPage() {
             <Typography
               variant="h5"
               sx={{
-                fontFamily: "Manrope, sans-serif",
                 fontWeight: 800,
                 color: onSurface,
                 mb: 0.5,
@@ -96,12 +94,6 @@ export default function ActionItemsPage() {
           <Button
             variant="contained"
             onClick={() => setAddOpen(true)}
-            sx={{
-              fontFamily: "Manrope, sans-serif",
-              fontWeight: 700,
-              borderRadius: 2,
-              px: 3,
-            }}
           >
             + Add Task
           </Button>
@@ -154,7 +146,6 @@ export default function ActionItemsPage() {
             sx={{
               borderRadius: 3,
               border: `1px solid ${borderSubtle}`,
-              bgcolor: surfaceContainerLowest,
             }}
           >
             <Stack spacing={0}>
