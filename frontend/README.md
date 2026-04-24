@@ -4,6 +4,9 @@
 
 React + TypeScript frontend built with Vite, MUI, TanStack React Query, and Firebase Auth.
 
+## Coding conventions
+File naming convention for components should be: <Data><UX widget>. 
+
 ## src/ file scaffold
 
 ```
