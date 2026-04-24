@@ -10,6 +10,16 @@ export interface EmailSyncStatus {
   status: string;
 }
 
+export interface EmailSyncRecord {
+  syncId: string;
+  status: string;
+  startedAt: string;
+  completedAt: string | null;
+  emailsFetched: number | null;
+  emailsProcessed: number | null;
+  errorMessage: string | null;
+}
+
 export const fetchEmailSettings = (): Promise<EmailSettings | null> =>
   axiosInstance.get('/email-settings').then((r) => r.data).catch((err) => {
     if (err.response?.status === 404) return null;
@@ -30,3 +40,6 @@ export const startEmailSync = (): Promise<EmailSyncStatus> =>
 
 export const fetchEmailSync = (syncId: string): Promise<EmailSyncStatus> =>
   axiosInstance.get(`/email-syncs/${syncId}`).then((r) => r.data);
+
+export const fetchEmailSyncs = (): Promise<EmailSyncRecord[]> =>
+  axiosInstance.get('/email-syncs').then((r) => r.data);
