@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 import ApplicationAddDialog from "./ApplicationAddDialog";
 import NavBar from "../shared/NavBar";
@@ -8,6 +7,7 @@ import HuntActionItemsPanel from "./HuntActionItemsPanel";
 import ApplicationPipelineCard from "./ApplicationPipelineCard";
 import EmailSettingsEnableCTABanner from "./EmailSettingsEnableCTABanner";
 import NetworkContactPreview from "./NetworkContactPreview";
+import EmailSyncButton from "./EmailSyncButton";
 import { surface, onSurface, onSurfaceVariant } from "../colors";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -45,9 +45,7 @@ export default function DashboardPage() {
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 2, flexShrink: 0 }}>
-          <Button component={Link} to="/emailsettings" variant="outlined">
-            Email sync
-          </Button>
+          <EmailSyncButton />
           <Button variant="contained" onClick={() => setDialogOpen(true)}>
             New Application
           </Button>

@@ -32,7 +32,10 @@ function Header() {
       }}
     >
       <Box sx={{ maxWidth: 560 }}>
-        <Typography variant="h1" sx={{ fontWeight: 800, color: onSurface, mb: 1.5 }}>
+        <Typography
+          variant="h1"
+          sx={{ fontWeight: 800, color: onSurface, mb: 1.5 }}
+        >
           Email Synchronization
         </Typography>
         <Typography variant="body1" sx={{ color: onSurfaceVariant }}>
@@ -40,27 +43,6 @@ function Header() {
           and application updates directly from your inbox.
         </Typography>
       </Box>
-      <Chip
-        icon={
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: 16, fontVariationSettings: '"FILL" 1' }}
-          >
-            verified_user
-          </span>
-        }
-        label="Enterprise Security"
-        sx={{
-          bgcolor: `${successDark}1A`,
-          color: successDark,
-          fontWeight: 700,
-          fontSize: 13,
-          height: 36,
-          px: 1,
-          borderRadius: 2,
-          flexShrink: 0,
-        }}
-      />
     </Box>
   );
 }
@@ -154,7 +136,7 @@ export default function EmailSettingsPage() {
             mb: 3,
           }}
         >
-          <EmailSettingsPermissionsCard />
+          <EmailSettingsPermissionsCard label={emailSettings?.label} />
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <EmailSecurityFaqCard />
             <EmailSecurityHelpCard />

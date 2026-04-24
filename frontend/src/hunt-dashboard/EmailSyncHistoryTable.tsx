@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Paper, Typography } from "@mui/material";
-import { onPrimaryFixedVariant, onSurface, onSurfaceVariant, successDark, error as errorColor, primary } from "../colors";
+import { Box, Paper, Typography } from "@mui/material";
+import { onSurface, onSurfaceVariant, successDark, error as errorColor, primary } from "../colors";
 import { cardSx } from "../shared/styles";
-import { fetchEmailSyncs, startEmailSync, type EmailSyncRecord } from "../api/emailSettings";
+import { fetchEmailSyncs, type EmailSyncRecord } from "../api/emailSettings";
+import EmailSyncButton from "./EmailSyncButton";
 
 function formatSyncTime(isoString: string): string {
   const date = new Date(isoString);
@@ -36,23 +37,14 @@ function syncDetail(sync: EmailSyncRecord): string {
 
 export default function EmailSyncHistoryTable() {
   const [syncs, setSyncs] = useState<EmailSyncRecord[]>([]);
-  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     fetchEmailSyncs().then(setSyncs).catch(() => {});
   }, []);
 
   const handleSync = async () => {
-    setSyncing(true);
-    try {
-      await startEmailSync();
-      const updated = await fetchEmailSyncs();
-      setSyncs(updated);
-    } catch {
-      // no-op
-    } finally {
-      setSyncing(false);
-    }
+    const updated = await fetchEmailSyncs();
+    setSyncs(updated);
   };
 
   return (
@@ -68,14 +60,7 @@ export default function EmailSyncHistoryTable() {
         <Typography variant="h2" sx={{ color: onSurface }}>
           Sync History
         </Typography>
-        <Button
-          variant="text"
-          sx={{ fontSize: 13, color: onPrimaryFixedVariant }}
-          onClick={handleSync}
-          disabled={syncing}
-        >
-          {syncing ? "Syncing…" : "Sync"}
-        </Button>
+        <EmailSyncButton onSync={handleSync} />
       </Box>
       <Box>
         {syncs.map((sync) => (

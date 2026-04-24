@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboard } from "../api/applications";
 import ApplicationAddDialog from "./ApplicationAddDialog";
@@ -8,6 +7,7 @@ import NavBar from "../shared/NavBar";
 import Footer from "../shared/Footer";
 import ApplicationSankeyGraph, { computeSankeyLinks } from "./ApplicationSankeyGraph";
 import ApplicationList from "./ApplicationList";
+import EmailSyncButton from "./EmailSyncButton";
 import { surface, onSurface, onSurfaceVariant } from "../colors";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -66,21 +66,7 @@ export default function ApplicationPipelinePage() {
             </Typography>
           </Box>
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              component={Link}
-              to="/emailsettings"
-              variant="outlined"
-              sx={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 700,
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-                textTransform: "none",
-              }}
-            >
-              Email Sync
-            </Button>
+            <EmailSyncButton />
             <Button
               variant="contained"
               onClick={() => setDialogOpen(true)}
