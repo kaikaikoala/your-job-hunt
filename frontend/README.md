@@ -10,40 +10,40 @@ React + TypeScript frontend built with Vite, MUI, TanStack React Query, and Fire
 src/
 ├── App.tsx                    # Root routing (React Router)
 ├── main.tsx                   # Entry point — QueryClient, ThemeProvider
-├── theme.ts                   # MUI theme (colors, fonts)
+├── theme.ts                   # MUI theme (typography scale, component defaults)
+├── colors.ts                  # Design-system color + shadow tokens
 ├── firebase.ts                # Firebase app initialization
 │
-├── api/                       # HTTP layer (axios + React Query keys)
-│   ├── axiosInstance.ts       # Axios instance with Firebase auth interceptor
-│   ├── applications.ts        # Applications endpoints + types
-│   └── stages.ts              # Stages endpoints + types
+├── api/                       # HTTP layer — axios instance + endpoints for
+│                              # applications, stages, actionItems, emailSettings,
+│                              # network contacts, and AI agents
 │
 ├── context/
 │   └── AuthContext.tsx        # Firebase auth context (useAuth hook)
 │
 ├── assets/                    # Static images
 │
+├── oauth/                     # Gmail OAuth flow (PKCE + callback handler)
+│
 ├── landing-page/
 │   └── LandingPage.tsx        # Marketing / home page
 │
-├── hunt-dashboard/            # Core job-tracking feature
-│   ├── HuntPage.tsx           # Dashboard with Sankey flow + application list
-│   ├── HuntPage.test.tsx
-│   ├── ApplicationDetailPage.tsx  # Per-application stage timeline
-│   ├── AddApplicationDialog.tsx   # Modal to create a new application
-│   └── AddStageDialog.tsx         # Modal to add a stage to an application
+├── hunt-dashboard/            # Core job-tracking feature — dashboard, pipeline,
+│                              # application detail, email sync, action items,
+│                              # network contacts, and AI assistant
 │
 ├── profile/
 │   └── SignInPage.tsx         # Google sign-in page
 │
-└── shared/                    # Cross-feature UI
-    ├── NavBar.tsx             # Top navigation bar
-    └── ProtectedRoute.tsx     # Auth guard (redirects to /sign-in if unauthenticated)
+└── shared/                    # Cross-feature UI + utilities — NavBar, Footer,
+                               # ProtectedRoute, and reusable sx objects (styles.ts)
 ```
 
 ---
 
 ## Design System
+
+> Colors are defined in `src/colors.ts`. Component defaults (Button padding, DialogTitle font, etc.) are set in `src/theme.ts` `components.*` overrides — avoid repeating them in `sx` props.
 
 ### 1. Overview & Creative North Star: "The Digital Curator"
 
@@ -128,7 +128,9 @@ For the resume tailoring app, use a **floating action chip** that follows the us
 - **Don't** use `none` or `sm` roundedness. All interactive elements must use `md` (0.75rem) or `lg` (1rem) to feel approachable and modern.
 - **Don't** center-align long-form text. Keep it left-aligned to maintain the "Editorial" grid structure.
 
-# Typography Specifications: 
+# Typography Specifications
+
+> These specs are fully implemented in `src/theme.ts` (`typography.*` variants) and propagate automatically to all MUI components. Override only when intentionally deviating.
 
 ## Core Principles
 The typography for Your-Job-Hunt is designed to blend **Editorial Elegance** with **SaaS Utility**. It prioritizes readability for long-form resume content while maintaining a sharp, professional edge for data-heavy tracking views.
