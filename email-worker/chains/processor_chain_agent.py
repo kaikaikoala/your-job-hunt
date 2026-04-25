@@ -1,5 +1,6 @@
 """
-OrchestratorAgent: understand email intent and call the right DB tool.
+ProcessorChainAgent: understand email intent and call the right DB tool.
+Single LLM call per email — routes to one of three CRUD tools.
 """
 from __future__ import annotations
 
@@ -13,6 +14,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from chains.tools import (
     add_application as _add_application,
     add_application_stage as _add_application_stage,
+    update_application as _update_application,
     update_application_stage as _update_application_stage,
 )
 
@@ -71,6 +73,16 @@ def _build_tools(user_id: str) -> list:
         return _add_application_stage(user_id, company, role, stage, result, stage_date)
 
     @tool
+    def update_application(
+        company: str,
+        role: str | None = None,
+        job_posting_url: str | None = None,
+        salary_range: str | None = None,
+    ) -> str:
+        """Correct the role or other metadata on an existing application. Looks up by company only."""
+        return _update_application(user_id, company, role, job_posting_url, salary_range)
+
+    @tool
     def update_application_stage(
         company: str,
         role: str,
@@ -81,13 +93,13 @@ def _build_tools(user_id: str) -> list:
         """Update the outcome or date of an existing stage. Use for confirmed interview dates, rejection updates, or pass/fail decisions."""
         return _update_application_stage(user_id, company, role, stage, result, stage_date)
 
-    return [add_application, add_application_stage, update_application_stage]
+    return [add_application, add_application_stage, update_application, update_application_stage]
 
 
 def process_email(user_id: str, email: dict) -> None:
     """Route a job-related email to the appropriate DB tool via a tool-calling agent."""
     subject = email.get("subject", "")
-    logger.info("OrchestratorAgent: processing subject=%r", subject)
+    logger.info("ProcessorChainAgent: processing subject=%r", subject)
 
     tools = _build_tools(user_id)
     agent = create_agent(_llm, tools, system_prompt=_SYSTEM_PROMPT)
@@ -101,4 +113,4 @@ def process_email(user_id: str, email: dict) -> None:
     try:
         agent.invoke({"messages": [{"role": "user", "content": email_text}]})
     except Exception as exc:
-        logger.warning("OrchestratorAgent failed for subject=%r: %s", subject, exc)
+        logger.warning("ProcessorChainAgent failed for subject=%r: %s", subject, exc)

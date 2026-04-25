@@ -1,5 +1,11 @@
 .DS_STORE
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
 # Environment files
 .env
 .env.*

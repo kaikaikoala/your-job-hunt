@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
 from chains.filter_agent import is_job_related
-from chains.orchestrator_agent import process_email
+from chains.processor_graph_agent import process_email
 from db import get_conn
 from gmail_client import fetch_emails
 

@@ -2,6 +2,7 @@
 DB write tools invoked by the orchestrator agent.
 All functions write directly to PostgreSQL via psycopg2.
 """
+
 from __future__ import annotations
 
 import logging
@@ -18,16 +19,15 @@ def add_application(
     role: str,
     job_posting_url: str | None = None,
     salary_range: str | None = None,
-    stage_date: str | None = None,
 ) -> str | None:
     """
-    Insert a new application row and add an initial 'Applied' stage.
+    Insert a new application row. Does not add any stage; caller is responsible
+    for adding the initial stage via add_application_stage.
     Skipped if the user already has an open application for the same company+role,
     or if the same job_posting_url is already tracked.
     Returns the app_id string or None on conflict/error.
     """
     app_id = str(uuid.uuid4())
-    stage_id = str(uuid.uuid4())
 
     # TODO: allow insert when the existing application's latest stage is Rejected.
     check_company_role_sql = """
@@ -40,10 +40,6 @@ def add_application(
         DO NOTHING
         RETURNING app_id
     """
-    insert_stage_sql = """
-        INSERT INTO application_stage (app_stage_id, app_id, stage, stage_date, result, created_at)
-        VALUES (%s, %s, 'Applied', %s, 'Pending', NOW())
-    """
 
     try:
         with get_conn() as conn:
@@ -51,7 +47,9 @@ def add_application(
                 cur.execute(check_company_role_sql, (user_id, company, role))
                 if cur.fetchone():
                     logger.info(
-                        "add_application: skipped duplicate company=%s role=%s", company, role
+                        "add_application: skipped duplicate company=%s role=%s",
+                        company,
+                        role,
                     )
                     return None
 
@@ -62,13 +60,15 @@ def add_application(
                 row = cur.fetchone()
                 if row is None:
                     logger.info(
-                        "add_application: skipped duplicate job_posting_url=%s", job_posting_url
+                        "add_application: skipped duplicate job_posting_url=%s",
+                        job_posting_url,
                     )
                     return None
                 returned_app_id = str(row[0])
-                cur.execute(insert_stage_sql, (stage_id, returned_app_id, stage_date))
             conn.commit()
-        logger.info("add_application: created app_id=%s company=%s", returned_app_id, company)
+        logger.info(
+            "add_application: created app_id=%s company=%s", returned_app_id, company
+        )
         return returned_app_id
     except Exception as exc:
         logger.error("add_application failed: %s", exc)
@@ -103,7 +103,9 @@ def add_application_stage(
                 row = cur.fetchone()
                 if row is None:
                     logger.info(
-                        "add_application_stage: no app found company=%s role=%s", company, role
+                        "add_application_stage: no app found company=%s role=%s",
+                        company,
+                        role,
                     )
                     return f"No application found for {company} / {role}"
                 app_id = str(row[0])
@@ -115,6 +117,96 @@ def add_application_stage(
     except Exception as exc:
         logger.error("add_application_stage failed: %s", exc)
         return f"Error adding stage: {exc}"
+
+
+def get_application_summary(user_id: str, company: str, role: str) -> dict:
+    """
+    Read current application state for a given user/company/role.
+    Returns {found, app_id, stages: [{stage, result, stage_date}]}.
+    Safe default: returns found=False on any error.
+    """
+    company_role_sql = """
+        SELECT app_id FROM applications
+        WHERE user_id = %s AND LOWER(company) = LOWER(%s) AND LOWER(role) = LOWER(%s)
+    """
+    company_sql = """
+        SELECT app_id FROM applications
+        WHERE user_id = %s AND LOWER(company) = LOWER(%s)
+        LIMIT 1
+    """
+    stages_sql = """
+        SELECT stage, result, stage_date FROM application_stage
+        WHERE app_id = %s
+        ORDER BY created_at ASC
+    """
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                # Find the application
+                cur.execute(company_role_sql, (user_id, company, role))
+                row = cur.fetchone()
+                if row is None:
+                    cur.execute(company_sql, (user_id, company))
+                    row = cur.fetchone()
+                    if row is None:
+                        return {"found": False, "app_id": None, "stages": []}
+                app_id = str(row[0])
+                cur.execute(stages_sql, (app_id,))
+                stages = [
+                    {
+                        "stage": r[0],
+                        "result": r[1],
+                        "stage_date": str(r[2]) if r[2] else None,
+                    }
+                    for r in cur.fetchall()
+                ]
+        return {"found": True, "app_id": app_id, "stages": stages}
+    except Exception as exc:
+        logger.error("get_application_summary failed: %s", exc)
+        return {"found": False, "app_id": None, "stages": []}
+
+
+def update_application(
+    user_id: str,
+    company: str,
+    role: str | None = None,
+    job_posting_url: str | None = None,
+    salary_range: str | None = None,
+) -> str:
+    """
+    Update metadata on an existing application. Looks up by user_id + company only,
+    since the role itself may be what is being corrected.
+    Only fields passed as non-None are updated (others are left unchanged).
+    Returns a descriptive success or error string.
+    """
+    lookup_sql = """
+        SELECT app_id FROM applications
+        WHERE user_id = %s AND LOWER(company) = LOWER(%s)
+        LIMIT 1
+    """
+    update_sql = """
+        UPDATE applications
+        SET role = COALESCE(%s, role),
+            job_posting_url = COALESCE(%s, job_posting_url),
+            salary_range = COALESCE(%s, salary_range)
+        WHERE app_id = %s
+    """
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(lookup_sql, (user_id, company))
+                row = cur.fetchone()
+                if row is None:
+                    logger.info("update_application: no app found company=%s", company)
+                    return f"No application found for {company}"
+                app_id = str(row[0])
+                cur.execute(update_sql, (role, job_posting_url, salary_range, app_id))
+            conn.commit()
+        logger.info("update_application: updated app_id=%s company=%s", app_id, company)
+        return f"Updated application for {company}"
+    except Exception as exc:
+        logger.error("update_application failed: %s", exc)
+        return f"Error updating application: {exc}"
 
 
 def update_application_stage(
@@ -153,7 +245,9 @@ def update_application_stage(
                 app_row = cur.fetchone()
                 if app_row is None:
                     logger.info(
-                        "update_application_stage: no app found company=%s role=%s", company, role
+                        "update_application_stage: no app found company=%s role=%s",
+                        company,
+                        role,
                     )
                     return f"No application found for {company} / {role}"
                 app_id = str(app_row[0])
@@ -162,14 +256,18 @@ def update_application_stage(
                 stage_row = cur.fetchone()
                 if stage_row is None:
                     logger.info(
-                        "update_application_stage: no stage=%s found for app_id=%s", stage, app_id
+                        "update_application_stage: no stage=%s found for app_id=%s",
+                        stage,
+                        app_id,
                     )
                     return f"No stage '{stage}' found for {company} / {role}"
                 stage_id = str(stage_row[0])
 
                 cur.execute(update_sql, (result, stage_date, stage_id))
             conn.commit()
-        logger.info("update_application_stage: updated stage=%s app_id=%s", stage, app_id)
+        logger.info(
+            "update_application_stage: updated stage=%s app_id=%s", stage, app_id
+        )
         return f"Updated stage '{stage}' for {company} / {role}"
     except Exception as exc:
         logger.error("update_application_stage failed: %s", exc)
