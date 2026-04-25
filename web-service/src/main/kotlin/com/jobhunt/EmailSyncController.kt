@@ -1,6 +1,5 @@
 package com.jobhunt
 
-import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataIntegrityViolationException
@@ -52,7 +51,6 @@ class EmailSyncController(
     private fun currentUserId() = UUID.fromString(SecurityContextHolder.getContext().authentication.name)
 
     @PostMapping
-    @Transactional
     fun startSync(): ResponseEntity<EmailSyncResponse> {
         val userId = currentUserId()
         log.info("POST /email-syncs userId={}", userId)
@@ -62,7 +60,7 @@ class EmailSyncController(
         }
 
         val sync = try {
-            syncRepo.save(EmailSync(userId = userId))
+            syncRepo.saveAndFlush(EmailSync(userId = userId))
         } catch (ex: DataIntegrityViolationException) {
             throw ResponseStatusException(HttpStatus.CONFLICT, "A sync is already running")
         }

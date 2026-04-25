@@ -58,6 +58,7 @@ export const borderFaint = '#F1F5F9';
 
 export const error = '#BA1A1A';
 export const errorContainer = '#FFDAD6';
+export const warning = '#F59E0B';
 /** Offer stage / positive outcome */
 export const success = '#4EDEA3';
 /** Success labels (e.g. "Resume Optimized") */

@@ -17,6 +17,7 @@ export interface EmailSyncRecord {
   completedAt: string | null;
   emailsFetched: number | null;
   emailsProcessed: number | null;
+  applicationUpdates: number | null;
   errorMessage: string | null;
 }
 

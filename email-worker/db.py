@@ -28,5 +28,8 @@ def get_conn():
     conn = get_pool().getconn()
     try:
         yield conn
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         get_pool().putconn(conn)

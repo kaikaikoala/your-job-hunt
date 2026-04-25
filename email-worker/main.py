@@ -2,10 +2,12 @@
 FastAPI private service — email sync worker.
 Called by the web-service POST /email-syncs endpoint.
 """
+
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import timezone
+from email.utils import parsedate_to_datetime
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict
@@ -13,7 +15,7 @@ from pydantic.alias_generators import to_camel
 
 from chains.filter_agent import is_job_related
 from chains.processor_graph_agent import process_email
-from db import get_conn
+from db_client import SyncUpdate, update_sync
 from gmail_client import fetch_emails
 
 logging.basicConfig(
@@ -36,39 +38,17 @@ class SyncRequest(BaseModel):
     label: str | None = None
 
 
-def _update_sync(
-    sync_id: str,
-    status: str,
-    emails_fetched: int | None = None,
-    emails_processed: int | None = None,
-    error_message: str | None = None,
-) -> None:
-    sql = """
-        UPDATE email_syncs
-        SET status = %s,
-            completed_at = %s,
-            emails_fetched = %s,
-            emails_processed = %s,
-            error_message = %s
-        WHERE sync_id = %s
-    """
+def _parse_email_date(date_str: str):
+    if not date_str:
+        return None
     try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    sql,
-                    (
-                        status,
-                        datetime.now(timezone.utc),
-                        emails_fetched,
-                        emails_processed,
-                        error_message,
-                        sync_id,
-                    ),
-                )
-            conn.commit()
-    except Exception as exc:
-        logger.error("Failed to update email_syncs row sync_id=%s: %s", sync_id, exc)
+        return (
+            parsedate_to_datetime(date_str)
+            .astimezone(timezone.utc)
+            .replace(tzinfo=None)
+        )
+    except Exception:
+        return None
 
 
 @app.post("/sync", status_code=200)
@@ -88,7 +68,7 @@ def run_sync(req: SyncRequest):
         )
     except Exception as exc:
         logger.error("fetch_emails failed for sync_id=%s: %s", req.sync_id, exc)
-        _update_sync(req.sync_id, status="failed", error_message=str(exc))
+        update_sync(req.sync_id, SyncUpdate(status="failed", error_message=str(exc)))
         raise HTTPException(status_code=502, detail="Failed to fetch emails from Gmail")
 
     emails_fetched = len(emails)
@@ -96,23 +76,29 @@ def run_sync(req: SyncRequest):
 
     emails_processed = 0
     errors = []
-    for email in reversed(emails):
-        if not is_job_related(email):
-            continue
-        try:
-            process_email(user_id=req.user_id, email=email)
-            emails_processed += 1
-        except Exception as exc:
-            logger.warning("process_email failed subject=%r: %s", email.get("subject"), exc)
-            errors.append(str(exc))
+    # for email in reversed(emails):
+    #    if not is_job_related(email):
+    #        continue
+    #    try:
+    #        process_email(user_id=req.user_id, email=email)
+    #        emails_processed += 1
+    #    except Exception as exc:
+    #        logger.warning("process_email failed subject=%r: %s", email.get("subject"), exc)
+    #        errors.append(str(exc))
 
-    error_message = "; ".join(errors[:5]) if errors else None
-    _update_sync(
-        sync_id=req.sync_id,
-        status="completed",
-        emails_fetched=emails_fetched,
-        emails_processed=emails_processed,
-        error_message=error_message,
+    # Gmail returns newest-first; oldest is last element, newest is first
+    first_email_at = _parse_email_date(emails[-1].get("date", "")) if emails else None
+    last_email_at = _parse_email_date(emails[0].get("date", "")) if emails else None
+    update_sync(
+        req.sync_id,
+        SyncUpdate(
+            status="completed",
+            emails_fetched=emails_fetched,
+            emails_processed=emails_processed,
+            error_message="; ".join(errors[:5]) if errors else None,
+            first_email_at=first_email_at,
+            last_email_at=last_email_at,
+        ),
     )
 
     logger.info(
