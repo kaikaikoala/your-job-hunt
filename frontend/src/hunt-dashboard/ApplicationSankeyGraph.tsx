@@ -23,6 +23,21 @@ export interface SankeyLink {
   value: number;
 }
 
+const STAGE_OPTIONS = [
+  "Referred",
+  "Applied",
+  "Screening",
+  "Recruiter Screen",
+  "Team Lead/Manager Screen",
+  "Technical Screen",
+  "Interview",
+  "Technical Interview",
+  "System Design Interview",
+  "Onsite Technical",
+  "Offer",
+  "Rejected",
+];
+
 export function computeSankeyLinks(
   applications: ApplicationWithStages[],
 ): SankeyLink[] {
@@ -31,6 +46,10 @@ export function computeSankeyLinks(
   const counts = new Map<string, number>();
   for (const app of applications) {
     const sorted = [...app.stages].sort((a: Stage, b: Stage) => {
+      const aStageIndex = STAGE_OPTIONS.indexOf(a.stage);
+      const bStageIndex = STAGE_OPTIONS.indexOf(b.stage);
+      if (aStageIndex !== -1 && bStageIndex !== -1)
+        return aStageIndex - bStageIndex;
       if (a.stageDate && b.stageDate)
         return a.stageDate.localeCompare(b.stageDate);
       return a.createdAt.localeCompare(b.createdAt);
@@ -40,12 +59,11 @@ export function computeSankeyLinks(
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
   }
-  return Array.from(counts.entries())
-    .map(([key, value]) => {
-      const [source, target] = key.split("\x00");
-      return { source, target, value };
-    })
-    .filter((l) => l.source.toLowerCase() !== l.target.toLowerCase());
+  const result = Array.from(counts.entries()).map(([key, value]) => {
+    const [source, target] = key.split("\x00");
+    return { source, target, value };
+  });
+  return result;
 }
 
 // ─── Conversion Flow card ─────────────────────────────────────────────────────
