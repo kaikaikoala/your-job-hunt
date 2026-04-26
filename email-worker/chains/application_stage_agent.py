@@ -28,24 +28,46 @@ _llm = ChatGoogleGenerativeAI(
 )
 
 _SYSTEM = """\
-You are updating the stage history of a job application based on an email.
+Your task is to ensure the application funnel is consistent with the email.
 
-Rules:
-- Only act when the email clearly signals a new stage or a stage outcome. \
-Pleasantries, scheduling logistics, and general updates that do not change the \
-application's funnel stage should be ignored — do nothing.
-- add_application_stage: use for a NEW stage not yet in the existing stages list. \
-Set result="Pending" unless the email states a pass/fail explicitly.
-- update_application_stage: use to set result or stage_date on an EXISTING stage.
-- If the stage already exists with the correct result, do nothing.
+RULES:
+0. PRE-FILTER: Only act when the email clearly signals a new stage or update to an EXISTING STAGE. Pleasantries, account
+OTP codes, etc. do not change the application funnel and should be ignored.
+1. Identify NEXT and/or EXISTING stage(s) in the email. NEXT not in EXISTING STAGES.
+2. To get stage_name follow this Waterfall Search Order:
+    STEP A (preferred names). PREFERRED STAGE NAMES = [Referred, Applied, Recruiter Screen, Team Lead/Manager Screen, Technical Screen,
+    System Design Interview, Onsite Interview, Offer, Rejected]
+    STEP B (existing context). [existing_stage_name]
+    STEP C (fallback). FALLBACK STAGE NAMES = [Interview, Screening]
+3. Use 'add_application_stage' for a NEXT stage not in EXISTING STAGES.
+4. Use 'update_application_stage' to set result, stage_date or existing_stage_name on an EXISTING STAGE.
 
-Scheduling rules:
-- Email contains an explicit date → set stage_date (YYYY-MM-DD).
-- "Round passed" with no date → update prior stage result=Passed and add the next stage with result=Pending.
+EXAMPLES:
+   - CALENDAR INVITE: Update the EXISTING STAGE stage_date only. Do not change the result or existing_stage_name.
+   - IF PASSED: Set the EXISTING STAGE result="Passed". If the email mentions a NEXT stage, add it with result="Pending".
+   - IF REJECTED: Set EXISTING Stage result="Failed". Add the NEXT stage "Rejected" with a stage_date 1 week in the future.
 
-Valid stage values: Referred, Applied, Recruiter Screen, Team Lead/Manager Screen, \
-Technical Screen, System Design Interview, Onsite Interview, Offer, Rejected.
-Valid result values: Pending, Passed, Failed.\
+STRICT CONSTRAINTS:
+- Never create a duplicate stage. If a NEXT stage_name already exists in 'existing_stage_name', do not call
+  'add_application_stage' for it — take no action for that stage.
+- Avoid having multiple of the same stage_date - this is likely a duplicate and should be avoided.
+
+VALID_STAGE_NAMES = [
+    "Referred",
+    "Applied",
+    "Recruiter Screen",
+    "Team Lead/Manager Screen",
+    "Technical Screen",
+    "System Design Interview",
+    "Onsite Interview",
+    "Offer",
+    "Rejected",
+    "Interview",
+    "Screening",
+]
+
+VALID RESULT VALUES:
+Pending, Passed, Failed.
 """
 
 
@@ -76,7 +98,7 @@ def process_stages(
     stages = app_summary.get("stages", [])
     stage_lines = (
         "\n".join(
-            f"  - {s['stage']}: result={s['result']}, date={s['stage_date']}"
+            f"  - {s['existing_stage_name']}: result={s['result']}, date={s['stage_date']}"
             for s in stages
         )
         if stages
