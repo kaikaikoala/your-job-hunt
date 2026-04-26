@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-COPY email-worker/main.py email-worker/config.py email-worker/db.py email-worker/gmail_client.py ./
+COPY email-worker/main.py email-worker/config.py email-worker/db.py email-worker/db_client.py email-worker/gmail_client.py ./
 COPY email-worker/chains/ ./chains/
 
 EXPOSE 8001
