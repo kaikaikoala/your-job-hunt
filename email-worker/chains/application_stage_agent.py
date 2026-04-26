@@ -22,7 +22,7 @@ from chains.tools import (
 logger = logging.getLogger(__name__)
 
 _llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",
+    model="gemini-2.5-flash",
     google_api_key=os.environ.get("GEMINI_API_KEY"),
     temperature=0,
 )
@@ -45,7 +45,10 @@ OTP codes, etc. do not change the application funnel and should be ignored.
 EXAMPLES:
    - CALENDAR INVITE: Update the EXISTING STAGE stage_date only. Do not change the result or existing_stage_name.
    - IF PASSED: Set the EXISTING STAGE result="Passed". If the email mentions a NEXT stage, add it with result="Pending".
+   Example: "Good feedback on your interview today, Please forward your availability for the System Design Interview"
    - IF REJECTED: Set EXISTING Stage result="Failed". Add the NEXT stage "Rejected" with a stage_date 1 week in the future.
+   Example: "Sorry, we will move forward with other applicats"
+   - IF APPLIED: Set the EXISTING STAGE result="Applied". Example: "Thanks for applying"
 
 STRICT CONSTRAINTS:
 - Never create a duplicate stage. If a NEXT stage_name already exists in 'existing_stage_name', do not call

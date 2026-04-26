@@ -28,7 +28,11 @@ Rules:
 - role: extract the job title only if it is explicitly stated in the email body or subject. \
 Do NOT guess or infer — return null if the role is not clearly mentioned.
 - date: extract the most relevant date mentioned in the body (e.g. interview date, \
-deadline). Format as YYYY-MM-DD. \
+deadline). Format as YYYY-MM-DD.
+- job_posting_url: extract any URL that links directly to the job posting or job description. \
+Return null if none is present.
+- salary_range: extract any salary or compensation range mentioned (e.g. "$120k–$150k", \
+"£60,000"). Return null if not mentioned. \
 """
 
 
@@ -36,6 +40,8 @@ class ParsedEmail(BaseModel):
     company: str | None = None
     role: str | None = None
     date: str | None = None
+    job_posting_url: str | None = None
+    salary_range: str | None = None
 
 
 def parse_email(email: dict) -> ParsedEmail:
@@ -58,9 +64,11 @@ def parse_email(email: dict) -> ParsedEmail:
         logger.error("parse_email failed: %s", exc)
         return ParsedEmail()
     logger.info(
-        "parse_email: company=%r role=%r date=%r",
+        "parse_email: company=%r role=%r date=%r job_posting_url=%r salary_range=%r",
         result.company,
         result.role,
         result.date,
+        result.job_posting_url,
+        result.salary_range,
     )
     return result

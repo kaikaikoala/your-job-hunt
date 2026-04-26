@@ -109,7 +109,13 @@ def run_sync(req: SyncRequest):
                         parsed.company,
                     )
                     continue
-                app_id = add_application(req.user_id, parsed.company, parsed.role)
+                app_id = add_application(
+                    req.user_id,
+                    parsed.company,
+                    parsed.role,
+                    parsed.job_posting_url,
+                    parsed.salary_range,
+                )
                 if not app_id:
                     logger.info(
                         "run_sync: add_application returned None for company=%r — skipping",
