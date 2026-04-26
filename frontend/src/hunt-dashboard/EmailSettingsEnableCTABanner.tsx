@@ -77,7 +77,7 @@ export default function EmailSettingsEnableCTABanner() {
 
           <Button
             component={Link}
-            to="/emailsettings"
+            to="/email-settings"
             variant="contained"
             startIcon={
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>

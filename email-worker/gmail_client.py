@@ -63,6 +63,7 @@ def fetch_emails(
     refresh_token: str,
     token_expiry: str | None,
     label: str | None,
+    after: datetime | None = None,
     max_results: int = 100,
 ) -> list[dict]:
     """
@@ -72,8 +73,13 @@ def fetch_emails(
     service = _build_service(access_token, refresh_token, token_expiry)
 
     query_args: dict = {"userId": "me", "maxResults": max_results}
+    q_parts = []
     if label:
-        query_args["q"] = f"label:{label.replace(' ', '-')}"
+        q_parts.append(f"label:{label.replace(' ', '-')}")
+    if after:
+        q_parts.append(f"after:{int(after.timestamp())}")
+    if q_parts:
+        query_args["q"] = " ".join(q_parts)
 
     result = service.users().messages().list(**query_args).execute()
     message_refs = result.get("messages", [])

@@ -33,8 +33,6 @@ export function computeSankeyLinks(
     const sorted = [...app.stages].sort((a: Stage, b: Stage) => {
       if (a.stageDate && b.stageDate)
         return a.stageDate.localeCompare(b.stageDate);
-      if (a.stageDate) return -1;
-      if (b.stageDate) return 1;
       return a.createdAt.localeCompare(b.createdAt);
     });
     for (let i = 1; i < sorted.length; i++) {

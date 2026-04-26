@@ -63,3 +63,24 @@ def update_sync(sync_id: str, update: SyncUpdate) -> None:
     except Exception as exc:
         logger.error("Failed to update email_syncs row sync_id=%s: %s", sync_id, exc, exc_info=True)
         raise
+
+
+def get_last_email_timestamp(user_id: str) -> datetime | None:
+    sql = """
+        SELECT last_email_timestamp
+        FROM email_syncs
+        WHERE user_id = %s
+          AND status = 'completed'
+          AND last_email_timestamp IS NOT NULL
+        ORDER BY completed_at DESC
+        LIMIT 1
+    """
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (user_id,))
+                row = cur.fetchone()
+                return row[0] if row else None
+    except Exception as exc:
+        logger.error("get_last_email_timestamp failed for user_id=%s: %s", user_id, exc)
+        return None

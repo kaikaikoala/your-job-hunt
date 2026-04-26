@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -17,22 +17,46 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchApplication, deleteApplication } from '../api/applications';
-import { fetchStages, updateStage, deleteStage, type Stage, type PatchStageInput } from '../api/stages';
-import { fetchActionItems, updateActionItem, deleteActionItem, type ActionItem } from '../api/actionItems';
-import { fetchContact } from '../api/network';
-import ApplicationStageAddDialog from './ApplicationStageAddDialog';
-import ActionItemAddDialog from './ActionItemAddDialog';
-import ApplicationEditDialog from './ApplicationEditDialog';
-import NavBar from '../shared/NavBar';
-import Footer from '../shared/Footer';
-import { surface, primary, onSurface, onSurfaceVariant, outlineVariant, borderSubtle, error, stageColor } from '../colors';
+} from "@mui/material";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchApplication, deleteApplication } from "../api/applications";
+import {
+  fetchStages,
+  updateStage,
+  deleteStage,
+  type Stage,
+  type PatchStageInput,
+} from "../api/stages";
+import {
+  fetchActionItems,
+  updateActionItem,
+  deleteActionItem,
+  type ActionItem,
+} from "../api/actionItems";
+import { fetchContact } from "../api/network";
+import ApplicationStageAddDialog from "./ApplicationStageAddDialog";
+import ActionItemAddDialog from "./ActionItemAddDialog";
+import ApplicationEditDialog from "./ApplicationEditDialog";
+import NavBar from "../shared/NavBar";
+import Footer from "../shared/Footer";
+import {
+  surface,
+  primary,
+  onSurface,
+  onSurfaceVariant,
+  outlineVariant,
+  borderSubtle,
+  error,
+  stageColor,
+} from "../colors";
 
 function formatDate(iso?: string) {
-  if (!iso) return '—';
-  return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  if (!iso) return "—";
+  return new Date(iso + "T00:00:00").toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export default function ApplicationDetailPage() {
@@ -45,25 +69,25 @@ export default function ApplicationDetailPage() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const { data: app, isLoading: appLoading } = useQuery({
-    queryKey: ['application', id],
+    queryKey: ["application", id],
     queryFn: () => fetchApplication(id!),
     enabled: !!id,
   });
 
   const { data: stages, isLoading: stagesLoading } = useQuery({
-    queryKey: ['stages', id],
+    queryKey: ["stages", id],
     queryFn: () => fetchStages(id!),
     enabled: !!id,
   });
 
   const { data: actionItems, isLoading: actionItemsLoading } = useQuery({
-    queryKey: ['actionItems', { appId: id }],
+    queryKey: ["actionItems", { appId: id }],
     queryFn: () => fetchActionItems({ appId: id }),
     enabled: !!id,
   });
 
   const { data: referrer } = useQuery({
-    queryKey: ['contact', app?.referrerId],
+    queryKey: ["contact", app?.referrerId],
     queryFn: () => fetchContact(app!.referrerId!),
     enabled: !!app?.referrerId,
   });
@@ -71,16 +95,16 @@ export default function ApplicationDetailPage() {
   const deleteMutation = useMutation({
     mutationFn: () => deleteApplication(id!),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['dashboard'] });
-      navigate('/hunt');
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+      navigate("/application-pipeline");
     },
   });
 
   if (appLoading) {
     return (
-      <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
-        <NavBar activeLink="hunt-tracker" />
-        <Box sx={{ display: 'flex', justifyContent: 'center', pt: '96px' }}>
+      <Box sx={{ minHeight: "100vh", bgcolor: surface }}>
+        <NavBar activeLink="application-pipeline" />
+        <Box sx={{ display: "flex", justifyContent: "center", pt: "96px" }}>
           <CircularProgress />
         </Box>
       </Box>
@@ -89,66 +113,158 @@ export default function ApplicationDetailPage() {
 
   if (!app) {
     return (
-      <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
-        <NavBar activeLink="hunt-tracker" />
-        <Box sx={{ textAlign: 'center', pt: '96px' }}>
-          <Typography variant="h6" sx={{ color: onSurfaceVariant }}>Application not found.</Typography>
-          <Button onClick={() => navigate('/hunt')} sx={{ mt: 2 }}>Back to Dashboard</Button>
+      <Box sx={{ minHeight: "100vh", bgcolor: surface }}>
+        <NavBar activeLink="application-pipeline" />
+        <Box sx={{ textAlign: "center", pt: "96px" }}>
+          <Typography variant="h6" sx={{ color: onSurfaceVariant }}>
+            Application not found.
+          </Typography>
+          <Button
+            onClick={() => navigate("/application-pipeline")}
+            sx={{ mt: 2 }}
+          >
+            Back to Dashboard
+          </Button>
         </Box>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
-      <NavBar activeLink="hunt-tracker" />
-      <Box component="main" sx={{ pt: '80px', px: 4, pb: 6, maxWidth: 860, mx: 'auto' }}>
-
+    <Box sx={{ minHeight: "100vh", bgcolor: surface }}>
+      <NavBar activeLink="application-pipeline" />
+      <Box
+        component="main"
+        sx={{ pt: "80px", px: 4, pb: 6, maxWidth: 860, mx: "auto" }}
+      >
         {/* Back */}
         <Button
-          startIcon={<span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>}
-          onClick={() => navigate('/hunt')}
+          startIcon={
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 18 }}
+            >
+              arrow_back
+            </span>
+          }
+          onClick={() => navigate("/application-pipeline")}
           sx={{ mb: 3, color: onSurfaceVariant, fontWeight: 600 }}
         >
           Dashboard
         </Button>
 
         {/* Application metadata */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, mb: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
-            <Typography variant="h5" sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 800, color: onSurface }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            border: `1px solid ${borderSubtle}`,
+            mb: 3,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              mb: 0.5,
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: "Manrope, sans-serif",
+                fontWeight: 800,
+                color: onSurface,
+              }}
+            >
               {app.role}
             </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Box sx={{ display: "flex", gap: 0.5 }}>
               <Tooltip title="Edit">
-                <IconButton size="small" onClick={() => setEditOpen(true)} sx={{ color: onSurfaceVariant }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
+                <IconButton
+                  size="small"
+                  onClick={() => setEditOpen(true)}
+                  sx={{ color: onSurfaceVariant }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: 20 }}
+                  >
+                    edit
+                  </span>
                 </IconButton>
               </Tooltip>
               <Tooltip title="Delete">
-                <IconButton size="small" onClick={() => setDeleteConfirmOpen(true)} sx={{ color: error }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+                <IconButton
+                  size="small"
+                  onClick={() => setDeleteConfirmOpen(true)}
+                  sx={{ color: error }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: 20 }}
+                  >
+                    delete
+                  </span>
                 </IconButton>
               </Tooltip>
             </Box>
           </Box>
-          <Typography sx={{ fontSize: 16, color: onSurfaceVariant, fontWeight: 500, mb: 2 }}>{app.company}</Typography>
+          <Typography
+            sx={{
+              fontSize: 16,
+              color: onSurfaceVariant,
+              fontWeight: 500,
+              mb: 2,
+            }}
+          >
+            {app.company}
+          </Typography>
           <Stack direction="row" spacing={3} flexWrap="wrap">
             {app.salaryRange && (
               <Box>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5 }}>Salary</Typography>
-                <Typography sx={{ fontSize: 14, color: onSurface }}>{app.salaryRange}</Typography>
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: onSurfaceVariant,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Salary
+                </Typography>
+                <Typography sx={{ fontSize: 14, color: onSurface }}>
+                  {app.salaryRange}
+                </Typography>
               </Box>
             )}
             {app.jobPostingUrl && (
               <Box>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5 }}>Job Posting</Typography>
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: onSurfaceVariant,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Job Posting
+                </Typography>
                 <Typography
                   component="a"
                   href={app.jobPostingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  sx={{ fontSize: 14, color: primary, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                  sx={{
+                    fontSize: 14,
+                    color: primary,
+                    textDecoration: "none",
+                    "&:hover": { textDecoration: "underline" },
+                  }}
                 >
                   View posting
                 </Typography>
@@ -156,9 +272,20 @@ export default function ApplicationDetailPage() {
             )}
             {referrer && (
               <Box>
-                <Typography sx={{ fontSize: 11, fontWeight: 700, color: onSurfaceVariant, textTransform: 'uppercase', letterSpacing: 0.5 }}>Referred By</Typography>
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: onSurfaceVariant,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Referred By
+                </Typography>
                 <Typography sx={{ fontSize: 14, color: onSurface }}>
-                  {referrer.name}{referrer.type ? ` · ${referrer.type}` : ''}
+                  {referrer.name}
+                  {referrer.type ? ` · ${referrer.type}` : ""}
                 </Typography>
               </Box>
             )}
@@ -166,9 +293,26 @@ export default function ApplicationDetailPage() {
         </Paper>
 
         {/* Stages timeline */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}` }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: onSurface }}>
+        <Paper
+          elevation={0}
+          sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}` }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "Manrope, sans-serif",
+                fontWeight: 700,
+                fontSize: 16,
+                color: onSurface,
+              }}
+            >
               Stages
             </Typography>
             <Button
@@ -184,19 +328,48 @@ export default function ApplicationDetailPage() {
           {stagesLoading ? (
             <CircularProgress size={24} />
           ) : !stages || stages.length === 0 ? (
-            <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>No stages yet.</Typography>
+            <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>
+              No stages yet.
+            </Typography>
           ) : (
             <Stack spacing={0}>
               {stages.map((s, idx) => (
-                <StageRow key={s.appStageId} stage={s} appId={id!} isLast={idx === stages.length - 1} />
+                <StageRow
+                  key={s.appStageId}
+                  stage={s}
+                  appId={id!}
+                  isLast={idx === stages.length - 1}
+                />
               ))}
             </Stack>
           )}
         </Paper>
         {/* Action items */}
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${borderSubtle}`, mt: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography sx={{ fontFamily: 'Manrope, sans-serif', fontWeight: 700, fontSize: 16, color: onSurface }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            border: `1px solid ${borderSubtle}`,
+            mt: 3,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "Manrope, sans-serif",
+                fontWeight: 700,
+                fontSize: 16,
+                color: onSurface,
+              }}
+            >
               Action Items
             </Typography>
             <Button
@@ -212,7 +385,9 @@ export default function ApplicationDetailPage() {
           {actionItemsLoading ? (
             <CircularProgress size={24} />
           ) : !actionItems || actionItems.length === 0 ? (
-            <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>No action items yet.</Typography>
+            <Typography sx={{ color: onSurfaceVariant, fontSize: 14 }}>
+              No action items yet.
+            </Typography>
           ) : (
             <Stack spacing={0}>
               {actionItems.map((item) => (
@@ -223,28 +398,50 @@ export default function ApplicationDetailPage() {
         </Paper>
       </Box>
 
-      <ApplicationStageAddDialog open={addStageOpen} appId={id!} onClose={() => setAddStageOpen(false)} />
-      <ActionItemAddDialog open={addActionItemOpen} appId={id!} onClose={() => setAddActionItemOpen(false)} />
+      <ApplicationStageAddDialog
+        open={addStageOpen}
+        appId={id!}
+        onClose={() => setAddStageOpen(false)}
+      />
+      <ActionItemAddDialog
+        open={addActionItemOpen}
+        appId={id!}
+        onClose={() => setAddActionItemOpen(false)}
+      />
       <ApplicationEditDialog
         open={editOpen}
         app={app}
         referrer={referrer}
         onClose={() => setEditOpen(false)}
       />
-      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Delete Application?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            This will permanently delete <strong>{app.role}</strong> at <strong>{app.company}</strong> and all its stages. This cannot be undone.
+            This will permanently delete <strong>{app.role}</strong> at{" "}
+            <strong>{app.company}</strong> and all its stages. This cannot be
+            undone.
           </DialogContentText>
           {deleteMutation.isError && (
             <DialogContentText sx={{ color: error, mt: 1, fontSize: 14 }}>
-              Cannot delete — this application has action items. Remove them first.
+              Cannot delete — this application has action items. Remove them
+              first.
             </DialogContentText>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setDeleteConfirmOpen(false); deleteMutation.reset(); }} disabled={deleteMutation.isPending}>
+          <Button
+            onClick={() => {
+              setDeleteConfirmOpen(false);
+              deleteMutation.reset();
+            }}
+            disabled={deleteMutation.isPending}
+          >
             Cancel
           </Button>
           <Button
@@ -253,7 +450,7 @@ export default function ApplicationDetailPage() {
             disabled={deleteMutation.isPending}
             onClick={() => deleteMutation.mutate()}
           >
-            {deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+            {deleteMutation.isPending ? "Deleting…" : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -266,28 +463,31 @@ function ActionItemRow({ item }: { item: ActionItem }) {
   const qc = useQueryClient();
 
   const completeMutation = useMutation({
-    mutationFn: () => updateActionItem(item.actionItemId, { status: item.status === 'open' ? 'completed' : 'open' }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['actionItems'] }),
+    mutationFn: () =>
+      updateActionItem(item.actionItemId, {
+        status: item.status === "open" ? "completed" : "open",
+      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["actionItems"] }),
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteActionItem(item.actionItemId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['actionItems'] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["actionItems"] }),
   });
 
   return (
     <Box
       sx={{
-        display: 'flex',
-        alignItems: 'flex-start',
+        display: "flex",
+        alignItems: "flex-start",
         py: 1,
         borderBottom: `1px solid ${borderSubtle}`,
-        '&:last-child': { borderBottom: 'none' },
+        "&:last-child": { borderBottom: "none" },
       }}
     >
       <Checkbox
         size="small"
-        checked={item.status === 'completed'}
+        checked={item.status === "completed"}
         disabled={completeMutation.isPending}
         onChange={() => completeMutation.mutate()}
         sx={{ mt: -0.5, color: outlineVariant }}
@@ -296,8 +496,9 @@ function ActionItemRow({ item }: { item: ActionItem }) {
         <Typography
           sx={{
             fontSize: 14,
-            color: item.status === 'completed' ? outlineVariant : onSurface,
-            textDecoration: item.status === 'completed' ? 'line-through' : 'none',
+            color: item.status === "completed" ? outlineVariant : onSurface,
+            textDecoration:
+              item.status === "completed" ? "line-through" : "none",
           }}
         >
           {item.description}
@@ -315,25 +516,36 @@ function ActionItemRow({ item }: { item: ActionItem }) {
           disabled={deleteMutation.isPending}
           sx={{ color: error, ml: 1 }}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+            delete
+          </span>
         </IconButton>
       </Tooltip>
     </Box>
   );
 }
 
-function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLast: boolean }) {
+function StageRow({
+  stage,
+  appId,
+  isLast,
+}: {
+  stage: Stage;
+  appId: string;
+  isLast: boolean;
+}) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [editStage, setEditStage] = useState(stage.stage);
-  const [editDate, setEditDate] = useState(stage.stageDate ?? '');
-  const [editResult, setEditResult] = useState(stage.result ?? '');
+  const [editDate, setEditDate] = useState(stage.stageDate ?? "");
+  const [editResult, setEditResult] = useState(stage.result ?? "");
 
   const updateMutation = useMutation({
-    mutationFn: (input: PatchStageInput) => updateStage(appId, stage.appStageId, input),
+    mutationFn: (input: PatchStageInput) =>
+      updateStage(appId, stage.appStageId, input),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['stages', appId] });
-      qc.invalidateQueries({ queryKey: ['applications'] });
+      qc.invalidateQueries({ queryKey: ["stages", appId] });
+      qc.invalidateQueries({ queryKey: ["applications"] });
       setEditing(false);
     },
   });
@@ -341,8 +553,8 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
   const deleteMutation = useMutation({
     mutationFn: () => deleteStage(appId, stage.appStageId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['stages', appId] });
-      qc.invalidateQueries({ queryKey: ['applications'] });
+      qc.invalidateQueries({ queryKey: ["stages", appId] });
+      qc.invalidateQueries({ queryKey: ["applications"] });
     },
   });
 
@@ -350,8 +562,18 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
 
   if (editing) {
     return (
-      <Box sx={{ py: 1.5, borderBottom: isLast ? 'none' : `1px solid ${borderSubtle}` }}>
-        <Stack direction="row" spacing={1.5} alignItems="flex-end" flexWrap="wrap">
+      <Box
+        sx={{
+          py: 1.5,
+          borderBottom: isLast ? "none" : `1px solid ${borderSubtle}`,
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="flex-end"
+          flexWrap="wrap"
+        >
           <TextField
             size="small"
             label="Stage"
@@ -378,16 +600,20 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
           <Button
             size="small"
             variant="contained"
-            disabled={editStage.trim() === '' || updateMutation.isPending}
-            onClick={() => updateMutation.mutate({
-              stage: editStage.trim(),
-              stageDate: editDate || undefined,
-              result: editResult.trim() || undefined,
-            })}
+            disabled={editStage.trim() === "" || updateMutation.isPending}
+            onClick={() =>
+              updateMutation.mutate({
+                stage: editStage.trim(),
+                stageDate: editDate || undefined,
+                result: editResult.trim() || undefined,
+              })
+            }
           >
             Save
           </Button>
-          <Button size="small" onClick={() => setEditing(false)}>Cancel</Button>
+          <Button size="small" onClick={() => setEditing(false)}>
+            Cancel
+          </Button>
         </Stack>
       </Box>
     );
@@ -396,18 +622,30 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
   return (
     <Box
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
         py: 1.5,
-        borderBottom: isLast ? 'none' : `1px solid ${borderSubtle}`,
+        borderBottom: isLast ? "none" : `1px solid ${borderSubtle}`,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color, flexShrink: 0 }} />
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box
+          sx={{
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            bgcolor: color,
+            flexShrink: 0,
+          }}
+        />
         <Box>
-          <Typography sx={{ fontWeight: 600, fontSize: 14, color: onSurface }}>{stage.stage}</Typography>
-          <Typography sx={{ fontSize: 12, color: onSurfaceVariant }}>{formatDate(stage.stageDate)}</Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: 14, color: onSurface }}>
+            {stage.stage}
+          </Typography>
+          <Typography sx={{ fontSize: 12, color: onSurfaceVariant }}>
+            {formatDate(stage.stageDate)}
+          </Typography>
         </Box>
         {stage.result && (
           <Chip
@@ -422,10 +660,19 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
           />
         )}
       </Box>
-      <Box sx={{ display: 'flex', gap: 0.5 }}>
+      <Box sx={{ display: "flex", gap: 0.5 }}>
         <Tooltip title="Edit">
-          <IconButton size="small" onClick={() => setEditing(true)} sx={{ color: onSurfaceVariant }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>edit</span>
+          <IconButton
+            size="small"
+            onClick={() => setEditing(true)}
+            sx={{ color: onSurfaceVariant }}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 18 }}
+            >
+              edit
+            </span>
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete">
@@ -435,7 +682,12 @@ function StageRow({ stage, appId, isLast }: { stage: Stage; appId: string; isLas
             disabled={deleteMutation.isPending}
             sx={{ color: error }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 18 }}
+            >
+              delete
+            </span>
           </IconButton>
         </Tooltip>
       </Box>

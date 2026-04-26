@@ -37,7 +37,7 @@ OTP codes, etc. do not change the application funnel and should be ignored.
 2. To get stage_name follow this Waterfall Search Order:
     STEP A (preferred names). PREFERRED STAGE NAMES = [Referred, Applied, Recruiter Screen, Team Lead/Manager Screen, Technical Screen,
     System Design Interview, Onsite Interview, Offer, Rejected]
-    STEP B (existing context). [existing_stage_name]
+    STEP B (existing context). Reuse a stage name already listed in EXISTING STAGES.
     STEP C (fallback). FALLBACK STAGE NAMES = [Interview, Screening]
 3. Use 'add_application_stage' for a NEXT stage not in EXISTING STAGES.
 4. Use 'update_application_stage' to set result, stage_date or existing_stage_name on an EXISTING STAGE.
@@ -47,7 +47,7 @@ EXAMPLES:
    - IF PASSED: Set the EXISTING STAGE result="Passed". If the email mentions a NEXT stage, add it with result="Pending".
    Example: "Good feedback on your interview today, Please forward your availability for the System Design Interview"
    - IF REJECTED: Set EXISTING Stage result="Failed". Add the NEXT stage "Rejected" with a stage_date 1 week in the future.
-   Example: "Sorry, we will move forward with other applicats"
+   Example: "Sorry, we will move forward with other applicants"
    - IF APPLIED: Set the EXISTING STAGE result="Applied". Example: "Thanks for applying"
 
 STRICT CONSTRAINTS:
@@ -81,7 +81,7 @@ def process_stages(
 ) -> int:
     """
     Run the application stage agent for one email.
-    Returns the number of successful tool calls made (for application_updates counter).
+    Returns the number of tool calls made (for application_updates counter).
     """
 
     @tool
@@ -101,7 +101,7 @@ def process_stages(
     stages = app_summary.get("stages", [])
     stage_lines = (
         "\n".join(
-            f"  - {s['existing_stage_name']}: result={s['result']}, date={s['stage_date']}"
+            f"  - {s['stage']}: result={s['result']}, date={s['stage_date']}"
             for s in stages
         )
         if stages

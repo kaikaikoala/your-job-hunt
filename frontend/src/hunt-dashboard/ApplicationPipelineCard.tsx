@@ -65,7 +65,7 @@ export default function ApplicationPipelineCard() {
           label="See all"
           size="small"
           clickable
-          onClick={() => navigate("/applicationpipeline")}
+          onClick={() => navigate("/application-pipeline")}
           sx={{ fontSize: 11, height: 24 }}
         />
       </Box>

@@ -23,7 +23,7 @@ from chains.tools import (
     get_action_items,
     get_application_summary_by_id,
 )
-from db_client import SyncUpdate, update_sync
+from db_client import SyncUpdate, get_last_email_timestamp, update_sync
 from gmail_client import fetch_emails
 
 logging.basicConfig(
@@ -67,12 +67,16 @@ def run_sync(req: SyncRequest):
     """
     logger.info("run_sync: sync_id=%s user_id=%s", req.sync_id, req.user_id)
 
+    after_ts = get_last_email_timestamp(req.user_id)
+    logger.info("run_sync: sync_id=%s incremental after=%s", req.sync_id, after_ts)
+
     try:
         emails = fetch_emails(
             access_token=req.access_token,
             refresh_token=req.refresh_token,
             token_expiry=req.token_expiry,
             label=req.label,
+            after=after_ts,
         )
     except Exception as exc:
         logger.error("fetch_emails failed for sync_id=%s: %s", req.sync_id, exc)

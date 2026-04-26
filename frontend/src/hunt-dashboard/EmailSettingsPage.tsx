@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import EmailSettingsConnectionCard from "./EmailSettingsConnectionCard";
 import EmailSettingsBetaNotice from "./EmailSettingsBetaNotice";
 import EmailSyncStatsCard from "./EmailSyncStatsCard";
@@ -16,7 +16,7 @@ import {
 } from "../api/emailSettings";
 import Footer from "../shared/Footer";
 import NavBar from "../shared/NavBar";
-import { onSurface, onSurfaceVariant, successDark, surface } from "../colors";
+import { onSurface, onSurfaceVariant, surface } from "../colors";
 
 function Header() {
   return (
@@ -91,7 +91,7 @@ export default function EmailSettingsPage() {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: surface }}>
-      <NavBar />
+      <NavBar activeLink="email-settings" />
 
       <Box
         component="main"

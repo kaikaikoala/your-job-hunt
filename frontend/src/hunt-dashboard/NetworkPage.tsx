@@ -36,7 +36,7 @@ export default function NetworkPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: surface }}>
-      <NavBar activeLink="network" />
+      <NavBar />
 
       <Box component="main" sx={{ pt: '80px', px: 4, pb: 6, maxWidth: 860, mx: 'auto' }}>
         <Box

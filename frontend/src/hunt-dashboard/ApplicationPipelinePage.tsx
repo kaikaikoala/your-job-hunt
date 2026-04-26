@@ -32,7 +32,7 @@ export default function ApplicationPipelinePage() {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: surface }}>
-      <NavBar activeLink="hunt-tracker" />
+      <NavBar activeLink="application-pipeline" />
 
       <Box
         component="main"

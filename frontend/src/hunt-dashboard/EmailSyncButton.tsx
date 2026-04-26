@@ -77,7 +77,7 @@ export default function EmailSyncButton({ onSync }: EmailSyncButtonProps) {
 
   switch (state) {
     case "not-configured":
-      return renderNotConfigured(() => navigate("/emailsettings"));
+      return renderNotConfigured(() => navigate("/email-settings"));
     case "idle":
       return renderIdle(handleSync);
     case "syncing":
