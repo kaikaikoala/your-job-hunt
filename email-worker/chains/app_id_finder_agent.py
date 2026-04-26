@@ -37,13 +37,12 @@ to get all applications for that company.
 to identify the most recently active one closest to the email date.
 4. If no applications exist for this company at all, conclude that no app_id exists.
 
-Respond with ONLY the app_id UUID string if found, or the word "none" if not found. \
-Do not include any other text.\
+Set app_id to the UUID string of the matched application, or null if no match was found.\
 """
 
 
 class _AppIdResult(BaseModel):
-    app_id: str | None = None
+    app_id: str | None = None  # UUID of the matching application, or null if not found
 
 
 def find_app_id(user_id: str, parsed: ParsedEmail) -> str | None:
@@ -68,15 +67,21 @@ def find_app_id(user_id: str, parsed: ParsedEmail) -> str | None:
         f"Email date: {parsed.date or '(unknown)'}"
     )
 
-    agent = create_react_agent(_llm, [get_application, get_application_stages], prompt=_SYSTEM)
+    agent = create_react_agent(
+        _llm,
+        [get_application, get_application_stages],
+        prompt=_SYSTEM,
+        response_format=_AppIdResult,
+    )
     try:
         result = agent.invoke({"messages": [{"role": "user", "content": context}]})
-        answer = result["messages"][-1].content.strip()
-        if answer.lower() == "none" or not answer:
+        structured: _AppIdResult = result["structured_response"]
+        app_id = structured.app_id
+        if not app_id:
             logger.info("find_app_id: no app found for company=%r", parsed.company)
             return None
-        logger.info("find_app_id: app_id=%s for company=%r", answer, parsed.company)
-        return answer
+        logger.info("find_app_id: app_id=%s for company=%r", app_id, parsed.company)
+        return app_id
     except Exception as exc:
         logger.error("find_app_id failed: %s", exc)
         return None

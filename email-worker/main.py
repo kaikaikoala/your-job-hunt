@@ -92,6 +92,8 @@ def run_sync(req: SyncRequest):
         try:
             # 1. Parse email for company, role, date
             parsed = parse_email(email)
+            if not parsed.date:
+                parsed.date = email.get("date", "")
             if not parsed.company:
                 logger.info("run_sync: skipping email — no company extracted")
                 continue
@@ -123,7 +125,9 @@ def run_sync(req: SyncRequest):
             application_updates += process_stages(app_id, email, app_summary)
 
             # 6. Action item agent
-            application_updates += process_action_items(req.user_id, app_id, email, action_items)
+            application_updates += process_action_items(
+                req.user_id, app_id, email, action_items
+            )
 
             emails_processed += 1
         except Exception as exc:

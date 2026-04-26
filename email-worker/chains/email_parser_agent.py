@@ -2,6 +2,7 @@
 EmailParserAgent: extract structured fields from a job-related email.
 Single structured LLM call — no tools.
 """
+
 from __future__ import annotations
 
 import logging
@@ -27,8 +28,7 @@ Rules:
 - role: extract the job title only if it is explicitly stated in the email body or subject. \
 Do NOT guess or infer — return null if the role is not clearly mentioned.
 - date: extract the most relevant date mentioned in the body (e.g. interview date, \
-deadline). Format as YYYY-MM-DD. If no date is mentioned in the body, use the email's \
-received date. Return null if neither is available.\
+deadline). Format as YYYY-MM-DD. \
 """
 
 
@@ -58,6 +58,9 @@ def parse_email(email: dict) -> ParsedEmail:
         logger.error("parse_email failed: %s", exc)
         return ParsedEmail()
     logger.info(
-        "parse_email: company=%r role=%r date=%r", result.company, result.role, result.date
+        "parse_email: company=%r role=%r date=%r",
+        result.company,
+        result.role,
+        result.date,
     )
     return result
