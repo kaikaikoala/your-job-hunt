@@ -25,6 +25,7 @@ data class EmailSyncResponse(
     val completedAt: String?,
     val emailsFetched: Int?,
     val emailsProcessed: Int?,
+    val applicationsUpdated: Int?,
     val errorMessage: String?,
 )
 
@@ -108,6 +109,7 @@ class EmailSyncController(
         completedAt = completedAt?.toString(),
         emailsFetched = emailsFetched,
         emailsProcessed = emailsProcessed,
+        applicationsUpdated = applicationUpdates,
         errorMessage = errorMessage,
     )
 }

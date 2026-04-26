@@ -34,4 +34,7 @@ class EmailSync(
 
     @Column(name = "error_message")
     val errorMessage: String? = null,
+
+    @Column(name = "application_updates")
+    val applicationUpdates: Int? = null,
 )
