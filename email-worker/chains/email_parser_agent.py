@@ -23,14 +23,18 @@ _SYSTEM = """\
 Extract structured information from this job-related email.
 
 Rules:
-- company: infer from the sender email domain or email body. Use the company's common name \
-(e.g. "Stripe" not "stripe.com"). Return null if uncertain.
+- company:
+    1. PRIMARY: Extract from Subject Line (e.g., "Thank you for applying to [Company]").
+    2. SECONDARY: Extract from Body (e.g., "interest in joining [Company]" or "Recruiting Team at [Company]").
+    3. TERTIARY (Domain): Use the sender's email domain ONLY if Steps 1 & 2 fail.
+       - STRIP: Ignore infrastructure domains like greenhouse.io, lever.co, myworkday.com, icims.com, or oracle.com.
+       - TARGET: Extract the brand name (e.g., "lisa@render.com" -> Render).
 - role: extract the job title only if it is explicitly stated in the email body or subject. \
 Do NOT guess or infer — return null if the role is not clearly mentioned.
 - date: extract the most relevant date mentioned in the body (e.g. interview date, \
 deadline). Format as YYYY-MM-DD.
-- job_posting_url: extract any URL that links directly to the job posting or job description. \
-Return null if none is present.
+- job_posting_url: Extract any URL linking directly to the job description or listing.
+    - Exclude: Login links to portals, unsubscribe links, or generic company homepages.
 - salary_range: extract any salary or compensation range mentioned (e.g. "$120k–$150k", \
 "£60,000"). Return null if not mentioned. \
 """
